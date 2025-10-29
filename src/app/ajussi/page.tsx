@@ -1,0 +1,230 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Container } from '@/components/layout/Container'
+import { PageHeader } from '@/components/layout/PageHeader'
+import { SearchFilter, FilterOptions } from '@/components/ajussi/SearchFilter'
+import { AjussiCard } from '@/components/ajussi/AjussiCard'
+import { Loading } from '@/components/ui/Loading'
+import { Button } from '@/components/ui/Button'
+import { useToast } from '@/components/ui/Toast'
+import { AjussiWithProfile } from '@/types/database'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+
+interface ApiResponse {
+  success: boolean
+  data: AjussiWithProfile[]
+  meta: {
+    pagination: {
+      page: number
+      limit: number
+      total: number
+      totalPages: number
+    }
+  }
+}
+
+export default function AjussiListPage() {
+  const [ajussiList, setAjussiList] = useState<AjussiWithProfile[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState<FilterOptions>({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
+  const { error } = useToast()
+
+  const fetchAjussiList = async (page = 1, newFilters = filters) => {
+    try {
+      setLoading(true)
+      
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '12',
+      })
+
+      if (newFilters.search) params.append('search', newFilters.search)
+      if (newFilters.location) params.append('location', newFilters.location)
+      if (newFilters.tags?.length) params.append('tags', newFilters.tags.join(','))
+      if (newFilters.minRate) params.append('minRate', newFilters.minRate.toString())
+      if (newFilters.maxRate) params.append('maxRate', newFilters.maxRate.toString())
+
+      const response = await fetch(`/api/ajussi?${params}`)
+      const data: ApiResponse = await response.json()
+
+      if (data.success) {
+        setAjussiList(data.data)
+        setCurrentPage(data.meta.pagination.page)
+        setTotalPages(data.meta.pagination.totalPages)
+        setTotal(data.meta.pagination.total)
+      } else {
+        error('오류 발생', '아저씨 목록을 불러오는데 실패했습니다.')
+      }
+    } catch (err) {
+      console.error('Error fetching ajussi list:', err)
+      error('오류 발생', '아저씨 목록을 불러오는데 실패했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAjussiList(1, filters)
+    setCurrentPage(1)
+  }, [filters])
+
+  const handleFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters)
+  }
+
+  const handlePageChange = (page: number) => {
+    fetchAjussiList(page, filters)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleFavorite = async (ajussiId: string) => {
+    try {
+      // Check if already favorited (simple implementation)
+      const response = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ajussiId }),
+      })
+      
+      const result = await response.json()
+      if (result.success) {
+        // Refresh the list to update favorite status
+        fetchAjussiList(currentPage, filters)
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err)
+    }
+  }
+
+  return (
+    <>
+      <PageHeader
+        title="아저씨 찾기"
+        description="다양한 활동을 함께할 아저씨를 찾아보세요"
+        breadcrumbs={[
+          { label: '아저씨 찾기' }
+        ]}
+      />
+
+      <Container className="py-8">
+        <div className="space-y-6">
+          {/* Search and Filter */}
+          <SearchFilter
+            onFilterChange={handleFilterChange}
+            initialFilters={filters}
+          />
+
+          {/* Results Summary */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-600">
+              총 <span className="font-semibold text-gray-900">{total}</span>명의 아저씨가 있습니다
+            </p>
+            {Object.keys(filters).length > 0 && (
+              <p className="text-sm text-gray-500">
+                페이지 {currentPage} / {totalPages}
+              </p>
+            )}
+          </div>
+
+          {/* Loading State */}
+          {loading && (
+            <div className="py-12">
+              <Loading size="lg" text="아저씨 목록을 불러오는 중..." />
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && ajussiList.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                검색 결과가 없습니다
+              </h3>
+              <p className="text-gray-600 mb-4">
+                다른 조건으로 검색해보시거나 필터를 조정해보세요.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setFilters({})}
+              >
+                필터 초기화
+              </Button>
+            </div>
+          )}
+
+          {/* Ajussi Grid */}
+          {!loading && ajussiList.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {ajussiList.map((ajussi) => (
+                <AjussiCard
+                  key={ajussi.id}
+                  ajussi={ajussi}
+                  onFavorite={handleFavorite}
+                  showFavorite={true}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && totalPages > 1 && (
+            <div className="flex items-center justify-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage <= 1}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                이전
+              </Button>
+
+              <div className="flex space-x-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum
+                  if (totalPages <= 5) {
+                    pageNum = i + 1
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i
+                  } else {
+                    pageNum = currentPage - 2 + i
+                  }
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                      className="w-10"
+                    >
+                      {pageNum}
+                    </Button>
+                  )
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage >= totalPages}
+              >
+                다음
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            </div>
+          )}
+        </div>
+      </Container>
+    </>
+  )
+}
