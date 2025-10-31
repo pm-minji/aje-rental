@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -9,7 +9,11 @@ import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/components/providers/AuthProvider'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
-import { CheckCircle, Star, Users, Clock, Shield } from 'lucide-react'
+import { CheckCircle, Star, Users, Clock, Shield, RefreshCw, ArrowRight } from 'lucide-react'
+import { AjussiApplication } from '@/types/database'
+import { Badge } from '@/components/ui/Badge'
+import { formatDistanceToNow } from 'date-fns'
+import { ko } from 'date-fns/locale'
 
 export default function BecomeAjussiPage() {
   return (
@@ -23,35 +27,63 @@ function BecomeAjussiContent() {
   const { profile, isAjussi } = useAuth()
   const { success, error } = useToast()
   const [loading, setLoading] = useState(false)
+  const [applicationLoading, setApplicationLoading] = useState(true)
+  const [application, setApplication] = useState<AjussiApplication | null>(null)
   const router = useRouter()
 
-  const handleBecomeAjussi = async () => {
-    try {
-      setLoading(true)
-      
-      // Update user role to ajussi
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          profile: { role: 'ajussi' },
-        }),
-      })
+  useEffect(() => {
+    if (!isAjussi) {
+      fetchApplication()
+    }
+  }, [isAjussi])
 
+  const fetchApplication = async () => {
+    try {
+      setApplicationLoading(true)
+      const response = await fetch('/api/ajussi/application')
       const result = await response.json()
+
       if (result.success) {
-        success('아저씨 등록 완료', '이제 아저씨로 활동할 수 있습니다!')
-        router.push('/mypage/profile')
-      } else {
-        error('등록 실패', result.error || '아저씨 등록에 실패했습니다.')
+        setApplication(result.data)
+      } else if (result.error !== 'No application found') {
+        error('오류 발생', result.error || '신청 내역을 불러오는데 실패했습니다.')
       }
     } catch (err) {
-      console.error('Error becoming ajussi:', err)
-      error('등록 실패', '아저씨 등록 중 오류가 발생했습니다.')
+      console.error('Error fetching application:', err)
+      error('오류 발생', '신청 내역을 불러오는데 실패했습니다.')
     } finally {
-      setLoading(false)
+      setApplicationLoading(false)
+    }
+  }
+
+  const handleBecomeAjussi = async () => {
+    // Redirect to application form
+    router.push('/mypage/ajussi-application')
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return <Badge variant="warning">검토 중</Badge>
+      case 'APPROVED':
+        return <Badge variant="success">승인됨</Badge>
+      case 'REJECTED':
+        return <Badge variant="error">거절됨</Badge>
+      default:
+        return <Badge>{status}</Badge>
+    }
+  }
+
+  const getStatusMessage = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return '관리자가 신청서를 검토 중입니다. 검토 완료까지 1-2일 정도 소요될 수 있습니다.'
+      case 'APPROVED':
+        return '축하합니다! 아저씨로 승인되었습니다. 페이지를 새로고침하면 아저씨 기능을 사용할 수 있습니다.'
+      case 'REJECTED':
+        return '신청이 거절되었습니다. 아래 사유를 확인하고 수정 후 재신청해주세요.'
+      default:
+        return ''
     }
   }
 
@@ -75,7 +107,7 @@ function BecomeAjussiContent() {
               프로필 관리에서 아저씨 정보를 수정하거나 활동 상태를 관리할 수 있습니다.
             </p>
             <Button asChild>
-              <a href="/mypage/profile">프로필 관리하기</a>
+              <a href="/mypage/ajussi">아저씨 프로필 관리</a>
             </Button>
           </div>
         </Container>
@@ -96,6 +128,72 @@ function BecomeAjussiContent() {
 
       <Container className="py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          {/* Application Status Section - Show if user has applied */}
+          {!applicationLoading && application && (
+            <Card className="border-2 border-blue-200 bg-blue-50">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-xl font-semibold text-blue-900 mb-2">아저씨 신청 현황</h2>
+                    <p className="text-sm text-blue-700">
+                      신청일: {formatDistanceToNow(new Date(application.created_at), {
+                        addSuffix: true,
+                        locale: ko,
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {getStatusBadge(application.status)}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={fetchApplication}
+                      className="p-2 text-blue-600 hover:text-blue-800"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <div className="bg-white border border-blue-200 rounded-lg p-4 mb-4">
+                  <p className="text-blue-800 text-sm">
+                    {getStatusMessage(application.status)}
+                  </p>
+                </div>
+
+                {application.admin_notes && (
+                  <div className="bg-white border border-blue-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-medium text-blue-800 mb-2">관리자 메모</h4>
+                    <p className="text-sm text-blue-700">{application.admin_notes}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                  >
+                    <a href="/mypage/application">
+                      상세 내역 보기
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </a>
+                  </Button>
+                  
+                  {application.status === 'REJECTED' && (
+                    <Button
+                      onClick={handleBecomeAjussi}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      다시 신청하기
+                    </Button>
+                  )}
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
           {/* Hero Section */}
           <div className="text-center">
             <div className="text-6xl mb-6">👨‍🏫</div>
@@ -242,26 +340,28 @@ function BecomeAjussiContent() {
           </Card>
 
           {/* CTA */}
-          <div className="text-center">
-            <Card className="bg-primary/5 border-primary/20">
-              <CardBody>
-                <h3 className="text-xl font-semibold mb-4">
-                  지금 바로 아저씨가 되어보세요!
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  등록 후 언제든지 활동을 중단하거나 재개할 수 있습니다.
-                </p>
-                <Button
-                  onClick={handleBecomeAjussi}
-                  loading={loading}
-                  size="lg"
-                  className="px-8"
-                >
-                  아저씨로 등록하기
-                </Button>
-              </CardBody>
-            </Card>
-          </div>
+          {!application && (
+            <div className="text-center">
+              <Card className="bg-primary/5 border-primary/20">
+                <CardBody>
+                  <h3 className="text-xl font-semibold mb-4">
+                    지금 바로 아저씨가 되어보세요!
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    등록 후 언제든지 활동을 중단하거나 재개할 수 있습니다.
+                  </p>
+                  <Button
+                    onClick={handleBecomeAjussi}
+                    loading={loading}
+                    size="lg"
+                    className="px-8"
+                  >
+                    아저씨로 등록하기
+                  </Button>
+                </CardBody>
+              </Card>
+            </div>
+          )}
         </div>
       </Container>
     </>

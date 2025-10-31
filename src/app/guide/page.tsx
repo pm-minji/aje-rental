@@ -19,7 +19,7 @@ export default function GuidePage() {
     <>
       <PageHeader
         title="이용 가이드"
-        description="아저씨 렌탈 서비스를 안전하고 효과적으로 이용하는 방법을 알아보세요"
+        description="나의아저씨 서비스를 안전하고 효과적으로 이용하는 방법을 알아보세요"
         breadcrumbs={[
           { label: '이용 가이드' }
         ]}
@@ -163,7 +163,7 @@ export default function GuidePage() {
                 <CardBody>
                   <h3 className="font-semibold mb-2">Q. 아저씨가 되려면 어떻게 해야 하나요?</h3>
                   <p className="text-gray-600">
-                    회원가입 후 마이페이지에서 '아저씨 되기'를 클릭하여 프로필을 작성하시면 됩니다. 
+                    회원가입 후 마이페이지에서 &apos;아저씨 되기&apos;를 클릭하여 프로필을 작성하시면 됩니다. 
                     간단한 심사 과정을 거쳐 승인됩니다.
                   </p>
                 </CardBody>

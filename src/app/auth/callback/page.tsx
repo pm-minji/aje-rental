@@ -11,44 +11,18 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        const { data, error } = await supabase.auth.getSession()
+        console.log('Auth callback started')
+        console.log('Current URL:', window.location.href)
         
-        if (error) {
-          console.error('Auth callback error:', error)
-          router.push('/auth/login?error=callback_error')
-          return
-        }
-
-        if (data.session?.user) {
-          // Check if profile exists
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', data.session.user.id)
-            .single()
-
-          if (!profile) {
-            // Create profile for new user
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .insert({
-                id: data.session.user.id,
-                email: data.session.user.email!,
-                name: data.session.user.user_metadata?.full_name || data.session.user.email!,
-                profile_image: data.session.user.user_metadata?.avatar_url,
-                role: 'user',
-              })
-
-            if (profileError) {
-              console.error('Error creating profile:', profileError)
-            }
-          }
-
-          // Redirect to home page
-          router.push('/')
-        } else {
-          router.push('/auth/login')
-        }
+        // Wait for AuthProvider to handle the session
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        
+        // Get redirect URL and navigate
+        const urlParams = new URLSearchParams(window.location.search)
+        const redirectTo = urlParams.get('redirect') || '/'
+        console.log('Redirect URL:', redirectTo)
+        
+        router.push(redirectTo)
       } catch (error) {
         console.error('Unexpected error in auth callback:', error)
         router.push('/auth/login?error=unexpected_error')
@@ -56,7 +30,7 @@ export default function AuthCallback() {
     }
 
     handleAuthCallback()
-  }, [router, supabase])
+  }, [router])
 
   return (
     <div className="min-h-screen flex items-center justify-center">

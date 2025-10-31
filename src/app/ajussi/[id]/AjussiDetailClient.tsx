@@ -20,6 +20,7 @@ import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Loading, LoadingPage } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { redirectToLogin } from '@/lib/auth-utils'
 import { RequestModal } from '@/components/request/RequestModal'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { AjussiWithProfile, ReviewWithDetails } from '@/types/database'
@@ -64,7 +65,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
 
   const handleFavorite = async () => {
     if (!isAuthenticated) {
-      error('로그인 필요', '즐겨찾기를 사용하려면 로그인이 필요합니다.')
+      redirectToLogin()
       return
     }
 
@@ -111,7 +112,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
 
   const handleRequestService = () => {
     if (!isAuthenticated) {
-      error('로그인 필요', '서비스 요청을 하려면 로그인이 필요합니다.')
+      redirectToLogin()
       return
     }
     setShowRequestModal(true)

@@ -8,6 +8,8 @@ import { AjussiCard } from '@/components/ajussi/AjussiCard'
 import { Loading } from '@/components/ui/Loading'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { useAuth } from '@/components/providers/AuthProvider'
+import { redirectToLogin } from '@/lib/auth-utils'
 import { AjussiWithProfile } from '@/types/database'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -31,7 +33,29 @@ export default function AjussiListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
-  const { error } = useToast()
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
+  
+  const { isAuthenticated } = useAuth()
+  const { success, error } = useToast()
+
+  const fetchFavorites = async () => {
+    if (!isAuthenticated) {
+      setFavoriteIds(new Set())
+      return
+    }
+
+    try {
+      const response = await fetch('/api/favorites')
+      const result = await response.json()
+      
+      if (result.success) {
+        const ids = new Set<string>(result.data.map((fav: any) => fav.ajussi_id))
+        setFavoriteIds(ids)
+      }
+    } catch (err) {
+      console.error('Error fetching favorites:', err)
+    }
+  }
 
   const fetchAjussiList = async (page = 1, newFilters = filters) => {
     try {
@@ -69,8 +93,9 @@ export default function AjussiListPage() {
 
   useEffect(() => {
     fetchAjussiList(1, filters)
+    fetchFavorites()
     setCurrentPage(1)
-  }, [filters])
+  }, [filters, isAuthenticated])
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters)
@@ -82,8 +107,12 @@ export default function AjussiListPage() {
   }
 
   const handleFavorite = async (ajussiId: string) => {
+    if (!isAuthenticated) {
+      redirectToLogin()
+      return
+    }
+
     try {
-      // Check if already favorited (simple implementation)
       const response = await fetch('/api/favorites', {
         method: 'POST',
         headers: {
@@ -93,12 +122,25 @@ export default function AjussiListPage() {
       })
       
       const result = await response.json()
+      
       if (result.success) {
-        // Refresh the list to update favorite status
-        fetchAjussiList(currentPage, filters)
+        if (result.action === 'added') {
+          success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
+          setFavoriteIds(prev => new Set(Array.from(prev).concat(ajussiId)))
+        } else if (result.action === 'removed') {
+          success('즐겨찾기 해제', '즐겨찾기에서 제거되었습니다.')
+          setFavoriteIds(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(ajussiId)
+            return newSet
+          })
+        }
+      } else {
+        error('오류 발생', result.error || '즐겨찾기 처리 중 오류가 발생했습니다.')
       }
     } catch (err) {
       console.error('Error toggling favorite:', err)
+      error('오류 발생', '즐겨찾기 처리 중 오류가 발생했습니다.')
     }
   }
 
@@ -166,6 +208,7 @@ export default function AjussiListPage() {
                   key={ajussi.id}
                   ajussi={ajussi}
                   onFavorite={handleFavorite}
+                  isFavorited={favoriteIds.has(ajussi.user_id)}
                   showFavorite={true}
                 />
               ))}

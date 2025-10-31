@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, getUser } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const user = await getUser()
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     // Check if ajussi exists
     const { data: ajussi, error: ajussiError } = await supabase
@@ -47,13 +49,29 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (existing) {
-      return NextResponse.json(
-        { success: false, error: 'Already in favorites' },
-        { status: 400 }
-      )
+      // If already favorited, remove it (toggle off)
+      const { error: deleteError } = await supabase
+        .from('favorites')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('ajussi_id', ajussiId)
+
+      if (deleteError) {
+        console.error('Error removing from favorites:', deleteError)
+        return NextResponse.json(
+          { success: false, error: 'Failed to remove from favorites' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({
+        success: true,
+        action: 'removed',
+        message: 'Removed from favorites',
+      })
     }
 
-    // Add to favorites
+    // Add to favorites (toggle on)
     const { data: favorite, error: favoriteError } = await supabase
       .from('favorites')
       .insert({
@@ -73,7 +91,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      action: 'added',
       data: favorite,
+      message: 'Added to favorites',
     })
   } catch (error) {
     console.error('Unexpected error:', error)
@@ -104,7 +124,7 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     const { error } = await supabase
       .from('favorites')
@@ -143,7 +163,7 @@ export async function GET() {
       )
     }
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     const { data: favorites, error } = await supabase
       .from('favorites')

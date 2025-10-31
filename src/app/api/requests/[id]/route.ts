@@ -1,13 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, getUser } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getUser()
+    console.log('PUT /api/requests/[id] - Start')
+    
+    // Try to get user from session
+    const supabase = await createServerSupabase()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    console.log('User from session:', user?.id)
+    console.log('User error:', userError)
+    
     if (!user) {
+      console.log('No user found - Unauthorized')
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
@@ -15,10 +26,13 @@ export async function PUT(
     }
 
     const { id } = params
+    console.log('Request ID:', id)
     const body = await request.json()
+    console.log('Request body:', body)
     const { status } = body
 
     if (!status) {
+      console.log('No status provided')
       return NextResponse.json(
         { success: false, error: 'Status is required' },
         { status: 400 }
@@ -32,8 +46,6 @@ export async function PUT(
         { status: 400 }
       )
     }
-
-    const supabase = createServerSupabase()
 
     // Get the request to check permissions
     const { data: existingRequest, error: fetchError } = await supabase
@@ -105,10 +117,6 @@ export async function PUT(
           name,
           nickname,
           profile_image
-        ),
-        ajussi_profiles!ajussi_id (
-          title,
-          hourly_rate
         )
       `)
       .single()
@@ -121,7 +129,24 @@ export async function PUT(
       )
     }
 
-    // TODO: Send notification to the other party (implement later with Supabase Realtime)
+    // Get ajussi_profiles for the updated request
+    if (updatedRequest) {
+      const { data: ajussiProfile } = await supabase
+        .from('ajussi_profiles')
+        .select('user_id, id, title, hourly_rate, open_chat_url')
+        .eq('user_id', updatedRequest.ajussi_id)
+        .single()
+
+      const requestWithProfile = {
+        ...updatedRequest,
+        ajussi_profiles: ajussiProfile || null
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: requestWithProfile,
+      })
+    }
 
     return NextResponse.json({
       success: true,
@@ -150,7 +175,7 @@ export async function GET(
     }
 
     const { id } = params
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     const { data: requestData, error } = await supabase
       .from('requests')
@@ -167,10 +192,6 @@ export async function GET(
           name,
           nickname,
           profile_image
-        ),
-        ajussi_profiles!ajussi_id (
-          title,
-          hourly_rate
         )
       `)
       .eq('id', id)
@@ -184,9 +205,21 @@ export async function GET(
       )
     }
 
+    // Get ajussi_profiles for the request
+    const { data: ajussiProfile } = await supabase
+      .from('ajussi_profiles')
+      .select('user_id, id, title, hourly_rate, open_chat_url')
+      .eq('user_id', requestData.ajussi_id)
+      .single()
+
+    const requestWithProfile = {
+      ...requestData,
+      ajussi_profiles: ajussiProfile || null
+    }
+
     return NextResponse.json({
       success: true,
-      data: requestData,
+      data: requestWithProfile,
     })
   } catch (error) {
     console.error('Unexpected error:', error)

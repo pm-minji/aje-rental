@@ -9,7 +9,7 @@ export interface Database {
           nickname: string | null;
           profile_image: string | null;
           introduction: string | null;
-          role: 'user' | 'ajussi';
+          role: 'user' | 'ajussi' | 'admin';
           created_at: string;
           updated_at: string;
         };
@@ -72,6 +72,24 @@ export interface Database {
         Insert: Omit<Database['public']['Tables']['favorites']['Row'], 'id' | 'created_at'>;
         Update: Partial<Database['public']['Tables']['favorites']['Insert']>;
       };
+      ajussi_applications: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          description: string;
+          hourly_rate: number;
+          available_areas: string[];
+          open_chat_url: string;
+          tags: string[];
+          status: 'PENDING' | 'APPROVED' | 'REJECTED';
+          admin_notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['ajussi_applications']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['ajussi_applications']['Insert']>;
+      };
     };
   };
 }
@@ -82,6 +100,7 @@ export type AjussiProfile = Database['public']['Tables']['ajussi_profiles']['Row
 export type Request = Database['public']['Tables']['requests']['Row'];
 export type Review = Database['public']['Tables']['reviews']['Row'];
 export type Favorite = Database['public']['Tables']['favorites']['Row'];
+export type AjussiApplication = Database['public']['Tables']['ajussi_applications']['Row'];
 
 export type RequestStatus = Request['status'];
 

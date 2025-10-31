@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -12,7 +14,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '12')
     const search = searchParams.get('search')
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
     
     let query = supabase
       .from('ajussi_profiles')
@@ -45,8 +47,10 @@ export async function GET(request: NextRequest) {
       query = query.lte('hourly_rate', parseInt(maxRate))
     }
 
-    // Search filter
+    // Search filter - we'll filter after getting the data
+    // For now, just search in title and description
     if (search) {
+      console.log('Search query:', search)
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
     }
 

@@ -21,36 +21,43 @@ export default function ProtectedRoute({
   useEffect(() => {
     if (!loading) {
       if (!isAuthenticated) {
-        router.push('/auth/login')
+        console.log('ProtectedRoute: User not authenticated, redirecting to login')
+        router.replace('/auth/login')
         return
       }
 
       if (requireAjussi && !isAjussi) {
-        router.push('/') // Redirect to home if not ajussi
+        console.log('ProtectedRoute: User not ajussi, redirecting to home')
+        router.replace('/') // Redirect to home if not ajussi
         return
       }
     }
   }, [isAuthenticated, isAjussi, loading, requireAjussi, router])
 
+  // Show loading while auth state is being determined
   if (loading) {
     return (
       fallback || (
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-gray-600">로딩 중...</p>
+            <p className="text-gray-600">인증 확인 중...</p>
           </div>
         </div>
       )
     )
   }
 
+  // If not authenticated, show nothing (redirect will happen in useEffect)
   if (!isAuthenticated) {
-    return null // Will redirect in useEffect
+    console.log('ProtectedRoute: Rendering null for unauthenticated user')
+    return null
   }
 
+  // If ajussi required but user is not ajussi, show nothing (redirect will happen in useEffect)
   if (requireAjussi && !isAjussi) {
-    return null // Will redirect in useEffect
+    console.log('ProtectedRoute: Rendering null for non-ajussi user')
+    return null
   }
 
   return <>{children}</>

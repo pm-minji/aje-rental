@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     const { id } = params
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     // Get ajussi profile with user info
     const { data: ajussi, error: ajussiError } = await supabase

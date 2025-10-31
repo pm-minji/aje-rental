@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -91,11 +91,16 @@ export function useToast() {
 
 function ToastContainer() {
   const { toasts } = useToast()
+  const [mounted, setMounted] = useState(false)
 
-  if (typeof window === 'undefined') return null
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted || typeof window === 'undefined') return null
 
   return createPortal(
-    <div className="fixed top-4 right-4 z-50 space-y-2">
+    <div className="fixed top-4 right-4 z-50 space-y-4 w-80">
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} />
       ))}
@@ -133,7 +138,7 @@ function ToastItem({ toast }: { toast: Toast }) {
   return (
     <div
       className={cn(
-        'max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden',
+        'w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden',
         'animate-in slide-in-from-top-2 fade-in-0 duration-300'
       )}
     >
@@ -142,12 +147,12 @@ function ToastItem({ toast }: { toast: Toast }) {
           <div className="flex-shrink-0">
             <Icon className={cn('h-5 w-5', iconColors[toast.type])} />
           </div>
-          <div className="ml-3 w-0 flex-1">
-            <p className="text-sm font-medium text-gray-900">
+          <div className="ml-3 flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
               {toast.title}
             </p>
             {toast.message && (
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis">
                 {toast.message}
               </p>
             )}

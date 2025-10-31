@@ -5,7 +5,7 @@ type Tables = Database['public']['Tables']
 
 // Profile operations
 export const getProfile = async (userId: string): Promise<Profile | null> => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -41,7 +41,7 @@ export const getAjussiProfiles = async (filters?: {
   limit?: number
   offset?: number
 }) => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   let query = supabase
     .from('ajussi_profiles')
     .select(`
@@ -85,7 +85,7 @@ export const getAjussiProfiles = async (filters?: {
 }
 
 export const getAjussiProfile = async (userId: string) => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from('ajussi_profiles')
     .select(`
@@ -105,7 +105,7 @@ export const getAjussiProfile = async (userId: string) => {
 }
 
 export const getAjussiProfileById = async (profileId: string) => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from('ajussi_profiles')
     .select(`
@@ -137,7 +137,7 @@ export const createRequest = async (requestData: Tables['requests']['Insert']) =
 }
 
 export const getUserRequests = async (userId: string, type: 'sent' | 'received') => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   const column = type === 'sent' ? 'client_id' : 'ajussi_id'
   
   const { data, error } = await supabase
@@ -186,7 +186,7 @@ export const updateRequestStatus = async (
 
 // Review operations
 export const getAjussiReviews = async (ajussiId: string) => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from('reviews')
     .select(`
@@ -221,7 +221,7 @@ export const createReview = async (reviewData: Tables['reviews']['Insert']) => {
 
 // Favorite operations
 export const getUserFavorites = async (userId: string) => {
-  const supabase = createServerSupabase()
+  const supabase = await createServerSupabase()
   const { data, error } = await supabase
     .from('favorites')
     .select(`

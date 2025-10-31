@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Calendar, Clock, MapPin, User, MessageCircle, ExternalLink } from 'lucide-react'
+import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -30,6 +31,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
   const handleStatusChange = async (newStatus: string) => {
     try {
       setLoading(true)
+      console.log('Changing status:', { requestId: request.id, newStatus })
       await onStatusChange(request.id, newStatus)
       success(
         '상태 변경 완료',
@@ -38,7 +40,8 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
       setShowConfirmModal(false)
       setPendingAction(null)
     } catch (err) {
-      error('오류 발생', '상태 변경 중 오류가 발생했습니다.')
+      console.error('Status change error:', err)
+      error('오류 발생', `상태 변경 중 오류가 발생했습니다: ${err instanceof Error ? err.message : '알 수 없는 오류'}`)
     } finally {
       setLoading(false)
     }
@@ -54,7 +57,9 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
     }
   }
 
-  const openConfirmModal = (action: string) => {
+  const openConfirmModal = (action: string, e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
     setPendingAction(action)
     setShowConfirmModal(true)
   }
@@ -70,7 +75,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               key="cancel"
               variant="outline"
               size="sm"
-              onClick={() => openConfirmModal('CANCELLED')}
+              onClick={(e) => openConfirmModal('CANCELLED', e)}
             >
               취소하기
             </Button>
@@ -82,14 +87,14 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               key="reject"
               variant="outline"
               size="sm"
-              onClick={() => openConfirmModal('REJECTED')}
+              onClick={(e) => openConfirmModal('REJECTED', e)}
             >
               거절하기
             </Button>,
             <Button
               key="confirm"
               size="sm"
-              onClick={() => openConfirmModal('CONFIRMED')}
+              onClick={(e) => openConfirmModal('CONFIRMED', e)}
             >
               수락하기
             </Button>
@@ -102,12 +107,13 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
           <Button
             key="complete"
             size="sm"
-            onClick={() => openConfirmModal('COMPLETED')}
+            onClick={(e) => openConfirmModal('COMPLETED', e)}
           >
             완료하기
           </Button>
         )
-        if (request.ajussi_profiles?.open_chat_url) {
+        // 채팅하기 버튼은 클라이언트(유저)에게만 표시
+        if (isClient && request.ajussi_profiles?.open_chat_url) {
           buttons.push(
             <Button
               key="chat"
@@ -173,9 +179,28 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
 
   const modalContent = getConfirmModalContent()
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons
+    if ((e.target as HTMLElement).closest('button')) {
+      return
+    }
+    
+    if (isClient) {
+      // Navigate to specific ajussi detail page
+      const ajussiId = request.ajussi_id
+      if (ajussiId) {
+        window.location.href = `/ajussi/${ajussiId}`
+      }
+    }
+  }
+
   return (
     <>
-      <Card hover>
+      <Card 
+        hover 
+        className={`${isClient ? 'cursor-pointer' : ''}`}
+        onClick={isClient ? handleCardClick : undefined}
+      >
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between">

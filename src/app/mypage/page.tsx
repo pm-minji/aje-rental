@@ -31,12 +31,25 @@ function MyPageContent() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">프로필 관리</h2>
             <p className="text-gray-600 mb-4">
-              개인정보 및 프로필을 수정할 수 있습니다.
+              개인정보 및 기본 프로필을 수정할 수 있습니다.
             </p>
             <Button asChild>
               <Link href="/mypage/profile">프로필 수정</Link>
             </Button>
           </div>
+
+          {/* 아저씨 전용 */}
+          {isAjussi && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4">아저씨 프로필</h2>
+              <p className="text-gray-600 mb-4">
+                아저씨 서비스 정보와 활동 상태를 관리하세요.
+              </p>
+              <Button asChild variant="secondary">
+                <Link href="/mypage/ajussi">아저씨 설정</Link>
+              </Button>
+            </div>
+          )}
 
           {/* 의뢰 관리 */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -49,18 +62,7 @@ function MyPageContent() {
             </Button>
           </div>
 
-          {/* 아저씨 전용 */}
-          {isAjussi && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">아저씨 관리</h2>
-              <p className="text-gray-600 mb-4">
-                아저씨 프로필과 활동 상태를 관리하세요.
-              </p>
-              <Button asChild variant="secondary">
-                <Link href="/mypage/ajussi">아저씨 설정</Link>
-              </Button>
-            </div>
-          )}
+
 
           {/* 즐겨찾기 */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -84,6 +86,8 @@ function MyPageContent() {
             </Button>
           </div>
 
+
+
           {/* 일반 사용자가 아저씨 되기 */}
           {!isAjussi && (
             <div className="bg-primary/5 border border-primary/20 rounded-lg shadow p-6">
@@ -98,18 +102,7 @@ function MyPageContent() {
           )}
         </div>
 
-        {/* 계정 설정 */}
-        <div className="mt-8 bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">계정 설정</h2>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button variant="outline" asChild>
-              <Link href="/mypage/settings">설정</Link>
-            </Button>
-            <Button variant="destructive" asChild>
-              <Link href="/mypage/delete-account">계정 삭제</Link>
-            </Button>
-          </div>
-        </div>
+
       </div>
     </div>
   )

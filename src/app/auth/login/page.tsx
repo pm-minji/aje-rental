@@ -14,7 +14,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push('/')
+      const redirectTo = searchParams.get('redirect') || '/'
+      router.push(redirectTo)
     }
 
     // Check for error in URL params

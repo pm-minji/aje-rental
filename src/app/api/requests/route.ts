@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, getUser } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     const user = await getUser()
@@ -33,7 +35,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     // Check if ajussi exists and is active
     const { data: ajussi, error: ajussiError } = await supabase
@@ -82,10 +84,6 @@ export async function POST(request: NextRequest) {
           name,
           nickname,
           profile_image
-        ),
-        ajussi_profiles!ajussi_id (
-          title,
-          hourly_rate
         )
       `)
       .single()
@@ -115,7 +113,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUser()
+    // Try to get user from session directly
+    const supabase = await createServerSupabase()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    
+    console.log('GET /api/requests - User:', user?.id)
+    console.log('GET /api/requests - Error:', userError)
+    
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -129,8 +133,6 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const supabase = createServerSupabase()
-    
     let query = supabase
       .from('requests')
       .select(`
@@ -146,10 +148,6 @@ export async function GET(request: NextRequest) {
           name,
           nickname,
           profile_image
-        ),
-        ajussi_profiles!ajussi_id (
-          title,
-          hourly_rate
         )
       `)
 
@@ -174,7 +172,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1)
       .order('created_at', { ascending: false })
 
-    const { data, error } = await query
+    const { data: requests, error } = await query
 
     if (error) {
       console.error('Error fetching requests:', error)
@@ -184,9 +182,29 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Get ajussi_profiles for each request
+    if (requests && requests.length > 0) {
+      const ajussiIds = requests.map(req => req.ajussi_id)
+      const { data: ajussiProfiles } = await supabase
+        .from('ajussi_profiles')
+        .select('user_id, id, title, hourly_rate, open_chat_url')
+        .in('user_id', ajussiIds)
+
+      // Add ajussi_profiles to each request
+      const requestsWithProfiles = requests.map(request => ({
+        ...request,
+        ajussi_profiles: ajussiProfiles?.find(profile => profile.user_id === request.ajussi_id) || null
+      }))
+
+      return NextResponse.json({
+        success: true,
+        data: requestsWithProfiles,
+      })
+    }
+
     return NextResponse.json({
       success: true,
-      data: data || [],
+      data: requests || [],
     })
   } catch (error) {
     console.error('Unexpected error:', error)

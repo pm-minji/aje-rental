@@ -1,9 +1,99 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/layout/Container'
+import { AjussiCard } from '@/components/ajussi/AjussiCard'
+import { Loading } from '@/components/ui/Loading'
+import { useAuth } from '@/components/providers/AuthProvider'
+import { useToast } from '@/components/ui/Toast'
+import { redirectToLogin } from '@/lib/auth-utils'
 import Link from 'next/link'
-import { Star, Users, Clock, Shield } from 'lucide-react'
+import { Star, Users, Clock, Shield, ArrowRight } from 'lucide-react'
+import { AjussiWithProfile } from '@/types/database'
 
 export default function Home() {
+  const [featuredAjussi, setFeaturedAjussi] = useState<AjussiWithProfile[]>([])
+  const [loading, setLoading] = useState(true)
+  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
+  const { isAuthenticated } = useAuth()
+  const { success, error } = useToast()
+
+  const fetchFavorites = async () => {
+    if (!isAuthenticated) {
+      setFavoriteIds(new Set())
+      return
+    }
+
+    try {
+      const response = await fetch('/api/favorites')
+      const result = await response.json()
+      
+      if (result.success) {
+        const ids = new Set<string>(result.data.map((fav: any) => fav.ajussi_id))
+        setFavoriteIds(ids)
+      }
+    } catch (err) {
+      console.error('Error fetching favorites:', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchFeaturedAjussi()
+    fetchFavorites()
+  }, [isAuthenticated])
+
+  const fetchFeaturedAjussi = async () => {
+    try {
+      const response = await fetch('/api/ajussi?limit=6&sort=rating')
+      const result = await response.json()
+      if (result.success && result.data) {
+        setFeaturedAjussi(result.data)
+      }
+    } catch (error) {
+      console.error('Error fetching featured ajussi:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFavorite = async (ajussiId: string) => {
+    if (!isAuthenticated) {
+      redirectToLogin()
+      return
+    }
+
+    try {
+      const response = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ajussiId }),
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        if (result.action === 'added') {
+          success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
+          setFavoriteIds(prev => new Set([...prev, ajussiId]))
+        } else if (result.action === 'removed') {
+          success('즐겨찾기 해제', '즐겨찾기에서 제거되었습니다.')
+          setFavoriteIds(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(ajussiId)
+            return newSet
+          })
+        }
+      } else {
+        error('오류 발생', result.error || '즐겨찾기 처리 중 오류가 발생했습니다.')
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err)
+      error('오류 발생', '즐겨찾기 처리 중 오류가 발생했습니다.')
+    }
+  }
   return (
     <>
       {/* Hero Section */}
@@ -11,7 +101,7 @@ export default function Home() {
         <Container>
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              아저씨 렌탈 서비스
+              나의아저씨
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
               산책, 대화, 조언 등 다양한 활동을 함께할 아저씨를 찾아보세요.<br />
@@ -155,6 +245,55 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </Container>
+      </section>
+
+      {/* Featured Ajussi Section */}
+      <section className="py-16 lg:py-24 bg-white">
+        <Container>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              인기 아저씨들
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              높은 평점과 좋은 리뷰를 받은 아저씨들을 만나보세요
+            </p>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <Loading size="lg" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                {featuredAjussi && featuredAjussi.length > 0 ? (
+                  featuredAjussi.map((ajussi) => (
+                    <AjussiCard 
+                      key={ajussi.id} 
+                      ajussi={ajussi} 
+                      onFavorite={handleFavorite}
+                      isFavorited={favoriteIds.has(ajussi.user_id)}
+                      showFavorite={true}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-12 text-gray-500">
+                    <p>아직 등록된 아저씨가 없습니다.</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="text-center">
+                <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3">
+                  <Link href="/ajussi" className="flex items-center">
+                    더 많은 아저씨 보기
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
+            </>
+          )}
         </Container>
       </section>
 

@@ -83,6 +83,7 @@ function RequestsContent() {
 
   const handleStatusChange = async (requestId: string, newStatus: string) => {
     try {
+      console.log('API call:', { requestId, newStatus })
       const response = await fetch(`/api/requests/${requestId}`, {
         method: 'PUT',
         headers: {
@@ -91,7 +92,10 @@ function RequestsContent() {
         body: JSON.stringify({ status: newStatus }),
       })
 
+      console.log('API response status:', response.status)
       const result = await response.json()
+      console.log('API response data:', result)
+      
       if (!result.success) {
         throw new Error(result.error)
       }
@@ -99,6 +103,7 @@ function RequestsContent() {
       // Refresh the requests
       await fetchRequests()
     } catch (err) {
+      console.error('handleStatusChange error:', err)
       throw err
     }
   }

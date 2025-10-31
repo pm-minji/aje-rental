@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, getUser } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     const user = await getUser()
@@ -11,7 +13,7 @@ export async function GET() {
       )
     }
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
@@ -71,13 +73,14 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const { profile: profileData, ajussiProfile: ajussiProfileData } = body
 
-    const supabase = createServerSupabase()
+    const supabase = await createServerSupabase()
 
     // Update main profile
     if (profileData) {
       const updateData: any = {
         nickname: profileData.nickname,
         introduction: profileData.introduction,
+        profile_image: profileData.profile_image,
       }
       
       // Allow role change only from user to ajussi
@@ -169,9 +172,42 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // Fetch updated profile data
+    const { data: updatedProfile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+
+    if (fetchError) {
+      console.error('Error fetching updated profile:', fetchError)
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch updated profile' },
+        { status: 500 }
+      )
+    }
+
+    // Get updated ajussi profile if exists
+    let updatedAjussiProfile = null
+    if (updatedProfile.role === 'ajussi') {
+      const { data, error } = await supabase
+        .from('ajussi_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!error) {
+        updatedAjussiProfile = data
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Profile updated successfully',
+      data: {
+        profile: updatedProfile,
+        ajussiProfile: updatedAjussiProfile,
+      },
     })
   } catch (error) {
     console.error('Unexpected error:', error)

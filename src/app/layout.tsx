@@ -6,18 +6,19 @@ import Footer from '@/components/layout/Footer'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { ToastProvider } from '@/components/ui/Toast'
+import AuthLoadingWrapper from '@/components/auth/AuthLoadingWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    default: '아저씨 렌탈 서비스',
-    template: '%s | 아저씨 렌탈 서비스',
+    default: '나의아저씨',
+    template: '%s | 나의아저씨',
   },
   description: '다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
   keywords: ['아저씨', '렌탈', '산책', '대화', '조언', '멘토링', '동행', '서울', '활동', '만남'],
-  authors: [{ name: '아저씨 렌탈 서비스' }],
-  creator: '아저씨 렌탈 서비스',
+  authors: [{ name: '나의아저씨' }],
+  creator: '나의아저씨',
   metadataBase: new URL('https://ajussi-rental.com'),
   alternates: {
     canonical: '/',
@@ -26,13 +27,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     url: 'https://ajussi-rental.com',
-    title: '아저씨 렌탈 서비스',
+    title: '나의아저씨',
     description: '다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
-    siteName: '아저씨 렌탈 서비스',
+    siteName: '나의아저씨',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '아저씨 렌탈 서비스',
+    title: '나의아저씨',
     description: '다양한 활동을 함께할 아저씨를 찾아보세요',
   },
   robots: {
@@ -62,13 +63,15 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>
-              <div className="min-h-screen flex flex-col bg-gray-50">
-                <Header />
-                <main className="flex-1 bg-white">
-                  {children}
-                </main>
-                <Footer />
-              </div>
+              <AuthLoadingWrapper>
+                <div className="min-h-screen flex flex-col bg-gray-50">
+                  <Header />
+                  <main className="flex-1 bg-white">
+                    {children}
+                  </main>
+                  <Footer />
+                </div>
+              </AuthLoadingWrapper>
             </AuthProvider>
           </ToastProvider>
         </ErrorBoundary>

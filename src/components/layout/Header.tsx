@@ -4,11 +4,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { Button } from '@/components/ui/Button'
-import { Menu, X, User, LogOut, Settings, Heart } from 'lucide-react'
+import { Menu, X, User, LogOut, Settings, Heart, Shield } from 'lucide-react'
 
 export default function Header() {
   const { isAuthenticated, profile, signOut, loading, isAjussi } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const isAdmin = profile?.role === 'admin'
 
   const handleSignOut = async () => {
     try {
@@ -33,7 +34,7 @@ export default function Header() {
             className="text-xl font-bold text-primary hover:text-primary/80 transition-colors"
             onClick={closeMobileMenu}
           >
-            아저씨 렌탈
+            나의아저씨
           </Link>
           
           {/* Desktop Navigation */}
@@ -61,6 +62,14 @@ export default function Header() {
                 <span className="text-sm text-gray-600 hidden lg:block">
                   안녕하세요, {profile?.nickname || profile?.name}님
                 </span>
+                {isAdmin && (
+                  <Link 
+                    href="/admin" 
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    관리자
+                  </Link>
+                )}
                 <Link 
                   href="/mypage" 
                   className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -153,6 +162,17 @@ export default function Header() {
                   </div>
 
                   {/* Menu Items */}
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                      onClick={closeMobileMenu}
+                    >
+                      <Shield className="h-4 w-4 mr-3" />
+                      관리자
+                    </Link>
+                  )}
+                  
                   <Link
                     href="/mypage"
                     className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
