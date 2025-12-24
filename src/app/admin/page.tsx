@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/Button'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
@@ -193,11 +193,11 @@ function AdminContent() {
 
           {applications.length === 0 ? (
             <Card>
-              <CardBody>
+              <CardContent>
                 <div className="text-center py-8">
                   <p className="text-gray-500">신청서가 없습니다.</p>
                 </div>
-              </CardBody>
+              </CardContent>
             </Card>
           ) : (
             <div className="space-y-4">
@@ -219,7 +219,7 @@ function AdminContent() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardBody>
+                  <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <h4 className="font-medium text-gray-700 mb-1">서비스 설명</h4>
@@ -296,7 +296,7 @@ function AdminContent() {
                         </Button>
                       </div>
                     )}
-                  </CardBody>
+                  </CardContent>
                 </Card>
               ))}
             </div>

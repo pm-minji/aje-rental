@@ -16,7 +16,7 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Loading, LoadingPage } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -262,7 +262,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                   리뷰 ({reviewCount})
                 </h2>
               </CardHeader>
-              <CardBody>
+              <CardContent>
                 {reviews.length > 0 ? (
                   <div className="space-y-4">
                     {reviews.map((review) => (
@@ -314,7 +314,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                     <p className="text-sm">첫 번째 리뷰를 남겨보세요!</p>
                   </div>
                 )}
-              </CardBody>
+              </CardContent>
             </Card>
           </div>
 
@@ -325,7 +325,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
               <CardHeader>
                 <h3 className="text-lg font-semibold">서비스 정보</h3>
               </CardHeader>
-              <CardBody className="space-y-4">
+              <CardContent className="space-y-4">
                 <div className="flex items-center text-lg font-semibold text-primary">
                   <Clock className="h-5 w-5 mr-2" />
                   {formatCurrency(ajussi.hourly_rate)}/시간
@@ -363,7 +363,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                     서비스 요청하기
                   </Button>
                 </div>
-              </CardBody>
+              </CardContent>
             </Card>
 
             {/* Notice Card */}
@@ -374,14 +374,14 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                   <h3 className="font-medium">이용 안내</h3>
                 </div>
               </CardHeader>
-              <CardBody>
+              <CardContent>
                 <ul className="text-sm text-gray-600 space-y-2">
                   <li>• 서비스 이용 전 오픈채팅으로 사전 문의를 권장합니다.</li>
                   <li>• 공개된 장소에서 만나시기를 권장합니다.</li>
                   <li>• 서비스 이용 후 리뷰를 남겨주세요.</li>
                   <li>• 문제 발생 시 고객센터로 연락해주세요.</li>
                 </ul>
-              </CardBody>
+              </CardContent>
             </Card>
           </div>
         </div>

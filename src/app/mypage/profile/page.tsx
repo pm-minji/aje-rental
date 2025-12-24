@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Form, FormField, FormGroup, FormActions } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
@@ -166,7 +166,7 @@ function ProfileContent() {
             <CardHeader>
               <h2 className="text-xl font-semibold">기본 정보</h2>
             </CardHeader>
-            <CardBody>
+            <CardContent>
               <Form onSubmit={profileForm.handleSubmit(handleSaveProfile)}>
                 <FormGroup>
                   <FormField>
@@ -223,7 +223,7 @@ function ProfileContent() {
                   </Button>
                 </FormActions>
               </Form>
-            </CardBody>
+            </CardContent>
           </Card>
 
 
@@ -233,7 +233,7 @@ function ProfileContent() {
             <CardHeader>
               <h2 className="text-xl font-semibold text-red-600">계정 관리</h2>
             </CardHeader>
-            <CardBody>
+            <CardContent>
               <div className="space-y-4">
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                   <h3 className="font-medium text-red-800 mb-2">계정 삭제</h3>
@@ -250,7 +250,7 @@ function ProfileContent() {
                   </Button>
                 </div>
               </div>
-            </CardBody>
+            </CardContent>
           </Card>
         </div>
       </Container>

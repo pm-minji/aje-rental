@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -155,7 +155,7 @@ function BecomeAjussiContent() {
                   </div>
                 </div>
               </CardHeader>
-              <CardBody>
+              <CardContent>
                 <div className="bg-white border border-blue-200 rounded-lg p-4 mb-4">
                   <p className="text-blue-800 text-sm">
                     {getStatusMessage(application.status)}
@@ -190,7 +190,7 @@ function BecomeAjussiContent() {
                     </Button>
                   )}
                 </div>
-              </CardBody>
+              </CardContent>
             </Card>
           )}
 
@@ -209,7 +209,7 @@ function BecomeAjussiContent() {
           {/* Benefits */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="text-center">
-              <CardBody>
+              <CardContent>
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Star className="h-8 w-8 text-primary" />
                 </div>
@@ -217,11 +217,11 @@ function BecomeAjussiContent() {
                 <p className="text-sm text-gray-600">
                   다른 사람들에게 도움을 주며 보람을 느껴보세요
                 </p>
-              </CardBody>
+              </CardContent>
             </Card>
 
             <Card className="text-center">
-              <CardBody>
+              <CardContent>
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Clock className="h-8 w-8 text-primary" />
                 </div>
@@ -229,11 +229,11 @@ function BecomeAjussiContent() {
                 <p className="text-sm text-gray-600">
                   원하는 시간에 원하는 만큼 활동할 수 있습니다
                 </p>
-              </CardBody>
+              </CardContent>
             </Card>
 
             <Card className="text-center">
-              <CardBody>
+              <CardContent>
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-primary" />
                 </div>
@@ -241,11 +241,11 @@ function BecomeAjussiContent() {
                 <p className="text-sm text-gray-600">
                   다양한 사람들과 만나며 인맥을 넓혀보세요
                 </p>
-              </CardBody>
+              </CardContent>
             </Card>
 
             <Card className="text-center">
-              <CardBody>
+              <CardContent>
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Shield className="h-8 w-8 text-primary" />
                 </div>
@@ -253,7 +253,7 @@ function BecomeAjussiContent() {
                 <p className="text-sm text-gray-600">
                   검증된 플랫폼에서 안전하게 활동하세요
                 </p>
-              </CardBody>
+              </CardContent>
             </Card>
           </div>
 
@@ -262,7 +262,7 @@ function BecomeAjussiContent() {
             <CardHeader>
               <h2 className="text-xl font-semibold">아저씨 되기 조건</h2>
             </CardHeader>
-            <CardBody>
+            <CardContent>
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
@@ -296,7 +296,7 @@ function BecomeAjussiContent() {
                   </div>
                 </div>
               </div>
-            </CardBody>
+            </CardContent>
           </Card>
 
           {/* Process */}
@@ -304,7 +304,7 @@ function BecomeAjussiContent() {
             <CardHeader>
               <h2 className="text-xl font-semibold">등록 절차</h2>
             </CardHeader>
-            <CardBody>
+            <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="text-center">
                   <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-3 text-sm font-semibold">
@@ -336,14 +336,14 @@ function BecomeAjussiContent() {
                   </p>
                 </div>
               </div>
-            </CardBody>
+            </CardContent>
           </Card>
 
           {/* CTA */}
           {!application && (
             <div className="text-center">
               <Card className="bg-primary/5 border-primary/20">
-                <CardBody>
+                <CardContent>
                   <h3 className="text-xl font-semibold mb-4">
                     지금 바로 아저씨가 되어보세요!
                   </h3>
@@ -358,7 +358,7 @@ function BecomeAjussiContent() {
                   >
                     아저씨로 등록하기
                   </Button>
-                </CardBody>
+                </CardContent>
               </Card>
             </div>
           )}

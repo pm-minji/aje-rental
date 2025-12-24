@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/Button'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
@@ -109,7 +109,7 @@ function ApplicationContent() {
 
           {!application ? (
             <Card>
-              <CardBody>
+              <CardContent>
                 <div className="text-center py-12">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">
                     아저씨 신청 내역이 없습니다
@@ -123,7 +123,7 @@ function ApplicationContent() {
                     </Link>
                   </Button>
                 </div>
-              </CardBody>
+              </CardContent>
             </Card>
           ) : (
             <div className="space-y-6">
@@ -153,7 +153,7 @@ function ApplicationContent() {
                     </div>
                   </div>
                 </CardHeader>
-                <CardBody>
+                <CardContent>
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                     <p className="text-blue-800 text-sm">
                       {getStatusMessage(application.status)}
@@ -166,7 +166,7 @@ function ApplicationContent() {
                       <p className="text-sm text-gray-600">{application.admin_notes}</p>
                     </div>
                   )}
-                </CardBody>
+                </CardContent>
               </Card>
 
               {/* Application Details */}
@@ -174,7 +174,7 @@ function ApplicationContent() {
                 <CardHeader>
                   <h3 className="text-lg font-semibold">신청 내용</h3>
                 </CardHeader>
-                <CardBody>
+                <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <h4 className="font-medium text-gray-700 mb-2">서비스 제목</h4>
@@ -226,13 +226,13 @@ function ApplicationContent() {
                       </a>
                     </div>
                   </div>
-                </CardBody>
+                </CardContent>
               </Card>
 
               {/* Actions */}
               {application.status === 'REJECTED' && (
                 <Card>
-                  <CardBody>
+                  <CardContent>
                     <div className="text-center py-6">
                       <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         재신청하기
@@ -246,7 +246,7 @@ function ApplicationContent() {
                         </Link>
                       </Button>
                     </div>
-                  </CardBody>
+                  </CardContent>
                 </Card>
               )}
             </div>

@@ -1,6 +1,6 @@
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Card, CardBody } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 
 export default function TermsPage() {
   return (
@@ -16,7 +16,7 @@ export default function TermsPage() {
       <Container className="py-8">
         <div className="max-w-4xl mx-auto">
           <Card>
-            <CardBody>
+            <CardContent>
               <div className="prose max-w-none">
                 <h2>제1조 (목적)</h2>
                 <p>
@@ -104,7 +104,7 @@ export default function TermsPage() {
                   </p>
                 </div>
               </div>
-            </CardBody>
+            </CardContent>
           </Card>
         </div>
       </Container>
