@@ -154,13 +154,14 @@ export function RequestModal({
                 {...register('duration', { valueAsNumber: true })}
               />
               <div className="mt-2 p-3 bg-gray-50 rounded-md text-sm">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-gray-600">매칭 수수료 (첫 1시간)</span>
-                  <span className="font-semibold text-primary">{formatCurrency(hourlyRate)}</span>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">기본 요금 (첫 1시간)</span>
+                  <span className="font-semibold text-primary">20,000원</span>
                 </div>
-                <p className="text-xs text-gray-500">
-                  * 1시간 초과 시, 추가 요금은 현장에서 아저씨와 직접 정산합니다.
-                </p>
+                <div className="flex justify-between items-center text-gray-500 text-xs">
+                  <span>추가 시간</span>
+                  <span>시간당 10,000원 (현장 정산)</span>
+                </div>
               </div>
             </FormField>
 
