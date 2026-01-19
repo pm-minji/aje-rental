@@ -25,14 +25,11 @@ export async function GET(request: NextRequest) {
     const supabaseAdmin = createServerClient()
 
     // Check if user is admin
-    console.log('Checking admin role for user:', user.id)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
       .maybeSingle()
-
-    console.log('Profile data:', profile, 'Error:', profileError)
 
     if (!profile || profile.role !== 'admin') {
       console.log('User is not admin, role:', profile?.role)
@@ -41,8 +38,6 @@ export async function GET(request: NextRequest) {
         { status: 403 }
       )
     }
-
-    console.log('Admin access confirmed, fetching applications...')
 
     // Get all applications with user info
     const { data: applications, error } = await supabaseAdmin
@@ -68,7 +63,6 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    console.log('Returning applications:', applications?.length || 0)
     return NextResponse.json({
       success: true,
       data: applications || [],

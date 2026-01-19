@@ -14,11 +14,7 @@ export async function GET() {
     }
 
     // Use admin client to bypass RLS
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    console.log('API/Profile: Has service key?', !!serviceKey)
     const supabase = createServerClient()
-
-    console.log('API/Profile: Fetching profile for user', user.id)
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
@@ -26,8 +22,6 @@ export async function GET() {
       .select('*')
       .eq('id', user.id)
       .maybeSingle()
-
-    console.log('API/Profile: Fetch result:', { profile, error: profileError })
 
     if (profileError) {
       console.error('Error fetching profile:', profileError)
