@@ -1,11 +1,19 @@
+'use client'
+
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 interface FooterProps {
   showFullFooter?: boolean;
 }
 
 export default function Footer({ showFullFooter = true }: FooterProps) {
+  const pathname = usePathname()
+
+  // Only show footer on the home page
+  if (pathname !== '/') return null
+
   return (
     <footer className="bg-gray-50 border-t mt-auto pb-20 lg:pb-0">
       <div className="container mx-auto px-4 py-8">
