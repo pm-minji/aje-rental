@@ -11,6 +11,10 @@ import AuthLoadingWrapper from '@/components/auth/AuthLoadingWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
+export const viewport = {
+  themeColor: '#2563eb',
+}
+
 export const metadata: Metadata = {
   title: {
     default: '아저씨렌탈',
@@ -21,6 +25,7 @@ export const metadata: Metadata = {
   authors: [{ name: '아저씨렌탈' }],
   creator: '아저씨렌탈',
   metadataBase: new URL('https://aje-rental.vercel.app'),
+  manifest: '/manifest.json',
   alternates: {
     canonical: '/',
   },
@@ -31,11 +36,20 @@ export const metadata: Metadata = {
     title: '아저씨렌탈',
     description: '아저씨렌탈에서 다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
     siteName: '아저씨렌탈',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: '아저씨렌탈',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: '아저씨렌탈',
     description: '아저씨렌탈에서 다양한 활동을 함께할 아저씨를 찾아보세요',
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
@@ -47,6 +61,10 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
   },
   verification: {
     google: 'google-site-verification-code',

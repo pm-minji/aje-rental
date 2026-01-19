@@ -1,0 +1,21 @@
+{
+    "name": "아저씨렌탈",
+    "short_name": "아저씨렌탈",
+    "description": "재능 있는 아저씨를 빌려보세요",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#2563eb",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
