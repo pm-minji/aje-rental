@@ -64,7 +64,7 @@ export default function Footer({ showFullFooter = true }: FooterProps) {
                 </li>
                 <li>
                   <Link
-                    href="/faq"
+                    href="/guide#faq"
                     className="text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     자주 묻는 질문
@@ -78,36 +78,20 @@ export default function Footer({ showFullFooter = true }: FooterProps) {
               <h4 className="font-semibold text-gray-900 mb-4">고객지원</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link
-                    href="/terms"
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    이용약관
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/privacy"
-                    className="text-gray-600 hover:text-gray-900 transition-colors"
-                  >
-                    개인정보처리방침
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/contact"
+                  <a
+                    href="mailto:joon@pm-minji.com?subject=[문의]"
                     className="text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     문의하기
-                  </Link>
+                  </a>
                 </li>
                 <li>
-                  <Link
-                    href="/report"
+                  <a
+                    href="mailto:joon@pm-minji.com?subject=[신고]"
                     className="text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     신고하기
-                  </Link>
+                  </a>
                 </li>
               </ul>
             </div>
