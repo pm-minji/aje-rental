@@ -43,11 +43,8 @@ export function AjussiCard({
               />
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 truncate">
-                  {ajussi.title}
+                  {ajussi.title} 아저씨
                 </h3>
-                <p className="text-sm text-gray-600">
-                  {ajussi.profiles?.nickname || ajussi.profiles?.name || ''}
-                </p>
               </div>
             </div>
 
@@ -69,21 +66,21 @@ export function AjussiCard({
           </div>
 
           {/* Description */}
-          <p className="text-sm text-gray-600 line-clamp-2">
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-[40px]">
             {ajussi.description}
           </p>
 
           {/* Tags */}
           {ajussi.tags && ajussi.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {ajussi.tags.slice(0, 3).map((tag) => (
+              {ajussi.tags.slice(0, 5).map((tag) => (
                 <Badge key={tag} variant="secondary" size="sm">
                   {tag}
                 </Badge>
               ))}
-              {ajussi.tags.length > 3 && (
+              {ajussi.tags.length > 5 && (
                 <Badge variant="secondary" size="sm">
-                  +{ajussi.tags.length - 3}
+                  +{ajussi.tags.length - 5}
                 </Badge>
               )}
             </div>
@@ -102,8 +99,9 @@ export function AjussiCard({
               <div className="flex items-center text-sm text-gray-600">
                 <MapPin className="h-4 w-4 mr-2" />
                 <span className="truncate">
-                  {ajussi.available_areas.slice(0, 2).join(', ')}
-                  {ajussi.available_areas.length > 2 && ` 외 ${ajussi.available_areas.length - 2}곳`}
+                  {ajussi.available_areas.map(area =>
+                    area === 'Seoul' ? '서울' : area === 'Online' ? '온라인' : area
+                  ).join(', ')}
                 </span>
               </div>
             )}
