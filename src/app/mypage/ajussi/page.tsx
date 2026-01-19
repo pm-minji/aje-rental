@@ -175,14 +175,25 @@ function AjussiProfileContent() {
             <CardBody>
               <Form onSubmit={form.handleSubmit(handleSave)}>
                 <div className="space-y-6">
-                  <FormField>
-                    <Input
-                      label="아저씨 닉네임"
-                      placeholder="예: 건강한 산책과 운동 동행"
-                      error={form.formState.errors.title?.message}
-                      {...form.register('title')}
-                    />
-                  </FormField>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700">아저씨 닉네임</label>
+                    <div className="flex items-center">
+                      <Input
+                        placeholder="예: 낚시왕"
+                        {...form.register('title')}
+                        className="rounded-r-none border-r-0"
+                      />
+                      <div className="bg-gray-100 border border-l-0 border-gray-300 px-3 py-2 rounded-r-md text-gray-600 h-[42px] flex items-center whitespace-nowrap">
+                        아저씨
+                      </div>
+                    </div>
+                    {form.formState.errors.title?.message && (
+                      <p className="text-sm text-red-600 mt-1">{form.formState.errors.title.message}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">
+                      서비스에는 "{form.watch('title') || 'OOO'} 아저씨"로 표시됩니다.
+                    </p>
+                  </div>
 
                   <FormField>
                     <Textarea
