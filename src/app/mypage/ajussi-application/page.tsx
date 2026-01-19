@@ -404,7 +404,7 @@ export default function AjussiApplicationPage() {
                     <Input {...register('open_chat_url', {
                       required: '오픈채팅 주소를 입력해주세요',
                       pattern: {
-                        value: /^https:\/\/open\.kakao\.com\/.+/,
+                        value: /^https?:\/\/(open|pf)\.kakao\.com\/.+/i,
                         message: '올바른 카카오톡 오픈채팅 주소를 입력해주세요'
                       }
                     })} placeholder="https://open.kakao.com/o/..." />
@@ -486,7 +486,7 @@ export default function AjussiApplicationPage() {
                     다음 단계 <ChevronRight className="ml-1 w-4 h-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" loading={loading}>
+                  <Button type="submit" loading={loading} disabled={!isValid || selectedAreas.length === 0}>
                     신청서 제출
                   </Button>
                 )}
