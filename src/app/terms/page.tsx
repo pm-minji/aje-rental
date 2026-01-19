@@ -93,8 +93,8 @@ export default function TermsPage() {
 
                 <div className="mt-8 p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    <strong>시행일자:</strong> 2024년 1월 1일<br />
-                    <strong>최종 수정일:</strong> 2024년 1월 1일
+                    <strong>시행일자:</strong> 2026년 1월 1일<br />
+                    <strong>최종 수정일:</strong> 2026년 1월 1일
                   </p>
                 </div>
               </div>
