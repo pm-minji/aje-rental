@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { 
-  Heart, 
-  MapPin, 
-  Clock, 
-  Star, 
-  MessageCircle, 
+import {
+  Heart,
+  MapPin,
+  Clock,
+  Star,
+  MessageCircle,
   Calendar,
   AlertCircle,
   ExternalLink
@@ -179,17 +179,17 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center space-x-4">
                   <Avatar
-                    src={ajussi.profiles.profile_image}
-                    alt={ajussi.profiles.name}
+                    src={ajussi.profiles?.profile_image}
+                    alt={ajussi.profiles?.name || '아저씨'}
                     size="xl"
-                    fallback={ajussi.profiles.name}
+                    fallback={ajussi.profiles?.name || '?'}
                   />
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">
                       {ajussi.title}
                     </h1>
                     <p className="text-lg text-gray-600">
-                      {ajussi.profiles.nickname || ajussi.profiles.name}
+                      {ajussi.profiles?.nickname || ajussi.profiles?.name || ''}
                     </p>
                     {reviewCount > 0 && (
                       <div className="flex items-center mt-2">
@@ -197,11 +197,10 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(averageRating)
-                                  ? 'text-yellow-400 fill-current'
-                                  : 'text-gray-300'
-                              }`}
+                              className={`h-4 w-4 ${i < Math.floor(averageRating)
+                                ? 'text-yellow-400 fill-current'
+                                : 'text-gray-300'
+                                }`}
                             />
                           ))}
                         </div>
@@ -212,16 +211,15 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                     )}
                   </div>
                 </div>
-                
+
                 <Button
                   variant="ghost"
                   onClick={handleFavorite}
                   className="text-gray-400 hover:text-red-500"
                 >
                   <Heart
-                    className={`h-5 w-5 ${
-                      isFavorited ? 'fill-red-500 text-red-500' : ''
-                    }`}
+                    className={`h-5 w-5 ${isFavorited ? 'fill-red-500 text-red-500' : ''
+                      }`}
                   />
                 </Button>
               </div>
@@ -245,11 +243,11 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
               </div>
 
               {/* Introduction */}
-              {ajussi.profiles.introduction && (
+              {ajussi.profiles?.introduction && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                   <h3 className="font-medium text-gray-900 mb-2">자기소개</h3>
                   <p className="text-gray-700">
-                    {ajussi.profiles.introduction}
+                    {ajussi.profiles?.introduction}
                   </p>
                 </div>
               )}
@@ -269,26 +267,25 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                       <div key={review.id} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
                         <div className="flex items-start space-x-3">
                           <Avatar
-                            src={review.reviewer.profile_image}
-                            alt={review.reviewer.name}
+                            src={review.reviewer?.profile_image}
+                            alt={review.reviewer?.name || '사용자'}
                             size="sm"
-                            fallback={review.reviewer.name}
+                            fallback={review.reviewer?.name || '?'}
                           />
                           <div className="flex-1">
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="font-medium text-gray-900">
-                                  {review.reviewer.nickname || review.reviewer.name}
+                                  {review.reviewer?.nickname || review.reviewer?.name || '익명'}
                                 </p>
                                 <div className="flex items-center mt-1">
                                   {[...Array(5)].map((_, i) => (
                                     <Star
                                       key={i}
-                                      className={`h-3 w-3 ${
-                                        i < review.rating
-                                          ? 'text-yellow-400 fill-current'
-                                          : 'text-gray-300'
-                                      }`}
+                                      className={`h-3 w-3 ${i < review.rating
+                                        ? 'text-yellow-400 fill-current'
+                                        : 'text-gray-300'
+                                        }`}
                                     />
                                   ))}
                                 </div>
@@ -393,7 +390,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
           isOpen={showRequestModal}
           onClose={() => setShowRequestModal(false)}
           ajussiId={data.ajussi.id}
-          ajussiName={data.ajussi.profiles.nickname || data.ajussi.profiles.name}
+          ajussiName={data.ajussi.profiles?.nickname || data.ajussi.profiles?.name || '아저씨'}
           hourlyRate={data.ajussi.hourly_rate}
           onSubmit={handleSubmitRequest}
         />
