@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase'
+import { createServerSupabase, createServerClient } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,9 +10,9 @@ export async function POST(
   try {
     const supabase = await createServerSupabase()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+
     console.log('POST /api/admin/applications/[id]/approve - User:', user?.id)
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -20,12 +20,15 @@ export async function POST(
       )
     }
 
+    // Use admin client to bypass RLS for everything
+    const supabaseAdmin = createServerClient()
+
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (!profile || profile.role !== 'admin') {
       return NextResponse.json(
@@ -37,7 +40,7 @@ export async function POST(
     const { id } = params
 
     // Get the application
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await supabaseAdmin
       .from('ajussi_applications')
       .select('*')
       .eq('id', id)
@@ -62,7 +65,7 @@ export async function POST(
       // 1. Create ajussi profile
       console.log('Creating ajussi profile for user:', application.user_id)
       console.log('Application data:', application)
-      
+
       const ajussiProfileData = {
         user_id: application.user_id,
         title: application.title,
@@ -74,10 +77,10 @@ export async function POST(
         is_active: true,
         availability_mask: {}, // 기본값으로 빈 객체 설정
       }
-      
+
       console.log('Inserting ajussi profile data:', ajussiProfileData)
-      
-      const { data: ajussiProfile, error: profileError } = await supabase
+
+      const { data: ajussiProfile, error: profileError } = await supabaseAdmin
         .from('ajussi_profiles')
         .insert(ajussiProfileData)
         .select()
@@ -91,11 +94,11 @@ export async function POST(
           { status: 500 }
         )
       }
-      
+
       console.log('Ajussi profile created successfully:', ajussiProfile)
 
       // 2. Update user role to ajussi
-      const { error: roleError } = await supabase
+      const { error: roleError } = await supabaseAdmin
         .from('profiles')
         .update({ role: 'ajussi' })
         .eq('id', application.user_id)
@@ -103,11 +106,11 @@ export async function POST(
       if (roleError) {
         console.error('Error updating user role:', roleError)
         // Rollback ajussi profile creation
-        await supabase
+        await supabaseAdmin
           .from('ajussi_profiles')
           .delete()
           .eq('id', ajussiProfile.id)
-        
+
         return NextResponse.json(
           { success: false, error: 'Failed to update user role' },
           { status: 500 }
@@ -115,9 +118,9 @@ export async function POST(
       }
 
       // 3. Update application status
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabaseAdmin
         .from('ajussi_applications')
-        .update({ 
+        .update({
           status: 'APPROVED',
           admin_notes: `Approved by admin on ${new Date().toISOString()}`,
           updated_at: new Date().toISOString(),

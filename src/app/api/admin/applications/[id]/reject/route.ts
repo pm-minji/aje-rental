@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase'
+import { createServerSupabase, createServerClient } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,9 +10,9 @@ export async function POST(
   try {
     const supabase = await createServerSupabase()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+
     console.log('POST /api/admin/applications/[id]/reject - User:', user?.id)
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -20,12 +20,15 @@ export async function POST(
       )
     }
 
+    // Use admin client to bypass RLS for everything
+    const supabaseAdmin = createServerClient()
+
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (!profile || profile.role !== 'admin') {
       return NextResponse.json(
@@ -46,7 +49,7 @@ export async function POST(
     }
 
     // Get the application
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await supabaseAdmin
       .from('ajussi_applications')
       .select('*')
       .eq('id', id)
@@ -67,9 +70,9 @@ export async function POST(
     }
 
     // Update application status to rejected
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseAdmin
       .from('ajussi_applications')
-      .update({ 
+      .update({
         status: 'REJECTED',
         admin_notes: `Rejected: ${reason}`,
         updated_at: new Date().toISOString(),

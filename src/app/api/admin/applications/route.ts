@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase'
+import { createServerSupabase, createServerClient } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: NextRequest) {
   try {
     console.log('=== Admin Applications API Called ===')
-    
+
     // Try to get user from session directly
     const supabase = await createServerSupabase()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+
     console.log('User from session:', user?.id, 'Error:', userError)
-    
+
     if (!user) {
       console.log('No user found, returning 401')
       return NextResponse.json(
@@ -21,13 +21,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Use admin client to bypass RLS for role check and fetching applications
+    const supabaseAdmin = createServerClient()
+
     // Check if user is admin
     console.log('Checking admin role for user:', user.id)
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     console.log('Profile data:', profile, 'Error:', profileError)
 
@@ -42,7 +45,7 @@ export async function GET(request: NextRequest) {
     console.log('Admin access confirmed, fetching applications...')
 
     // Get all applications with user info
-    const { data: applications, error } = await supabase
+    const { data: applications, error } = await supabaseAdmin
       .from('ajussi_applications')
       .select(`
         *,
