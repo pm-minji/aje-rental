@@ -191,14 +191,6 @@ export default function Header() {
                     즐겨찾기
                   </Link>
 
-                  <Link
-                    href="/mypage/settings"
-                    className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-                    onClick={closeMobileMenu}
-                  >
-                    <Settings className="h-4 w-4 mr-3" />
-                    설정
-                  </Link>
 
                   <button
                     onClick={handleSignOut}

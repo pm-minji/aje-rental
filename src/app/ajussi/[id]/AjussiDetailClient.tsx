@@ -170,8 +170,92 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
         ]}
       />
 
-      <Container className="py-8">
+      <Container className="py-8 pb-32 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Sidebar - First on mobile, last on desktop */}
+          <div className="space-y-6 order-first lg:order-last">
+            {/* Booking Card */}
+            <Card>
+              <CardHeader>
+                <h3 className="text-lg font-semibold">서비스 정보</h3>
+              </CardHeader>
+              <CardBody className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start">
+                    <Clock className="h-5 w-5 mr-2 text-primary mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-gray-900">기본 요금: 20,000원</p>
+                      <p className="text-sm text-gray-600">첫 1시간 (매칭 수수료 포함)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-5 mr-2" />
+                    <div>
+                      <p className="font-semibold text-gray-900">추가 요금: 10,000원 / 시간</p>
+                      <p className="text-sm text-gray-600">1시간 이후 (현장 직접 결제)</p>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+                    ※ 이동, 식사, 문화생활(티켓) 등 활동에 필요한 비용은 의뢰인이 부담합니다.
+                  </div>
+                </div>
+
+                {ajussi.available_areas && ajussi.available_areas.length > 0 && (
+                  <div className="flex items-start">
+                    <MapPin className="h-5 w-5 mr-2 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-gray-900 mb-1">활동 지역</p>
+                      <p className="text-sm text-gray-600">
+                        {ajussi.available_areas.map(area =>
+                          area === 'Seoul' ? '서울' : area === 'Online' ? '온라인' : area
+                        ).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3 pt-4 border-t hidden lg:block">
+                  <Button
+                    onClick={handleOpenChat}
+                    variant="outline"
+                    className="w-full"
+                    disabled={!ajussi.open_chat_url}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    오픈채팅 문의
+                    <ExternalLink className="h-3 w-3 ml-1" />
+                  </Button>
+
+                  <Button
+                    onClick={handleRequestService}
+                    className="w-full"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    서비스 요청하기
+                  </Button>
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* Notice Card - Hidden on mobile */}
+            <Card className="hidden lg:block">
+              <CardHeader>
+                <div className="flex items-center">
+                  <AlertCircle className="h-5 w-5 text-amber-500 mr-2" />
+                  <h3 className="font-medium">이용 안내</h3>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <ul className="text-sm text-gray-600 space-y-2">
+                  <li>• 서비스 이용 전 오픈채팅으로 사전 문의를 권장합니다.</li>
+                  <li>• 공개된 장소에서 만나시기를 권장합니다.</li>
+                  <li>• 서비스 이용 후 리뷰를 남겨주세요.</li>
+                  <li>• 문제 발생 시 고객센터로 연락해주세요.</li>
+                </ul>
+              </CardBody>
+            </Card>
+          </div>
+
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Profile Section */}
@@ -311,92 +395,36 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
               </CardBody>
             </Card>
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Booking Card */}
-            <Card>
-              <CardHeader>
-                <h3 className="text-lg font-semibold">서비스 정보</h3>
-              </CardHeader>
-              <CardBody className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <Clock className="h-5 w-5 mr-2 text-primary mt-0.5" />
-                    <div>
-                      <p className="font-semibold text-gray-900">기본 요금: 20,000원</p>
-                      <p className="text-sm text-gray-600">첫 1시간 (매칭 수수료 포함)</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="w-5 mr-2" />
-                    <div>
-                      <p className="font-semibold text-gray-900">추가 요금: 10,000원 / 시간</p>
-                      <p className="text-sm text-gray-600">1시간 이후 (현장 직접 결제)</p>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-600">
-                    ※ 이동, 식사, 문화생활(티켓) 등 활동에 필요한 비용은 의뢰인이 부담합니다.
-                  </div>
-                </div>
-
-                {ajussi.available_areas && ajussi.available_areas.length > 0 && (
-                  <div className="flex items-start">
-                    <MapPin className="h-5 w-5 mr-2 text-gray-400 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-gray-900 mb-1">활동 지역</p>
-                      <p className="text-sm text-gray-600">
-                        {ajussi.available_areas.map(area =>
-                          area === 'Seoul' ? '서울' : area === 'Online' ? '온라인' : area
-                        ).join(', ')}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="space-y-3 pt-4 border-t">
-                  <Button
-                    onClick={handleOpenChat}
-                    variant="outline"
-                    className="w-full"
-                    disabled={!ajussi.open_chat_url}
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    오픈채팅 문의
-                    <ExternalLink className="h-3 w-3 ml-1" />
-                  </Button>
-
-                  <Button
-                    onClick={handleRequestService}
-                    className="w-full"
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    서비스 요청하기
-                  </Button>
-                </div>
-              </CardBody>
-            </Card>
-
-            {/* Notice Card */}
-            <Card>
-              <CardHeader>
-                <div className="flex items-center">
-                  <AlertCircle className="h-5 w-5 text-amber-500 mr-2" />
-                  <h3 className="font-medium">이용 안내</h3>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li>• 서비스 이용 전 오픈채팅으로 사전 문의를 권장합니다.</li>
-                  <li>• 공개된 장소에서 만나시기를 권장합니다.</li>
-                  <li>• 서비스 이용 후 리뷰를 남겨주세요.</li>
-                  <li>• 문제 발생 시 고객센터로 연락해주세요.</li>
-                </ul>
-              </CardBody>
-            </Card>
-          </div>
         </div>
       </Container>
+
+      {/* Mobile Sticky CTA Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4 lg:hidden z-50">
+        <div className="flex items-center justify-between max-w-lg mx-auto gap-3">
+          <div className="flex-shrink-0">
+            <p className="text-lg font-bold text-primary">20,000원</p>
+            <p className="text-xs text-gray-500">1시간 기본</p>
+          </div>
+          <div className="flex gap-2 flex-1">
+            <Button
+              onClick={handleOpenChat}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              disabled={!ajussi.open_chat_url}
+            >
+              <MessageCircle className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleRequestService}
+              size="sm"
+              className="flex-[2]"
+            >
+              서비스 요청
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* Request Modal */}
       {showRequestModal && data && (
