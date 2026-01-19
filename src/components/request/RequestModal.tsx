@@ -192,9 +192,10 @@ export function RequestModal({
               </h4>
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• 요청 후 아저씨의 수락을 기다려주세요</li>
+                <li>• 기본 1시간 요금(20,000원)은 선결제됩니다</li>
+                <li>• 이동, 식사, 체험 비용 등은 의뢰인이 부담합니다</li>
                 <li>• 공개된 장소에서 만나시기를 권장합니다</li>
                 <li>• 서비스 이용 후 리뷰를 남겨주세요</li>
-                <li>• 취소는 24시간 전까지 가능합니다</li>
               </ul>
             </div>
           </div>

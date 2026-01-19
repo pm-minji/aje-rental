@@ -323,9 +323,24 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                 <h3 className="text-lg font-semibold">서비스 정보</h3>
               </CardHeader>
               <CardBody className="space-y-4">
-                <div className="flex items-center text-lg font-semibold text-primary">
-                  <Clock className="h-5 w-5 mr-2" />
-                  {formatCurrency(20000)}/1시간 (첫 만남 고정)
+                <div className="space-y-3">
+                  <div className="flex items-start">
+                    <Clock className="h-5 w-5 mr-2 text-primary mt-0.5" />
+                    <div>
+                      <p className="font-semibold text-gray-900">기본 요금: 20,000원</p>
+                      <p className="text-sm text-gray-600">첫 1시간 (매칭 수수료 포함)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-5 mr-2" />
+                    <div>
+                      <p className="font-semibold text-gray-900">추가 요금: 10,000원 / 시간</p>
+                      <p className="text-sm text-gray-600">1시간 이후 (현장 직접 결제)</p>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-md text-sm text-gray-600">
+                    ※ 이동, 식사, 문화생활(티켓) 등 활동에 필요한 비용은 의뢰인이 부담합니다.
+                  </div>
                 </div>
 
                 {ajussi.available_areas && ajussi.available_areas.length > 0 && (

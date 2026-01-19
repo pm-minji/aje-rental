@@ -136,8 +136,9 @@ export default function GuidePage() {
                 <CardBody>
                   <h3 className="font-semibold mb-2">Q. 서비스 요금 체계가 어떻게 되나요?</h3>
                   <p className="text-gray-600">
-                    기본 1시간 요금은 예약 확정을 위해 플랫폼에서 선결제합니다.<br />
-                    이후 추가되는 시간이나 별도 비용(식대, 재료비 등)은 현장에서 아저씨와 직접 협의하여 정산하시면 됩니다.
+                    • <strong>기본 요금 (첫 1시간)</strong>: 20,000원 (플랫폼 선결제)<br />
+                    • <strong>추가 요금</strong>: 시간당 10,000원 (현장에서 아저씨와 직접 정산)<br />
+                    • <strong>활동비</strong>: 이동 교통비, 식사비, 티켓 등 활동에 드는 비용은 모두 <strong>의뢰인이 부담</strong>합니다.
                   </p>
                 </CardBody>
               </Card>
