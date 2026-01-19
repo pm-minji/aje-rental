@@ -91,7 +91,7 @@ export function AjussiCard({
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="h-4 w-4 mr-2" />
               <span className="font-semibold text-primary">
-                {formatCurrency(20000)}/1시간 (첫 만남 고정)
+                1시간 {ajussi.hourly_rate.toLocaleString()}원
               </span>
             </div>
 
