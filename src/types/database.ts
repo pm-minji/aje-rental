@@ -30,6 +30,11 @@ export interface Database {
           availability_mask: Record<string, any>;
           created_at: string;
           updated_at: string;
+          real_name: string | null;
+          birth_date: string | null;
+          phone_number: string | null;
+          career_history: string | null;
+          specialties: string[] | null;
         };
         Insert: Omit<Database['public']['Tables']['ajussi_profiles']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['ajussi_profiles']['Insert']>;
@@ -86,6 +91,11 @@ export interface Database {
           admin_notes: string | null;
           created_at: string;
           updated_at: string;
+          real_name: string | null;
+          birth_date: string | null;
+          phone_number: string | null;
+          career_history: string | null;
+          specialties: string[] | null;
         };
         Insert: Omit<Database['public']['Tables']['ajussi_applications']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['ajussi_applications']['Insert']>;

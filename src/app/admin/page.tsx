@@ -37,11 +37,11 @@ function AdminContent() {
   const checkAdminAndFetch = async () => {
     try {
       console.log('Current profile from AuthProvider:', profile)
-      
+
       // Fetch fresh profile data to check admin status
       const response = await fetch('/api/profile')
       const result = await response.json()
-      
+
       console.log('Profile API response:', result)
 
       if (!result.success) {
@@ -70,10 +70,10 @@ function AdminContent() {
     try {
       setLoading(true)
       console.log('Fetching applications from /api/admin/applications')
-      
+
       const response = await fetch('/api/admin/applications')
       console.log('Response status:', response.status)
-      
+
       const result = await response.json()
       console.log('API result:', result)
 
@@ -220,39 +220,76 @@ function AdminContent() {
                     </div>
                   </CardHeader>
                   <CardBody>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <h4 className="font-medium text-gray-700 mb-1">서비스 설명</h4>
-                        <p className="text-sm text-gray-600">{application.description}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                      {/* 신청자 정보 */}
+                      <div className="md:col-span-2 bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <h4 className="font-bold text-blue-900 mb-2">신청자 본인 확인 정보</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <span className="text-sm text-blue-600 block">실명</span>
+                            <span className="font-medium text-gray-900">{application.real_name || '-'}</span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-blue-600 block">생년월일 (만 나이)</span>
+                            <span className="font-medium text-gray-900">
+                              {application.birth_date || '-'}
+                              {application.birth_date && ` (만 ${new Date().getFullYear() - new Date(application.birth_date).getFullYear()}세)`}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-sm text-blue-600 block">연락처</span>
+                            <span className="font-medium text-gray-900">{application.phone_number || '-'}</span>
+                          </div>
+                        </div>
                       </div>
+
+                      <div>
+                        <h4 className="font-medium text-gray-700 mb-1">서비스 제목 (닉네임)</h4>
+                        <p className="font-bold text-gray-900 text-lg">{application.title}</p>
+                      </div>
+
                       <div>
                         <h4 className="font-medium text-gray-700 mb-1">시간당 요금</h4>
                         <p className="text-sm text-gray-600">
                           {application.hourly_rate.toLocaleString()}원
                         </p>
                       </div>
+
+                      <div className="md:col-span-2">
+                        <h4 className="font-medium text-gray-700 mb-1">한줄 소개</h4>
+                        <p className="text-gray-900 bg-gray-50 p-2 rounded">{application.description}</p>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <h4 className="font-medium text-gray-700 mb-1">경력 및 주요 이력</h4>
+                        <p className="text-gray-900 bg-gray-50 p-3 rounded whitespace-pre-wrap text-sm">
+                          {application.career_history || '입력된 경력이 없습니다.'}
+                        </p>
+                      </div>
+
                       <div>
                         <h4 className="font-medium text-gray-700 mb-1">활동 지역</h4>
                         <div className="flex flex-wrap gap-1">
                           {application.available_areas.map((area) => (
                             <span
                               key={area}
-                              className="px-2 py-1 bg-gray-100 text-xs rounded"
+                              className="px-2 py-1 bg-gray-100 text-xs rounded border border-gray-200"
                             >
-                              {area}
+                              {area === 'Seoul' ? '서울(오프라인)' : (area === 'Online' ? '온라인' : area)}
                             </span>
                           ))}
                         </div>
                       </div>
+
                       <div>
-                        <h4 className="font-medium text-gray-700 mb-1">서비스 태그</h4>
+                        <h4 className="font-medium text-gray-700 mb-1">전문 분야 (태그)</h4>
                         <div className="flex flex-wrap gap-1">
-                          {application.tags.map((tag) => (
+                          {(application.specialties || application.tags).map((tag) => (
                             <span
                               key={tag}
-                              className="px-2 py-1 bg-blue-100 text-xs rounded"
+                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-medium"
                             >
-                              {tag}
+                              #{tag}
                             </span>
                           ))}
                         </div>
@@ -269,7 +306,7 @@ function AdminContent() {
                         {application.open_chat_url}
                       </a>
                     </div>
-                    
+
                     {application.admin_notes && (
                       <div className="mb-4 p-3 bg-gray-50 rounded">
                         <h4 className="font-medium text-gray-700 mb-1">관리자 메모</h4>
