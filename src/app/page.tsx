@@ -110,7 +110,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button asChild size="lg" className="text-lg px-8 py-3">
-                <Link href="/ajussi">재능 찾기</Link>
+                <Link href="/ajussi">아저씨 찾기</Link>
               </Button>
               <Button variant="outline" asChild size="lg" className="text-lg px-8 py-3">
                 <Link href="/guide">이용 가이드</Link>
@@ -267,7 +267,7 @@ export default function Home() {
               <div className="text-center">
                 <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3">
                   <Link href="/ajussi" className="flex items-center">
-                    더 많은 재능 보기
+                    더 많은 아저씨 보기
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
@@ -290,7 +290,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-3 bg-white text-primary hover:bg-white text-primary">
-                <Link href="/ajussi">재능 찾기</Link>
+                <Link href="/ajussi">아저씨 찾기</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent border-white text-white hover:bg-transparent hover:text-white">
                 <Link href="/mypage/become-ajussi">아저씨 등록하기</Link>

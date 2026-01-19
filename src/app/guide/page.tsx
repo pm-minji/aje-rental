@@ -36,7 +36,7 @@ export default function GuidePage() {
                   <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                     <Search className="h-8 w-8 text-primary" />
                   </div>
-                  <h3 className="font-semibold mb-2">1. 재능 찾기</h3>
+                  <h3 className="font-semibold mb-2">1. 아저씨 찾기</h3>
                   <p className="text-sm text-gray-600">
                     전문 분야, 지역, 가격대를 비교하여<br />나에게 딱 맞는 아저씨를 찾으세요.
                   </p>
