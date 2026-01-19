@@ -39,9 +39,9 @@ export async function GET() {
       )
     }
 
-    // Get ajussi profile if exists
+    // Get ajussi profile if exists (for ajussi or admin roles)
     let ajussiProfile = null
-    if ((profile as any).role === 'ajussi') {
+    if ((profile as any).role === 'ajussi' || (profile as any).role === 'admin') {
       const { data, error } = await supabase
         .from('ajussi_profiles')
         .select('*')
@@ -209,9 +209,9 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    // Get updated ajussi profile if exists
+    // Get updated ajussi profile if exists (for ajussi or admin roles)
     let updatedAjussiProfile = null
-    if ((updatedProfile as any).role === 'ajussi') {
+    if ((updatedProfile as any).role === 'ajussi' || (updatedProfile as any).role === 'admin') {
       const { data, error } = await supabaseAdmin
         .from('ajussi_profiles')
         .select('*')
