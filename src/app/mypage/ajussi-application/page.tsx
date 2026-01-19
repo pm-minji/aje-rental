@@ -212,6 +212,10 @@ export default function AjussiApplicationPage() {
     )
   }
 
+  const onInvalid = () => {
+    error('입력 확인', '모든 필수 항목을 입력하고 동의해주세요.')
+  }
+
   return (
     <>
       <PageHeader
@@ -276,7 +280,7 @@ export default function AjussiApplicationPage() {
           </Card>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
           <Card>
             <CardBody className="p-6 md:p-8">
 
@@ -482,7 +486,7 @@ export default function AjussiApplicationPage() {
                     다음 단계 <ChevronRight className="ml-1 w-4 h-4" />
                   </Button>
                 ) : (
-                  <Button type="submit" loading={loading} disabled={!isValid || selectedAreas.length === 0}>
+                  <Button type="submit" loading={loading}>
                     신청서 제출
                   </Button>
                 )}
