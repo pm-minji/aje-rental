@@ -41,7 +41,7 @@ export async function GET() {
 
     // Get ajussi profile if exists
     let ajussiProfile = null
-    if (profile.role === 'ajussi') {
+    if ((profile as any).role === 'ajussi') {
       const { data, error } = await supabase
         .from('ajussi_profiles')
         .select('*')
@@ -101,7 +101,7 @@ export async function PUT(request: NextRequest) {
 
       const { error: profileError } = await supabaseAdmin
         .from('profiles')
-        .update(updateData)
+        .update(updateData as any)
         .eq('id', user.id)
 
       if (profileError) {
@@ -127,7 +127,7 @@ export async function PUT(request: NextRequest) {
         console.error('API/Profile PUT: Error checking role:', roleCheckError)
       }
 
-      if (currentProfile?.role !== 'ajussi') {
+      if ((currentProfile as any)?.role !== 'ajussi' && (currentProfile as any)?.role !== 'admin') {
         return NextResponse.json(
           { success: false, error: 'Not authorized to update ajussi profile' },
           { status: 403 }
@@ -158,7 +158,7 @@ export async function PUT(request: NextRequest) {
             open_chat_url: ajussiProfileData.open_chat_url,
             is_active: ajussiProfileData.is_active,
             tags: ajussiProfileData.tags,
-          })
+          } as any)
           .eq('user_id', user.id)
 
         if (ajussiError) {
@@ -181,7 +181,7 @@ export async function PUT(request: NextRequest) {
             open_chat_url: ajussiProfileData.open_chat_url,
             is_active: ajussiProfileData.is_active ?? true,
             tags: ajussiProfileData.tags || [],
-          })
+          } as any)
 
         if (ajussiError) {
           console.error('API/Profile PUT: Error creating ajussi profile:', ajussiError)
@@ -211,7 +211,7 @@ export async function PUT(request: NextRequest) {
 
     // Get updated ajussi profile if exists
     let updatedAjussiProfile = null
-    if (updatedProfile.role === 'ajussi') {
+    if ((updatedProfile as any).role === 'ajussi') {
       const { data, error } = await supabaseAdmin
         .from('ajussi_profiles')
         .select('*')
