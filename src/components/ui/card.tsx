@@ -49,12 +49,12 @@ export function CardHeader({ children, className }: CardHeaderProps) {
   )
 }
 
-interface CardBodyProps {
+interface CardContentProps {
   children: ReactNode
   className?: string
 }
 
-export function CardBody({ children, className }: CardBodyProps) {
+export function CardContent({ children, className }: CardContentProps) {
   return (
     <div className={cn('py-4', className)}>
       {children}

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
-import { Card, CardHeader, CardBody } from '@/components/ui/Card'
+import { Card, CardHeader, CardContent } from '@/components/ui/card'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -188,7 +188,7 @@ export default function AjussiApplicationPage() {
               <CardHeader>
                 <h3 className="text-lg font-semibold text-orange-800">재신청 안내</h3>
               </CardHeader>
-              <CardBody>
+              <CardContent>
                 <div className="space-y-3">
                   <p className="text-orange-700 text-sm">
                     이전 신청이 거절되었습니다. 아래 사유를 참고하여 내용을 수정해주세요.
@@ -203,7 +203,7 @@ export default function AjussiApplicationPage() {
                     폼에 이전 신청 내용이 자동으로 채워져 있습니다. 필요한 부분을 수정한 후 다시 제출해주세요.
                   </p>
                 </div>
-              </CardBody>
+              </CardContent>
             </Card>
           )}
 
@@ -216,7 +216,7 @@ export default function AjussiApplicationPage() {
                 신청서 검토 후 승인되면 아저씨로 활동할 수 있습니다.
               </p>
             </CardHeader>
-            <CardBody>
+            <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -334,7 +334,7 @@ export default function AjussiApplicationPage() {
                   </Button>
                 </div>
               </form>
-            </CardBody>
+            </CardContent>
           </Card>
         </div>
       </Container>

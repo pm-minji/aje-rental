@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Calendar, Clock, MapPin, User, MessageCircle, ExternalLink, Star } from 'lucide-react'
 import Link from 'next/link'
-import { Card } from '@/components/ui/Card'
+import { Card } from '@/components/ui/card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
