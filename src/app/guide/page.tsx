@@ -2,11 +2,11 @@ import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { 
-  Search, 
-  MessageCircle, 
-  Calendar, 
-  CheckCircle, 
+import {
+  Search,
+  MessageCircle,
+  Calendar,
+  CheckCircle,
   Star,
   Shield,
   AlertTriangle,
@@ -19,7 +19,7 @@ export default function GuidePage() {
     <>
       <PageHeader
         title="이용 가이드"
-        description="나의아저씨 서비스를 안전하고 효과적으로 이용하는 방법을 알아보세요"
+        description="아저씨렌탈 서비스를 안전하고 효과적으로 이용하는 방법을 알아보세요"
         breadcrumbs={[
           { label: '이용 가이드' }
         ]}
@@ -163,7 +163,7 @@ export default function GuidePage() {
                 <CardBody>
                   <h3 className="font-semibold mb-2">Q. 아저씨가 되려면 어떻게 해야 하나요?</h3>
                   <p className="text-gray-600">
-                    회원가입 후 마이페이지에서 &apos;아저씨 되기&apos;를 클릭하여 프로필을 작성하시면 됩니다. 
+                    회원가입 후 마이페이지에서 &apos;아저씨 되기&apos;를 클릭하여 프로필을 작성하시면 됩니다.
                     간단한 심사 과정을 거쳐 승인됩니다.
                   </p>
                 </CardBody>
@@ -173,7 +173,7 @@ export default function GuidePage() {
                 <CardBody>
                   <h3 className="font-semibold mb-2">Q. 문제가 발생했을 때는 어떻게 하나요?</h3>
                   <p className="text-gray-600">
-                    서비스 이용 중 문제가 발생하면 즉시 고객센터로 연락해주세요. 
+                    서비스 이용 중 문제가 발생하면 즉시 고객센터로 연락해주세요.
                     신고 기능을 통해 부적절한 행동을 신고할 수도 있습니다.
                   </p>
                 </CardBody>
@@ -183,7 +183,7 @@ export default function GuidePage() {
                 <CardBody>
                   <h3 className="font-semibold mb-2">Q. 리뷰는 언제 작성할 수 있나요?</h3>
                   <p className="text-gray-600">
-                    서비스가 완료된 후에 리뷰를 작성할 수 있습니다. 
+                    서비스가 완료된 후에 리뷰를 작성할 수 있습니다.
                     정직하고 건설적인 리뷰는 다른 사용자들에게 큰 도움이 됩니다.
                   </p>
                 </CardBody>

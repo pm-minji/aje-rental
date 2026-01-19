@@ -12,13 +12,13 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    default: '나의아저씨',
-    template: '%s | 나의아저씨',
+    default: '아저씨렌탈',
+    template: '%s | 아저씨렌탈',
   },
-  description: '다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
-  keywords: ['아저씨', '렌탈', '산책', '대화', '조언', '멘토링', '동행', '서울', '활동', '만남'],
-  authors: [{ name: '나의아저씨' }],
-  creator: '나의아저씨',
+  description: '아저씨렌탈에서 다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
+  keywords: ['아저씨렌탈', '아저씨', '렌탈', '산책', '대화', '조언', '멘토링', '동행', '서울', '활동', '만남'],
+  authors: [{ name: '아저씨렌탈' }],
+  creator: '아저씨렌탈',
   metadataBase: new URL('https://aje-rental.vercel.app'),
   alternates: {
     canonical: '/',
@@ -27,14 +27,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     url: 'https://aje-rental.vercel.app',
-    title: '나의아저씨',
-    description: '다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
-    siteName: '나의아저씨',
+    title: '아저씨렌탈',
+    description: '아저씨렌탈에서 다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
+    siteName: '아저씨렌탈',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '나의아저씨',
-    description: '다양한 활동을 함께할 아저씨를 찾아보세요',
+    title: '아저씨렌탈',
+    description: '아저씨렌탈에서 다양한 활동을 함께할 아저씨를 찾아보세요',
   },
   robots: {
     index: true,

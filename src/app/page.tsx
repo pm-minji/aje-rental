@@ -101,7 +101,7 @@ export default function Home() {
         <Container>
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              나의아저씨
+              아저씨렌탈
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
               산책, 대화, 조언 등 다양한 활동을 함께할 아저씨를 찾아보세요.<br />
@@ -177,7 +177,7 @@ export default function Home() {
         <Container>
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              왜 아저씨 렌탈인가요?
+              왜 아저씨렌탈인가요?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               안전하고 신뢰할 수 있는 서비스로 특별한 경험을 제공합니다
