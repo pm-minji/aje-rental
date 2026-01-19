@@ -19,14 +19,14 @@ export const metadata: Metadata = {
   keywords: ['아저씨', '렌탈', '산책', '대화', '조언', '멘토링', '동행', '서울', '활동', '만남'],
   authors: [{ name: '나의아저씨' }],
   creator: '나의아저씨',
-  metadataBase: new URL('https://ajussi-rental.com'),
+  metadataBase: new URL('https://aje-rental.vercel.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://ajussi-rental.com',
+    url: 'https://aje-rental.vercel.app',
     title: '나의아저씨',
     description: '다양한 활동을 함께할 아저씨를 찾아보세요. 산책, 대화, 조언 등 새로운 경험과 따뜻한 만남이 기다립니다.',
     siteName: '나의아저씨',

@@ -28,7 +28,7 @@ export default function Home() {
     try {
       const response = await fetch('/api/favorites')
       const result = await response.json()
-      
+
       if (result.success) {
         const ids = new Set<string>(result.data.map((fav: any) => fav.ajussi_id))
         setFavoriteIds(ids)
@@ -71,13 +71,13 @@ export default function Home() {
         },
         body: JSON.stringify({ ajussiId }),
       })
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         if (result.action === 'added') {
           success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
-          setFavoriteIds(prev => new Set([...prev, ajussiId]))
+          setFavoriteIds(prev => new Set([...Array.from(prev), ajussiId]))
         } else if (result.action === 'removed') {
           success('즐겨찾기 해제', '즐겨찾기에서 제거되었습니다.')
           setFavoriteIds(prev => {
@@ -107,7 +107,7 @@ export default function Home() {
               산책, 대화, 조언 등 다양한 활동을 함께할 아저씨를 찾아보세요.<br />
               새로운 경험과 따뜻한 만남이 기다립니다.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button asChild size="lg" className="text-lg px-8 py-3">
                 <Link href="/ajussi">아저씨 찾기</Link>
@@ -157,31 +157,31 @@ export default function Home() {
               <div className="text-4xl mb-6">🚶‍♂️</div>
               <h3 className="text-xl font-semibold mb-4">산책 동행</h3>
               <p className="text-gray-600 mb-4">
-                공원이나 동네를 함께 걸으며 건강한 시간을 보내세요. 
+                공원이나 동네를 함께 걸으며 건강한 시간을 보내세요.
                 올바른 걷기 자세와 건강 관리 팁도 함께 배울 수 있습니다.
               </p>
               <div className="text-sm text-primary font-medium">
                 시간당 15,000원부터
               </div>
             </div>
-            
+
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition-shadow">
               <div className="text-4xl mb-6">💬</div>
               <h3 className="text-xl font-semibold mb-4">대화 상대</h3>
               <p className="text-gray-600 mb-4">
-                인생 경험이 풍부한 아저씨와 의미있는 대화를 나누세요. 
+                인생 경험이 풍부한 아저씨와 의미있는 대화를 나누세요.
                 고민 상담부터 일상 이야기까지 편안하게 대화할 수 있습니다.
               </p>
               <div className="text-sm text-primary font-medium">
                 시간당 20,000원부터
               </div>
             </div>
-            
+
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition-shadow">
               <div className="text-4xl mb-6">💡</div>
               <h3 className="text-xl font-semibold mb-4">조언 & 멘토링</h3>
               <p className="text-gray-600 mb-4">
-                인생 선배의 지혜로운 조언과 멘토링을 받아보세요. 
+                인생 선배의 지혜로운 조언과 멘토링을 받아보세요.
                 취업, 인간관계, 인생 설계 등 다양한 분야의 조언을 받을 수 있습니다.
               </p>
               <div className="text-sm text-primary font-medium">
@@ -269,9 +269,9 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {featuredAjussi && featuredAjussi.length > 0 ? (
                   featuredAjussi.map((ajussi) => (
-                    <AjussiCard 
-                      key={ajussi.id} 
-                      ajussi={ajussi} 
+                    <AjussiCard
+                      key={ajussi.id}
+                      ajussi={ajussi}
                       onFavorite={handleFavorite}
                       isFavorited={favoriteIds.has(ajussi.user_id)}
                       showFavorite={true}
@@ -283,7 +283,7 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              
+
               <div className="text-center">
                 <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3">
                   <Link href="/ajussi" className="flex items-center">
@@ -305,14 +305,14 @@ export default function Home() {
               지금 시작해보세요
             </h2>
             <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
-              새로운 만남과 경험이 기다리고 있습니다. 
+              새로운 만남과 경험이 기다리고 있습니다.
               지금 바로 아저씨를 찾아보세요!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-3">
+              <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-3 bg-white text-primary hover:bg-white text-primary">
                 <Link href="/ajussi">아저씨 찾기</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3 border-white text-white hover:bg-white hover:text-primary">
+              <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent border-white text-white hover:bg-transparent hover:text-white">
                 <Link href="/mypage/become-ajussi">아저씨 되기</Link>
               </Button>
             </div>
