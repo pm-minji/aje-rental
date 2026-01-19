@@ -7,15 +7,12 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const location = searchParams.get('location')
-    const tags = searchParams.get('tags')?.split(',').filter(Boolean)
-    const minRate = searchParams.get('minRate')
-    const maxRate = searchParams.get('maxRate')
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
     const search = searchParams.get('search')
 
     const supabase = await createServerSupabase()
-    
+
     let query = supabase
       .from('ajussi_profiles')
       .select(`
@@ -34,34 +31,10 @@ export async function GET(request: NextRequest) {
       query = query.contains('available_areas', [location])
     }
 
-    // Tags filter
-    if (tags && tags.length > 0) {
-      query = query.overlaps('tags', tags)
-    }
-
-    // Rate filters
-    if (minRate) {
-      query = query.gte('hourly_rate', parseInt(minRate))
-    }
-    if (maxRate) {
-      query = query.lte('hourly_rate', parseInt(maxRate))
-    }
-
-    // Search filter - we'll filter after getting the data
-    // For now, just search in title and description
-    if (search) {
-      console.log('Search query:', search)
-      query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
-    }
-
-    // Pagination
-    const offset = (page - 1) * limit
-    query = query.range(offset, offset + limit - 1)
-
     // Order by created_at desc
     query = query.order('created_at', { ascending: false })
 
-    const { data, error, count } = await query
+    const { data, error } = await query
 
     if (error) {
       console.error('Error fetching ajussi profiles:', error)
@@ -71,21 +44,38 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get total count for pagination
-    const { count: totalCount } = await supabase
-      .from('ajussi_profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_active', true)
+    let filteredData = data || []
+
+    // Search filter - search in title, description, and tags (client-side)
+    if (search) {
+      const searchTerm = search.replace(/^#/, '').trim().toLowerCase()
+
+      filteredData = filteredData.filter(ajussi => {
+        // Check title
+        if (ajussi.title?.toLowerCase().includes(searchTerm)) return true
+        // Check description
+        if (ajussi.description?.toLowerCase().includes(searchTerm)) return true
+        // Check tags array
+        if (ajussi.tags?.some((tag: string) => tag.toLowerCase().includes(searchTerm))) return true
+        return false
+      })
+    }
+
+    // Pagination (after filtering)
+    const total = filteredData.length
+    const totalPages = Math.ceil(total / limit)
+    const offset = (page - 1) * limit
+    const paginatedData = filteredData.slice(offset, offset + limit)
 
     return NextResponse.json({
       success: true,
-      data: data || [],
+      data: paginatedData,
       meta: {
         pagination: {
           page,
           limit,
-          total: totalCount || 0,
-          totalPages: Math.ceil((totalCount || 0) / limit),
+          total,
+          totalPages,
         },
       },
     })
