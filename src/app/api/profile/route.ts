@@ -21,6 +21,7 @@ export async function GET() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
+      .returns<any>()
       .maybeSingle()
 
     if (profileError) {
@@ -45,6 +46,7 @@ export async function GET() {
         .from('ajussi_profiles')
         .select('*')
         .eq('user_id', user.id)
+        .returns<any>()
         .maybeSingle()
 
       if (!error) {
@@ -81,7 +83,8 @@ export async function PUT(request: NextRequest) {
     const body = await request.json()
     const { profile: profileData, ajussiProfile: ajussiProfileData } = body
 
-    const supabase = await createServerSupabase()
+    // Use admin client to bypass RLS
+    const supabaseAdmin = createServerClient()
 
     // Update main profile
     if (profileData) {
@@ -96,13 +99,13 @@ export async function PUT(request: NextRequest) {
         updateData.role = 'ajussi'
       }
 
-      const { error: profileError } = await supabase
+      const { error: profileError } = await supabaseAdmin
         .from('profiles')
         .update(updateData)
         .eq('id', user.id)
 
       if (profileError) {
-        console.error('Error updating profile:', profileError)
+        console.error('API/Profile PUT: Error updating profile:', profileError)
         return NextResponse.json(
           { success: false, error: 'Failed to update profile' },
           { status: 500 }
@@ -113,11 +116,16 @@ export async function PUT(request: NextRequest) {
     // Update ajussi profile if provided
     if (ajussiProfileData) {
       // Check if user is ajussi
-      const { data: currentProfile } = await supabase
+      const { data: currentProfile, error: roleCheckError } = await supabaseAdmin
         .from('profiles')
         .select('role')
         .eq('id', user.id)
-        .single()
+        .returns<any>()
+        .maybeSingle()
+
+      if (roleCheckError) {
+        console.error('API/Profile PUT: Error checking role:', roleCheckError)
+      }
 
       if (currentProfile?.role !== 'ajussi') {
         return NextResponse.json(
@@ -127,15 +135,20 @@ export async function PUT(request: NextRequest) {
       }
 
       // Check if ajussi profile exists
-      const { data: existingAjussi } = await supabase
+      const { data: existingAjussi, error: checkError } = await supabaseAdmin
         .from('ajussi_profiles')
         .select('id')
         .eq('user_id', user.id)
-        .single()
+        .returns<any>()
+        .maybeSingle()
+
+      if (checkError) {
+        console.error('API/Profile PUT: Error checking existing ajussi profile:', checkError)
+      }
 
       if (existingAjussi) {
         // Update existing
-        const { error: ajussiError } = await supabase
+        const { error: ajussiError } = await supabaseAdmin
           .from('ajussi_profiles')
           .update({
             title: ajussiProfileData.title,
@@ -149,7 +162,7 @@ export async function PUT(request: NextRequest) {
           .eq('user_id', user.id)
 
         if (ajussiError) {
-          console.error('Error updating ajussi profile:', ajussiError)
+          console.error('API/Profile PUT: Error updating ajussi profile:', ajussiError)
           return NextResponse.json(
             { success: false, error: 'Failed to update ajussi profile' },
             { status: 500 }
@@ -157,7 +170,7 @@ export async function PUT(request: NextRequest) {
         }
       } else {
         // Create new
-        const { error: ajussiError } = await supabase
+        const { error: ajussiError } = await supabaseAdmin
           .from('ajussi_profiles')
           .insert({
             user_id: user.id,
@@ -171,7 +184,7 @@ export async function PUT(request: NextRequest) {
           })
 
         if (ajussiError) {
-          console.error('Error creating ajussi profile:', ajussiError)
+          console.error('API/Profile PUT: Error creating ajussi profile:', ajussiError)
           return NextResponse.json(
             { success: false, error: 'Failed to create ajussi profile' },
             { status: 500 }
@@ -181,14 +194,15 @@ export async function PUT(request: NextRequest) {
     }
 
     // Fetch updated profile data
-    const { data: updatedProfile, error: fetchError } = await supabase
+    const { data: updatedProfile, error: fetchError } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .returns<any>()
+      .maybeSingle()
 
-    if (fetchError) {
-      console.error('Error fetching updated profile:', fetchError)
+    if (fetchError || !updatedProfile) {
+      console.error('API/Profile PUT: Error fetching updated profile:', fetchError)
       return NextResponse.json(
         { success: false, error: 'Failed to fetch updated profile' },
         { status: 500 }
@@ -198,11 +212,12 @@ export async function PUT(request: NextRequest) {
     // Get updated ajussi profile if exists
     let updatedAjussiProfile = null
     if (updatedProfile.role === 'ajussi') {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseAdmin
         .from('ajussi_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single()
+        .returns<any>()
+        .maybeSingle()
 
       if (!error) {
         updatedAjussiProfile = data

@@ -169,13 +169,13 @@ export async function GET() {
       .from('favorites')
       .select(`
         *,
-        ajussi_profile:ajussi_profiles!ajussi_id (
-          *,
-          profiles (
-            id,
-            name,
-            nickname,
-            profile_image
+        ajussi:profiles!ajussi_id (
+          id,
+          name,
+          nickname,
+          profile_image,
+          ajussi_profile:ajussi_profiles (
+            *
           )
         )
       `)
