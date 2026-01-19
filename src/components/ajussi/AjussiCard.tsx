@@ -16,11 +16,11 @@ interface AjussiCardProps {
   showFavorite?: boolean
 }
 
-export function AjussiCard({ 
-  ajussi, 
-  onFavorite, 
+export function AjussiCard({
+  ajussi,
+  onFavorite,
   isFavorited = false,
-  showFavorite = true 
+  showFavorite = true
 }: AjussiCardProps) {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -36,21 +36,21 @@ export function AjussiCard({
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               <Avatar
-                src={ajussi.profiles.profile_image}
-                alt={ajussi.profiles.name}
+                src={ajussi.profiles?.profile_image}
+                alt={ajussi.profiles?.name || '아저씨'}
                 size="lg"
-                fallback={ajussi.profiles.name}
+                fallback={ajussi.profiles?.name || '?'}
               />
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 truncate">
                   {ajussi.title}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {ajussi.profiles.nickname || ajussi.profiles.name}
+                  {ajussi.profiles?.nickname || ajussi.profiles?.name || ''}
                 </p>
               </div>
             </div>
-            
+
             {showFavorite && (
               <Button
                 variant="ghost"
@@ -59,11 +59,10 @@ export function AjussiCard({
                 className="h-8 w-8 p-0 hover:bg-red-50"
               >
                 <Heart
-                  className={`h-4 w-4 ${
-                    isFavorited 
-                      ? 'fill-red-500 text-red-500' 
+                  className={`h-4 w-4 ${isFavorited
+                      ? 'fill-red-500 text-red-500'
                       : 'text-gray-400 hover:text-red-500'
-                  }`}
+                    }`}
                 />
               </Button>
             )}
@@ -98,7 +97,7 @@ export function AjussiCard({
                 {formatCurrency(ajussi.hourly_rate)}/시간
               </span>
             </div>
-            
+
             {ajussi.available_areas && ajussi.available_areas.length > 0 && (
               <div className="flex items-center text-sm text-gray-600">
                 <MapPin className="h-4 w-4 mr-2" />

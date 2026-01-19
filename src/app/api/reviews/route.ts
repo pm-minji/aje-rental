@@ -3,6 +3,113 @@ import { createServerSupabase, getUser } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
+// GET - 리뷰 목록 조회 (내가 작성한 리뷰 또는 내가 받은 리뷰)
+export async function GET(request: NextRequest) {
+  try {
+    const user = await getUser()
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { searchParams } = new URL(request.url)
+    const isReceived = searchParams.get('received') === 'true'
+    const isWritten = searchParams.get('written') === 'true'
+
+    const supabase = await createServerSupabase()
+
+    if (isReceived) {
+      // 아저씨가 받은 리뷰 조회
+      // 먼저 아저씨 프로필 확인
+      const { data: ajussiProfile } = await supabase
+        .from('ajussi_profiles')
+        .select('user_id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!ajussiProfile) {
+        return NextResponse.json({ success: true, data: [] })
+      }
+
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          reviewer:profiles!reviewer_id (
+            name,
+            nickname,
+            profile_image
+          ),
+          request:requests!request_id (
+            ajussi_id,
+            client_id,
+            date,
+            duration,
+            location
+          )
+        `)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        return NextResponse.json(
+          { success: false, error: 'Failed to fetch reviews' },
+          { status: 500 }
+        )
+      }
+
+      // 내가 받은 리뷰만 필터링
+      const receivedReviews = reviews?.filter(
+        (r) => r.request?.ajussi_id === user.id
+      ) || []
+
+      return NextResponse.json({ success: true, data: receivedReviews })
+    }
+
+    if (isWritten) {
+      // 내가 작성한 리뷰 조회
+      const { data: reviews, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          request:requests!request_id (
+            ajussi_id,
+            client_id,
+            ajussi_profiles:ajussi_profiles!inner (
+              title,
+              user_id,
+              profiles:profiles!user_id (
+                name,
+                nickname,
+                profile_image
+              )
+            )
+          )
+        `)
+        .eq('reviewer_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        return NextResponse.json(
+          { success: false, error: 'Failed to fetch reviews' },
+          { status: 500 }
+        )
+      }
+
+      return NextResponse.json({ success: true, data: reviews || [] })
+    }
+
+    return NextResponse.json({ success: true, data: [] })
+  } catch (error) {
+    console.error('Unexpected error:', error)
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const user = await getUser()
@@ -113,3 +220,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+

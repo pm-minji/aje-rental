@@ -51,16 +51,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getInitialSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        
+
         if (!mounted) return
 
         if (session?.user) {
           console.log('Initial session found:', session.user.id)
-          
+
           // Check if user still exists in database
           try {
             const profileData = await fetchProfile(session.user.id, true) // Allow redirect on initial load
-            
+
             if (!mounted) return
 
             // If profile fetch fails (user deleted), sign out
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(null)
           }
         }
-        
+
         setLoading(false)
         setInitialLoadComplete(true)
         setProfileCheckComplete(true)
@@ -103,19 +103,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id)
-        
+
         if (!mounted) return
 
         if (session?.user) {
           console.log('Processing user session...')
-          
+
           // Only fetch profile and potentially redirect after initial load is complete
           // and if we're not on the setup page
           const shouldFetchProfile = initialLoadComplete && !pathname.includes('/auth/setup-profile')
-          
+
           if (shouldFetchProfile) {
             const profileData = await fetchProfile(session.user.id, true) // Allow redirect
-            
+
             if (!mounted) return
 
             setUser(session.user)
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setProfile(null)
           setSession(null)
         }
-        
+
         if (mounted) {
           setLoading(false)
           setProfileCheckComplete(true)
@@ -149,14 +149,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string, allowRedirect: boolean = false): Promise<Profile | null> => {
     try {
       console.log('Fetching profile for user:', userId, 'allowRedirect:', allowRedirect)
-      
+
       const response = await fetch('/api/auth/create-profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       })
-      
+
       // Check if response is 401 (unauthorized)
       if (response.status === 401) {
         console.log('API returned 401, user session invalid, signing out...')
@@ -166,30 +166,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const result = await response.json()
       console.log('API create profile result:', result)
-      
+
       if (result.success) {
         console.log('Profile created/fetched successfully via API')
-        
+
         // Only redirect if explicitly allowed and conditions are met
         if (allowRedirect) {
           const needsProfileSetup = result.isNewUser || (!result.data.nickname)
           const isOnSetupPage = pathname.includes('/auth/setup-profile')
-          
+
           if (needsProfileSetup && !isOnSetupPage) {
             console.log('New user detected, redirecting to profile setup')
-            
+
             const redirectParam = new URLSearchParams(window.location.search).get('redirect')
-            const setupUrl = redirectParam 
+            const setupUrl = redirectParam
               ? `/auth/setup-profile?redirect=${encodeURIComponent(redirectParam)}`
               : '/auth/setup-profile'
-            
+
             // Use setTimeout to avoid race conditions
             setTimeout(() => {
               router.push(setupUrl)
             }, 100)
           }
         }
-        
+
         return result.data
       } else {
         console.error('API error:', result.error)
@@ -202,17 +202,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithGoogle = async (redirectTo?: string) => {
-    const callbackUrl = redirectTo 
+    const callbackUrl = redirectTo
       ? `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`
       : `${window.location.origin}/auth/callback`
-      
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: callbackUrl,
       },
     })
-    
+
     if (error) {
       console.error('Error signing in with Google:', error)
       throw error
@@ -243,54 +243,67 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       console.log('User data deleted successfully, now signing out...')
 
-      // Then sign out from client side (this will trigger auth state change)
-      await supabase.auth.signOut()
-
-      // Clear local state immediately
+      // Clear local state immediately BEFORE signOut to prevent race conditions
       setUser(null)
       setProfile(null)
       setSession(null)
       setLoading(false)
       setProfileCheckComplete(true)
 
-      // Clear all browser storage and cookies to ensure complete logout
-      try {
-        // Clear localStorage
-        localStorage.clear()
-        
-        // Clear sessionStorage  
-        sessionStorage.clear()
-        
-        // Clear cookies by setting them to expire
-        document.cookie.split(";").forEach(function(c) { 
-          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-        });
-        
-        // Clear IndexedDB (Supabase might use this)
-        if ('indexedDB' in window) {
-          indexedDB.databases().then(databases => {
-            databases.forEach(db => {
-              if (db.name && db.name.includes('supabase')) {
-                indexedDB.deleteDatabase(db.name)
-              }
-            })
-          }).catch(console.error)
-        }
-      } catch (error) {
-        console.error('Error clearing storage:', error)
+      // Clear all Supabase auth cookies explicitly
+      const clearSupabaseCookies = () => {
+        const cookies = document.cookie.split(';')
+        cookies.forEach(cookie => {
+          const [name] = cookie.split('=')
+          const trimmedName = name.trim()
+          // Clear both with and without path
+          document.cookie = `${trimmedName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+          document.cookie = `${trimmedName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC;`
+          // Also try with domain
+          document.cookie = `${trimmedName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`
+        })
       }
 
-      // Force reload the page to completely reset the application state
-      setTimeout(() => {
-        window.location.href = '/'
-      }, 1000)
+      // Clear all browser storage
+      try {
+        localStorage.clear()
+        sessionStorage.clear()
+        clearSupabaseCookies()
+
+        // Clear IndexedDB (Supabase might use this)
+        if ('indexedDB' in window) {
+          const databases = await indexedDB.databases()
+          for (const db of databases) {
+            if (db.name) {
+              indexedDB.deleteDatabase(db.name)
+            }
+          }
+        }
+      } catch (storageError) {
+        console.error('Error clearing storage:', storageError)
+      }
+
+      // Sign out from Supabase with scope: 'global' to invalidate all sessions
+      try {
+        await supabase.auth.signOut({ scope: 'global' })
+      } catch (signOutError) {
+        console.error('SignOut error (non-critical):', signOutError)
+        // Continue even if signOut fails - user data is already deleted
+      }
+
+      // Clear cookies again after signOut (signOut might have set new ones)
+      clearSupabaseCookies()
 
       console.log('Account deletion and sign out completed')
+
+      // Force reload immediately to reset all state
+      window.location.href = '/'
     } catch (error) {
       console.error('Error in deleteAccount:', error)
       throw error
     }
   }
+
 
   const updateProfile = async (updates: Partial<Profile>) => {
     if (!user) return { data: null, error: new Error('No user logged in') }
