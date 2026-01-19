@@ -408,6 +408,31 @@ export default function AjussiApplicationPage() {
                         message: '올바른 카카오톡 오픈채팅 주소를 입력해주세요'
                       }
                     })} placeholder="https://open.kakao.com/o/..." />
+
+                    <details className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-md">
+                      <summary className="p-3 cursor-pointer font-medium hover:text-primary list-none flex items-center">
+                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center mr-2 text-xs">?</span>
+                        오픈채팅방이 왜 필요한가요? / 만드는 방법
+                      </summary>
+                      <div className="px-4 pb-4 space-y-3 border-t border-gray-100 pt-3">
+                        <div>
+                          <p className="font-semibold text-gray-800 mb-1">💡 왜 필요한가요?</p>
+                          <p>
+                            아저씨렌탈은 개인 연락처 노출 없이 안전하게 소통하기 위해 카카오톡 오픈채팅을 사용합니다.
+                            고객과의 상담 및 일정 조율이 이 링크를 통해 이루어집니다.
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800 mb-1">🛠 만드는 방법</p>
+                          <ol className="list-decimal pl-5 space-y-1">
+                            <li>카카오톡 앱 실행 → '채팅' 탭 → 우측 상단 말풍선(+) 아이콘 터치</li>
+                            <li><strong>[오픈채팅]</strong> 선택 → <strong>[1:1 채팅방]</strong> 만들기</li>
+                            <li>방 이름(예: OOO 아저씨 상담방) 설정 후 '완료'</li>
+                            <li>생성된 방의 <strong>[링크 공유]</strong> 버튼을 눌러 주소를 복사하여 위 칸에 붙여넣기</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </details>
                   </div>
 
                   <div>
