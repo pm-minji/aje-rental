@@ -20,8 +20,7 @@ export async function GET(
           id,
           name,
           nickname,
-          profile_image,
-          introduction
+          profile_image
         )
       `)
       .eq('id', id)
