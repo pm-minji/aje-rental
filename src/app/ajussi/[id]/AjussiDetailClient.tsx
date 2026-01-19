@@ -9,7 +9,8 @@ import {
   MessageCircle,
   Calendar,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  ChevronRight
 } from 'lucide-react'
 import { Container } from '@/components/layout/Container'
 import { PageHeader } from '@/components/layout/PageHeader'
