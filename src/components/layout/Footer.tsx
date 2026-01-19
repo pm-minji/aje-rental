@@ -7,7 +7,7 @@ interface FooterProps {
 
 export default function Footer({ showFullFooter = true }: FooterProps) {
   return (
-    <footer className="bg-gray-50 border-t mt-auto">
+    <footer className="bg-gray-50 border-t mt-auto pb-20 lg:pb-0">
       <div className="container mx-auto px-4 py-8">
         {showFullFooter ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -62,11 +62,10 @@ export default function Footer({ showFullFooter = true }: FooterProps) {
         ) : null}
 
         <div className={`${showFullFooter ? 'mt-8 pt-8 border-t border-gray-200' : ''} flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500`}>
-          <div>
-            © 2024 아저씨렌탈. All rights reserved.
-          </div>
-          <div className="mt-2 sm:mt-0">
-            <span>Made with ❤️ in Seoul</span>
+          <div className="flex items-center space-x-4">
+            <span>© 2024 아저씨렌탈</span>
+            <Link href="/terms" className="hover:text-gray-900">이용약관</Link>
+            <Link href="/privacy" className="hover:text-gray-900">개인정보처리방침</Link>
           </div>
         </div>
       </div>

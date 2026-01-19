@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase'
 
-export const dynamic = 'force-dynamic'
+// Allow caching for 30 seconds
+export const revalidate = 30
 
 export async function GET(request: NextRequest) {
   try {
@@ -78,6 +79,10 @@ export async function GET(request: NextRequest) {
           totalPages,
         },
       },
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60'
+      }
     })
   } catch (error) {
     console.error('Unexpected error:', error)
