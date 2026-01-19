@@ -10,7 +10,6 @@ import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
 import { Heart, MapPin, Clock, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { formatCurrency } from '@/lib/utils'
 import { AjussiWithProfile } from '@/types/database'
 
 export default function FavoritesPage() {
@@ -39,8 +38,24 @@ function FavoritesContent() {
             const response = await fetch('/api/favorites')
             const result = await response.json()
 
-            if (result.success) {
-                setFavorites(result.data || [])
+            if (result.success && result.data) {
+                // Transform API response to AjussiWithProfile format
+                const transformedData = result.data
+                    .filter((fav: any) => fav.ajussi?.ajussi_profile?.[0]) // Only include valid entries
+                    .map((fav: any) => {
+                        const profile = fav.ajussi
+                        const ajussiProfile = profile.ajussi_profile[0]
+                        return {
+                            ...ajussiProfile,
+                            profiles: {
+                                id: profile.id,
+                                name: profile.name,
+                                nickname: profile.nickname,
+                                profile_image: profile.profile_image,
+                            }
+                        }
+                    })
+                setFavorites(transformedData)
             } else {
                 showError('오류', result.error || '즐겨찾기를 불러오는데 실패했습니다.')
             }
@@ -124,7 +139,7 @@ function FavoritesContent() {
                                                 <div className="flex items-center text-sm text-gray-600">
                                                     <Clock className="h-4 w-4 mr-1" />
                                                     <span className="font-semibold text-primary">
-                                                        {formatCurrency(ajussi.hourly_rate)}/시간
+                                                        20,000원 / 첫 1시간
                                                     </span>
                                                 </div>
 
