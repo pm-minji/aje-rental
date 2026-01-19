@@ -426,9 +426,9 @@ export default function AjussiApplicationPage() {
                           <p className="font-semibold text-gray-800 mb-1">🛠 만드는 방법</p>
                           <ol className="list-decimal pl-5 space-y-1">
                             <li>카카오톡 앱 실행 → '채팅' 탭 → 우측 상단 말풍선(+) 아이콘 터치</li>
-                            <li><strong>[오픈채팅]</strong> 선택 → <strong>[1:1 채팅방]</strong> 만들기</li>
-                            <li>방 이름(예: OOO 아저씨 상담방) 설정 후 '완료'</li>
-                            <li>생성된 방의 <strong>[링크 공유]</strong> 버튼을 눌러 주소를 복사하여 위 칸에 붙여넣기</li>
+                            <li><strong>[오픈채팅]</strong> 선택 → <strong>[오픈프로필]</strong> 탭 선택 → <strong>[+ 만들기]</strong></li>
+                            <li>프로필 이름(예: OOO 아저씨) 설정 후 '완료'</li>
+                            <li>생성된 프로필의 <strong>[링크 공유]</strong> 버튼을 눌러 주소를 복사하여 위 칸에 붙여넣기</li>
                           </ol>
                         </div>
                       </div>
