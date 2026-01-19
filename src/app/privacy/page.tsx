@@ -1,20 +1,14 @@
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardBody } from '@/components/ui/Card'
 
 export default function PrivacyPage() {
   return (
     <>
-      <PageHeader
-        title="개인정보처리방침"
-        description="아저씨렌탈 서비스 개인정보처리방침을 확인하세요"
-        breadcrumbs={[
-          { label: '개인정보처리방침' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">개인정보처리방침</h1>
+          </div>
           <Card>
             <CardBody>
               <div className="prose max-w-none">

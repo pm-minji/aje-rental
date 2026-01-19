@@ -6,7 +6,6 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
@@ -218,17 +217,11 @@ export default function AjussiApplicationPage() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 등록 신청"
-        description="당신의 경험이 누군가에게는 큰 힘이 됩니다"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '아저씨 되기', href: '/mypage/become-ajussi' },
-          { label: '신청서 작성' }
-        ]}
-      />
-
       <Container className="py-8 max-w-3xl">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">아저씨 등록 신청</h1>
+          <p className="text-gray-600 mt-1">당신의 경험이 누군가에게는 큰 힘이 됩니다</p>
+        </div>
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex justify-between mb-2">

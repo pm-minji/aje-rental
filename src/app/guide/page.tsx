@@ -1,5 +1,4 @@
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import {
@@ -17,16 +16,12 @@ import {
 export default function GuidePage() {
   return (
     <>
-      <PageHeader
-        title="이용 가이드"
-        description="아저씨렌탈 서비스를 안전하고 효과적으로 이용하는 방법을 알아보세요"
-        breadcrumbs={[
-          { label: '이용 가이드' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto space-y-12">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">이용 가이드</h1>
+            <p className="text-gray-600 mt-1">아저씨렌탈 서비스를 안전하고 효과적으로 이용하는 방법을 알아보세요</p>
+          </div>
           {/* How it works */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">서비스 이용 절차</h2>

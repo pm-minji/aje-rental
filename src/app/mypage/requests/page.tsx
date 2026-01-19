@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Select } from '@/components/ui/Select'
 import { Loading } from '@/components/ui/Loading'
@@ -45,13 +44,13 @@ function RequestsContent() {
   const fetchRequests = async () => {
     try {
       setLoading(true)
-      
+
       // Fetch sent requests
       const sentParams = new URLSearchParams({
         type: 'sent',
         ...(statusFilter && { status: statusFilter }),
       })
-      
+
       const sentResponse = await fetch(`/api/requests?${sentParams}`)
       const sentResult = await sentResponse.json()
 
@@ -65,7 +64,7 @@ function RequestsContent() {
           type: 'received',
           ...(statusFilter && { status: statusFilter }),
         })
-        
+
         const receivedResponse = await fetch(`/api/requests?${receivedParams}`)
         const receivedResult = await receivedResponse.json()
 
@@ -95,7 +94,7 @@ function RequestsContent() {
       console.log('API response status:', response.status)
       const result = await response.json()
       console.log('API response data:', result)
-      
+
       if (!result.success) {
         throw new Error(result.error)
       }
@@ -115,8 +114,8 @@ function RequestsContent() {
         {type === 'sent' ? '신청한 요청이 없습니다' : '받은 요청이 없습니다'}
       </h3>
       <p className="text-gray-600">
-        {type === 'sent' 
-          ? '아저씨를 찾아서 서비스를 요청해보세요!' 
+        {type === 'sent'
+          ? '아저씨를 찾아서 서비스를 요청해보세요!'
           : '아직 받은 서비스 요청이 없습니다.'
         }
       </p>
@@ -125,16 +124,12 @@ function RequestsContent() {
 
   return (
     <>
-      <PageHeader
-        title="의뢰 관리"
-        description="서비스 요청 내역을 확인하고 관리하세요"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '의뢰 관리' }
-        ]}
-      />
-
       <Container className="py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">의뢰 관리</h1>
+          <p className="text-gray-600 mt-1">서비스 요청 내역을 확인하고 관리하세요</p>
+        </div>
+
         <div className="space-y-6">
           {/* Filters */}
           <div className="flex items-center justify-between">

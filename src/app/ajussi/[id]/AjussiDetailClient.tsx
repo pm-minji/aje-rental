@@ -12,7 +12,6 @@ import {
   ExternalLink
 } from 'lucide-react'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'

@@ -1,20 +1,14 @@
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardBody } from '@/components/ui/Card'
 
 export default function TermsPage() {
   return (
     <>
-      <PageHeader
-        title="이용약관"
-        description="아저씨렌탈 서비스 이용약관을 확인하세요"
-        breadcrumbs={[
-          { label: '이용약관' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">이용약관</h1>
+          </div>
           <Card>
             <CardBody>
               <div className="prose max-w-none">

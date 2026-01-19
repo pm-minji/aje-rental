@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Form, FormField, FormActions } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Input'
@@ -157,17 +156,12 @@ function AjussiProfileContent() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 프로필 관리"
-        description="서비스 정보와 활동 상태를 관리하세요"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '아저씨 프로필' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">아저씨 프로필 관리</h1>
+            <p className="text-gray-600 mt-1">서비스 정보와 활동 상태를 관리하세요</p>
+          </div>
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold">서비스 정보</h2>

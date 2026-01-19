@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
@@ -90,13 +89,6 @@ function BecomeAjussiContent() {
   if (isAjussi) {
     return (
       <>
-        <PageHeader
-          title="아저씨 되기"
-          breadcrumbs={[
-            { label: '마이페이지', href: '/mypage' },
-            { label: '아저씨 되기' }
-          ]}
-        />
         <Container className="py-8">
           <div className="max-w-2xl mx-auto text-center">
             <div className="text-6xl mb-6">🎉</div>
@@ -117,17 +109,12 @@ function BecomeAjussiContent() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 되기"
-        description="다른 사람들에게 도움을 주는 아저씨가 되어보세요"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '아저씨 되기' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">아저씨 되기</h1>
+            <p className="text-gray-600 mt-1">다른 사람들에게 도움을 주는 아저씨가 되어보세요</p>
+          </div>
           {/* Application Status Section - Show if user has applied */}
           {!applicationLoading && application && (
             <Card className="border-2 border-blue-200 bg-blue-50">

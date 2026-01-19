@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Loading } from '@/components/ui/Loading'
@@ -89,13 +88,13 @@ function ApplicationContent() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 신청 내역"
-        description="아저씨 신청 상태를 확인하고 관리할 수 있습니다"
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">아저씨 신청 내역</h1>
+            <p className="text-gray-600 mt-1">아저씨 신청 상태를 확인하고 관리할 수 있습니다</p>
+          </div>
+
           {/* Back Button */}
           <div className="mb-6">
             <Link
