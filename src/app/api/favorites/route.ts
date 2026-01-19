@@ -25,17 +25,17 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createServerSupabase()
 
-    // Check if ajussi exists
+    // Check if ajussi exists (user profile exists)
     const { data: ajussi, error: ajussiError } = await supabase
       .from('profiles')
       .select('id, role')
       .eq('id', ajussiId)
-      .eq('role', 'ajussi')
       .single()
 
     if (ajussiError || !ajussi) {
+      console.error('Target user not found:', ajussiId, ajussiError)
       return NextResponse.json(
-        { success: false, error: 'Ajussi not found' },
+        { success: false, error: 'User not found' },
         { status: 404 }
       )
     }
