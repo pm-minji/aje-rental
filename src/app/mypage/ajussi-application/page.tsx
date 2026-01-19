@@ -119,12 +119,16 @@ export default function AjussiApplicationPage() {
 
   // Tag Handlers
   const handleAddSpecialty = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && specialtyInput.trim()) {
+    if (e.nativeEvent.isComposing) return
+
+    if (e.key === 'Enter') {
       e.preventDefault()
-      if (!specialties.includes(specialtyInput.trim())) {
-        setSpecialties([...specialties, specialtyInput.trim()])
+      if (specialtyInput.trim()) {
+        if (!specialties.includes(specialtyInput.trim())) {
+          setSpecialties([...specialties, specialtyInput.trim()])
+        }
+        setSpecialtyInput('')
       }
-      setSpecialtyInput('')
     }
   }
 
