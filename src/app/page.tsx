@@ -104,13 +104,13 @@ export default function Home() {
               아저씨렌탈
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              산책, 대화, 조언 등 다양한 활동을 함께할 아저씨를 찾아보세요.<br />
-              새로운 경험과 따뜻한 만남이 기다립니다.
+              각 분야의 숨은 고수, 검증된 아저씨들의 재능을<br />
+              합리적인 가격으로 이용해보세요.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button asChild size="lg" className="text-lg px-8 py-3">
-                <Link href="/ajussi">아저씨 찾기</Link>
+                <Link href="/ajussi">재능 찾기</Link>
               </Button>
               <Button variant="outline" asChild size="lg" className="text-lg px-8 py-3">
                 <Link href="/guide">이용 가이드</Link>
@@ -125,47 +125,47 @@ export default function Home() {
         <Container>
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              다양한 서비스
+              다양한 생활 재능
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              아저씨들과 함께할 수 있는 다양한 활동들을 만나보세요
+              일상의 도움이 필요할 때, 경험 많은 아저씨들의 재능을 활용하세요
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="text-4xl mb-6">🚶‍♂️</div>
-              <h3 className="text-xl font-semibold mb-4">산책 동행</h3>
+              <div className="text-4xl mb-6">🎓</div>
+              <h3 className="text-xl font-semibold mb-4">고민상담 & 멘토링</h3>
               <p className="text-gray-600 mb-4">
-                공원이나 동네를 함께 걸으며 건강한 시간을 보내세요.
-                올바른 걷기 자세와 건강 관리 팁도 함께 배울 수 있습니다.
+                인생 선배의 지혜로운 조언이 필요하신가요?
+                취업, 진로, 인간관계 등 깊이 있는 1:1 멘토링을 받아보세요.
               </p>
               <div className="text-sm text-primary font-medium">
-                1시간 20,000원 (첫 만남 고정)
+                1시간 20,000원 ~ (전문가 매칭)
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="text-4xl mb-6">💬</div>
-              <h3 className="text-xl font-semibold mb-4">대화 상대</h3>
+              <div className="text-4xl mb-6">🛠️</div>
+              <h3 className="text-xl font-semibold mb-4">취미 & 기술 레슨</h3>
               <p className="text-gray-600 mb-4">
-                인생 경험이 풍부한 아저씨와 의미있는 대화를 나누세요.
-                고민 상담부터 일상 이야기까지 편안하게 대화할 수 있습니다.
+                낚시, 바둑, 목공, 운전 연수 팁까지.
+                검증된 아저씨들의 숨겨진 특기를 저렴하게 배워보세요.
               </p>
               <div className="text-sm text-primary font-medium">
-                1시간 20,000원 (첫 만남 고정)
+                1시간 20,000원 ~ (합리적 가격)
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition-shadow">
-              <div className="text-4xl mb-6">💡</div>
-              <h3 className="text-xl font-semibold mb-4">조언 & 멘토링</h3>
+              <div className="text-4xl mb-6">🤝</div>
+              <h3 className="text-xl font-semibold mb-4">생활 도움 & 동행</h3>
               <p className="text-gray-600 mb-4">
-                인생 선배의 지혜로운 조언과 멘토링을 받아보세요.
-                취업, 인간관계, 인생 설계 등 다양한 분야의 조언을 받을 수 있습니다.
+                혼자하기 힘든 일, 든든한 동행이 필요할 때.
+                가구 이동, 쇼핑 동행, 산책 친구가 되어드립니다.
               </p>
               <div className="text-sm text-primary font-medium">
-                1시간 20,000원 (첫 만남 고정)
+                1시간 20,000원 ~ (안전한 만남)
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function Home() {
               왜 아저씨렌탈인가요?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              안전하고 신뢰할 수 있는 서비스로 특별한 경험을 제공합니다
+              신뢰할 수 있는 이웃 전문가를 가장 쉽고 안전하게 만나는 방법
             </p>
           </div>
 
@@ -189,9 +189,9 @@ export default function Home() {
               <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">안전한 만남</h3>
+              <h3 className="text-lg font-semibold mb-2">철저한 신원 검증</h3>
               <p className="text-gray-600 text-sm">
-                신원 확인된 아저씨들과 공개된 장소에서 안전하게 만나세요
+                실명, 나이, 연락처 인증은 물론<br />관리자 인터뷰를 통과한 분들만 활동합니다.
               </p>
             </div>
 
@@ -201,7 +201,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-semibold mb-2">검증된 품질</h3>
               <p className="text-gray-600 text-sm">
-                리뷰와 평점 시스템으로 검증된 고품질 서비스를 제공합니다
+                실제 이용자들의 리뷰와 평점으로<br />검증된 고품질 서비스를 제공합니다.
               </p>
             </div>
 
@@ -209,9 +209,9 @@ export default function Home() {
               <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Clock className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">유연한 시간</h3>
+              <h3 className="text-lg font-semibold mb-2">합리적인 비용</h3>
               <p className="text-gray-600 text-sm">
-                원하는 시간과 장소에서 자유롭게 서비스를 이용하세요
+                중개 수수료 거품을 뺀 직거래 방식으로<br />업계 최저가 수준의 비용을 제안합니다.
               </p>
             </div>
 
@@ -221,7 +221,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-semibold mb-2">다양한 선택</h3>
               <p className="text-gray-600 text-sm">
-                지역, 연령, 관심사별로 다양한 아저씨를 선택할 수 있습니다
+                우리 동네 숨은 고수부터 전문직 은퇴자까지<br />다양한 아저씨를 만나보세요.
               </p>
             </div>
           </div>
@@ -236,7 +236,7 @@ export default function Home() {
               인기 아저씨들
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              높은 평점과 좋은 리뷰를 받은 아저씨들을 만나보세요
+              높은 평점과 실력을 인정받은 베스트 아저씨들을 만나보세요
             </p>
           </div>
 
@@ -267,7 +267,7 @@ export default function Home() {
               <div className="text-center">
                 <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3">
                   <Link href="/ajussi" className="flex items-center">
-                    더 많은 아저씨 보기
+                    더 많은 재능 보기
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Link>
                 </Button>
@@ -285,15 +285,15 @@ export default function Home() {
               지금 시작해보세요
             </h2>
             <p className="text-lg mb-8 opacity-90 max-w-2xl mx-auto">
-              새로운 만남과 경험이 기다리고 있습니다.
-              지금 바로 아저씨를 찾아보세요!
+              당신에게 딱 맞는 생활 전문가를 찾는 가장 빠른 방법.<br />
+              지금 바로 아저씨렌탈을 시작하세요!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg px-8 py-3 bg-white text-primary hover:bg-white text-primary">
-                <Link href="/ajussi">아저씨 찾기</Link>
+                <Link href="/ajussi">재능 찾기</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="text-lg px-8 py-3 bg-transparent border-white text-white hover:bg-transparent hover:text-white">
-                <Link href="/mypage/become-ajussi">아저씨 되기</Link>
+                <Link href="/mypage/become-ajussi">아저씨 등록하기</Link>
               </Button>
             </div>
           </div>
