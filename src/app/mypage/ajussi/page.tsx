@@ -177,7 +177,7 @@ function AjussiProfileContent() {
                 <div className="space-y-6">
                   <FormField>
                     <Input
-                      label="서비스 제목"
+                      label="아저씨 닉네임"
                       placeholder="예: 건강한 산책과 운동 동행"
                       error={form.formState.errors.title?.message}
                       {...form.register('title')}
@@ -186,7 +186,7 @@ function AjussiProfileContent() {
 
                   <FormField>
                     <Textarea
-                      label="서비스 설명"
+                      label="아저씨 설명 (한줄 소개)"
                       placeholder="제공하는 서비스에 대해 자세히 설명해주세요"
                       rows={4}
                       error={form.formState.errors.description?.message}

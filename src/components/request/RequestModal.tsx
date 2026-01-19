@@ -148,18 +148,20 @@ export function RequestModal({
             {/* Duration */}
             <FormField>
               <Select
-                label="소요 시간"
+                label="예상 소요 시간"
                 options={DURATION_OPTIONS}
                 error={errors.duration?.message}
                 {...register('duration', { valueAsNumber: true })}
               />
-              {estimatedCost > 0 && (
-                <p className="text-sm text-gray-600 mt-1">
-                  예상 비용: <span className="font-semibold text-primary">
-                    {formatCurrency(estimatedCost)}
-                  </span>
+              <div className="mt-2 p-3 bg-gray-50 rounded-md text-sm">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-gray-600">매칭 수수료 (첫 1시간)</span>
+                  <span className="font-semibold text-primary">{formatCurrency(hourlyRate)}</span>
+                </div>
+                <p className="text-xs text-gray-500">
+                  * 1시간 초과 시, 추가 요금은 현장에서 아저씨와 직접 정산합니다.
                 </p>
-              )}
+              </div>
             </FormField>
 
             {/* Location */}
