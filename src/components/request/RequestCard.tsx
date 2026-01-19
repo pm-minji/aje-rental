@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
-import { formatCurrency, formatDateTime } from '@/lib/utils'
+import { formatDateTime } from '@/lib/utils'
 import { RequestWithDetails } from '@/types/database'
 import { ReviewModal } from '@/components/review/ReviewModal'
 
@@ -205,10 +205,10 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
     }
 
     if (isClient) {
-      // Navigate to specific ajussi detail page
-      const ajussiId = request.ajussi_id
-      if (ajussiId) {
-        window.location.href = `/ajussi/${ajussiId}`
+      // Navigate to specific ajussi detail page using ajussi_profiles.id
+      const ajussiProfileId = request.ajussi_profiles?.id
+      if (ajussiProfileId) {
+        window.location.href = `/ajussi/${ajussiProfileId}`
       }
     }
   }
@@ -254,11 +254,9 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="h-4 w-4 mr-2" />
               <span>{request.duration}분</span>
-              {request.ajussi_profiles && (
-                <span className="ml-2 font-medium text-primary">
-                  ({formatCurrency((request.duration / 60) * request.ajussi_profiles.hourly_rate)})
-                </span>
-              )}
+              <span className="ml-2 font-medium text-primary">
+                (20,000원 / 첫 1시간)
+              </span>
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
