@@ -104,8 +104,8 @@ export default function Home() {
               🍗 치킨 한 마리 값으로,<br />
               재능 있는 아저씨를 빌려보세요
             </h1>
-            <p className="text-lg text-gray-600 mb-8">
-              요리사 아저씨도, 변호사 아저씨도, 귀여운 아저씨도 — 모두 균일가!
+            <p className="text-lg text-gray-600 mb-8 break-keep">
+              요리사 아저씨도, 변호사 아저씨도.<br className="sm:hidden" /> 이 모든 아저씨가 균일가!
             </p>
             <Button asChild size="lg" className="text-lg px-8 py-3 w-full sm:w-auto">
               <Link href="/ajussi">지금 아저씨 찾기</Link>
