@@ -163,10 +163,10 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
   return (
     <>
       <PageHeader
-        title={ajussi.title}
+        title={`${ajussi.title} 아저씨`}
         breadcrumbs={[
           { label: '아저씨 찾기', href: '/ajussi' },
-          { label: ajussi.title }
+          { label: `${ajussi.title} 아저씨` }
         ]}
       />
 
@@ -186,11 +186,8 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                   />
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">
-                      {ajussi.title}
+                      {ajussi.title} 아저씨
                     </h1>
-                    <p className="text-lg text-gray-600">
-                      {ajussi.profiles?.nickname || ajussi.profiles?.name || ''}
-                    </p>
                     {reviewCount > 0 && (
                       <div className="flex items-center mt-2">
                         <div className="flex items-center">
@@ -349,7 +346,9 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                     <div>
                       <p className="font-medium text-gray-900 mb-1">활동 지역</p>
                       <p className="text-sm text-gray-600">
-                        {ajussi.available_areas.join(', ')}
+                        {ajussi.available_areas.map(area =>
+                          area === 'Seoul' ? '서울' : area === 'Online' ? '온라인' : area
+                        ).join(', ')}
                       </p>
                     </div>
                   </div>
@@ -405,7 +404,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
           isOpen={showRequestModal}
           onClose={() => setShowRequestModal(false)}
           ajussiId={data.ajussi.id}
-          ajussiName={data.ajussi.profiles?.nickname || data.ajussi.profiles?.name || '아저씨'}
+          ajussiName={`${data.ajussi.title} 아저씨`}
           hourlyRate={20000}
           onSubmit={handleSubmitRequest}
         />

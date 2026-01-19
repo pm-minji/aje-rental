@@ -180,42 +180,21 @@ export default function GuidePage() {
           {/* Contact */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">고객 지원</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardBody>
-                  <div className="flex items-center mb-4">
-                    <MessageCircle className="h-6 w-6 text-primary mr-3" />
-                    <div>
-                      <h3 className="font-semibold">온라인 고객센터</h3>
-                      <p className="text-gray-600">평일 10:00 - 18:00</p>
-                    </div>
+            <Card className="max-w-md">
+              <CardBody>
+                <div className="flex items-center mb-4">
+                  <Mail className="h-6 w-6 text-primary mr-3" />
+                  <div>
+                    <h3 className="font-semibold">문의 및 제휴</h3>
+                    <a href="mailto:joon@pm-minji.com" className="text-primary hover:underline">joon@pm-minji.com</a>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    서비스 이용 중 궁금한 점이나 불편사항이 있으시면<br />
-                    언제든지 문의 남겨주세요.
-                  </p>
-                  <a href="#" className="text-primary hover:underline font-medium text-sm">
-                    1:1 문의하기 &rarr;
-                  </a>
-                </CardBody>
-              </Card>
-
-              <Card>
-                <CardBody>
-                  <div className="flex items-center mb-4">
-                    <Mail className="h-6 w-6 text-primary mr-3" />
-                    <div>
-                      <h3 className="font-semibold">제휴 및 사업 문의</h3>
-                      <p className="text-gray-600">joon@pm-minji.com</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    기업 단체 강연이나 제휴 제안은 이메일로 보내주시면<br />
-                    담당자 확인 후 연락드리겠습니다.
-                  </p>
-                </CardBody>
-              </Card>
-            </div>
+                </div>
+                <p className="text-sm text-gray-600">
+                  서비스 이용 문의, 불편사항, 제휴 제안 모두 이메일로 보내주시면<br />
+                  담당자 확인 후 연락드리겠습니다.
+                </p>
+              </CardBody>
+            </Card>
           </section>
         </div>
       </Container>
