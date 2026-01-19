@@ -11,6 +11,7 @@ import { redirectToLogin } from '@/lib/auth-utils'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { AjussiWithProfile } from '@/types/database'
+import { pushToDataLayer } from '@/lib/gtm'
 
 export default function Home() {
   const [featuredAjussi, setFeaturedAjussi] = useState<AjussiWithProfile[]>([])
@@ -78,12 +79,22 @@ export default function Home() {
         if (result.action === 'added') {
           success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
           setFavoriteIds(prev => new Set([...Array.from(prev), ajussiId]))
+          pushToDataLayer({
+            event: 'favorite_added',
+            ajussiId,
+            location: 'home',
+          })
         } else if (result.action === 'removed') {
           success('즐겨찾기 해제', '즐겨찾기에서 제거되었습니다.')
           setFavoriteIds(prev => {
             const newSet = new Set(prev)
             newSet.delete(ajussiId)
             return newSet
+          })
+          pushToDataLayer({
+            event: 'favorite_removed',
+            ajussiId,
+            location: 'home',
           })
         }
       } else {
