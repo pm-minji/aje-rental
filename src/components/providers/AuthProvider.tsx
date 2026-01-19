@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false)
   const [profileCheckComplete, setProfileCheckComplete] = useState(false)
 
-  const supabase = createClientSupabase()
+  const [supabase] = useState(() => createClientSupabase())
   const router = useRouter()
   const pathname = usePathname()
 
