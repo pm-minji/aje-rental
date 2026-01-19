@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/Checkbox'
 import { Button } from '@/components/ui/Button'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
+import { Badge } from '@/components/ui/Badge'
 import { useAuth } from '@/components/providers/AuthProvider'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
@@ -30,17 +31,7 @@ const ajussiProfileSchema = z.object({
 type AjussiProfileFormData = z.infer<typeof ajussiProfileSchema>
 
 const LOCATIONS = [
-  '강남구', '서초구', '송파구', '마포구', '용산구', '중구', '영등포구',
-  '종로구', '성동구', '광진구', '동대문구', '중랑구', '성북구', '강북구',
-  '도봉구', '노원구', '은평구', '서대문구', '양천구', '강서구', '구로구',
-  '금천구', '관악구', '동작구', '강동구'
-]
-
-const TAGS = [
-  '산책', '대화', '조언', '멘토링', '운동', '건강관리',
-  '취업상담', '직장생활', '인생상담', '카페', '공원',
-  '문화생활', '독서', '음악', '영화', '요리', '여행',
-  '언어교환', '컴퓨터', '스마트폰', '투자', '부동산'
+  'Seoul', 'Online'
 ]
 
 export default function AjussiProfilePage() {
@@ -221,9 +212,32 @@ function AjussiProfileContent() {
                       <Input
                         label="오픈채팅 URL"
                         placeholder="https://open.kakao.com/..."
-                        error={form.formState.errors.open_chat_url?.message}
                         {...form.register('open_chat_url')}
                       />
+                      <details className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-md">
+                        <summary className="p-3 cursor-pointer font-medium hover:text-primary list-none flex items-center">
+                          <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center mr-2 text-xs">?</span>
+                          오픈채팅방이 왜 필요한가요? / 만드는 방법
+                        </summary>
+                        <div className="px-4 pb-4 space-y-3 border-t border-gray-100 pt-3">
+                          <div>
+                            <p className="font-semibold text-gray-800 mb-1">💡 왜 필요한가요?</p>
+                            <p>
+                              아저씨렌탈은 개인 연락처 노출 없이 안전하게 소통하기 위해 카카오톡 오픈채팅을 사용합니다.
+                              고객과의 상담 및 일정 조율이 이 링크를 통해 이루어집니다.
+                            </p>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 mb-1">🛠 만드는 방법</p>
+                            <ol className="list-decimal pl-5 space-y-1">
+                              <li>카카오톡 앱 실행 → '채팅' 탭 → 우측 상단 말풍선(+) 아이콘 터치</li>
+                              <li><strong>[오픈채팅]</strong> 선택 → <strong>[오픈프로필]</strong> 탭 선택 → <strong>[+ 만들기]</strong></li>
+                              <li>프로필 이름(예: OOO 아저씨) 설정 후 '완료'</li>
+                              <li>생성된 프로필의 <strong>[링크 공유]</strong> 버튼을 눌러 주소를 복사하여 위 칸에 붙여넣기</li>
+                            </ol>
+                          </div>
+                        </div>
+                      </details>
                     </FormField>
                   </div>
 
@@ -242,6 +256,9 @@ function AjussiProfileContent() {
                     <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                       {LOCATIONS.map((area) => {
                         const isSelected = form.watch('available_areas')?.includes(area)
+                        // Mapping for display
+                        const displayArea = area === 'Seoul' ? '서울 (오프라인)' : (area === 'Online' ? '온라인' : area);
+
                         return (
                           <button
                             key={area}
@@ -252,7 +269,7 @@ function AjussiProfileContent() {
                               : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
                               }`}
                           >
-                            {area}
+                            {displayArea}
                           </button>
                         )
                       })}
@@ -269,23 +286,33 @@ function AjussiProfileContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       서비스 태그
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {TAGS.map((tag) => {
-                        const isSelected = form.watch('tags')?.includes(tag)
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => handleTagToggle(tag)}
-                            className={`px-3 py-1 text-sm rounded-full border transition-colors ${isSelected
-                              ? 'bg-primary text-white border-primary'
-                              : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                              }`}
-                          >
-                            {tag}
-                          </button>
-                        )
-                      })}
+                    <div className="flex gap-2 mb-2">
+                      <Input
+                        placeholder="태그 입력 후 Enter (예: #고민상담, #낚시, #코딩)"
+                        onKeyDown={(e) => {
+                          if (e.nativeEvent.isComposing) return
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            const val = e.currentTarget.value.trim()
+                            if (val) {
+                              handleTagToggle(val) //Reuse logic to add
+                              e.currentTarget.value = ''
+                            }
+                          }
+                        }}
+                      />
+                      <Button type="button" onClick={() => {
+                        // Logic handled by input
+                      }}>추가</Button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {form.watch('tags')?.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="px-3 py-1 text-sm flex items-center gap-1">
+                          #{tag.replace(/^#/, '')}
+                          <button type="button" onClick={() => handleTagToggle(tag)} className="hover:text-red-500 ml-1">×</button>
+                        </Badge>
+                      ))}
                     </div>
                     {form.formState.errors.tags && (
                       <p className="text-sm text-red-600 mt-1">
