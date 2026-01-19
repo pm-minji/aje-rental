@@ -275,7 +275,7 @@ function AdminContent() {
                               key={area}
                               className="px-2 py-1 bg-gray-100 text-xs rounded border border-gray-200"
                             >
-                              {area === 'Seoul' ? '서울(오프라인)' : (area === 'Online' ? '온라인' : area)}
+                              {area === 'Seoul' || area === 'Gangnam-gu' ? '서울(오프라인)' : (area === 'Online' ? '온라인' : area)}
                             </span>
                           ))}
                         </div>
@@ -314,22 +314,25 @@ function AdminContent() {
                       </div>
                     )}
 
-                    {application.status === 'PENDING' && (
+                    {application.status !== 'REJECTED' && (
                       <div className="flex gap-2">
-                        <Button
-                          onClick={() => handleApprove(application.id)}
-                          loading={processing === application.id}
-                          disabled={processing !== null}
-                        >
-                          승인
-                        </Button>
+                        {application.status !== 'APPROVED' && (
+                          <Button
+                            onClick={() => handleApprove(application.id)}
+                            loading={processing === application.id}
+                            disabled={processing !== null}
+                          >
+                            승인
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           onClick={() => handleReject(application.id)}
                           loading={processing === application.id}
                           disabled={processing !== null}
+                          className={application.status === 'APPROVED' ? 'text-red-500 border-red-200 hover:bg-red-50' : ''}
                         >
-                          거절
+                          {application.status === 'APPROVED' ? '승인 취소 (거절)' : '거절'}
                         </Button>
                       </div>
                     )}

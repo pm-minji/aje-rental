@@ -62,25 +62,49 @@ export async function POST(
       )
     }
 
-    if (application.status !== 'PENDING') {
+    if (application.status !== 'PENDING' && application.status !== 'APPROVED') {
       return NextResponse.json(
-        { success: false, error: 'Application already processed' },
+        { success: false, error: 'Application already processed and cannot be rejected' },
         { status: 400 }
       )
     }
 
-    // Update application status to rejected
-    const { error: updateError } = await supabaseAdmin
-      .from('ajussi_applications')
-      .update({
-        status: 'REJECTED',
-        admin_notes: `Rejected: ${reason}`,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
+    // Start transaction-like operations
+    try {
+      // 1. Update application status
+      const { error: updateError } = await supabaseAdmin
+        .from('ajussi_applications')
+        .update({
+          status: 'REJECTED',
+          admin_notes: `Rejected: ${reason} (Date: ${new Date().toISOString()})`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
 
-    if (updateError) {
-      console.error('Error updating application status:', updateError)
+      if (updateError) throw updateError
+
+      // 2. If it was previously approved, we need to revert the user role and deactivate profile
+      if (application.status === 'APPROVED') {
+        const userId = application.user_id
+
+        // Revert role to user
+        const { error: roleError } = await supabaseAdmin
+          .from('profiles')
+          .update({ role: 'user' })
+          .eq('id', userId)
+
+        if (roleError) console.error('Error reverting user role:', roleError)
+
+        // Deactivate ajussi profile (or could delete, but soft delete/deactivate is safer)
+        const { error: profileError } = await supabaseAdmin
+          .from('ajussi_profiles')
+          .update({ is_active: false })
+          .eq('user_id', userId)
+
+        if (profileError) console.error('Error deactivating ajussi profile:', profileError)
+      }
+    } catch (err) {
+      console.error('Error rejecting application:', err)
       return NextResponse.json(
         { success: false, error: 'Failed to reject application' },
         { status: 500 }
