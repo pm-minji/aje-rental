@@ -22,16 +22,8 @@ interface SearchFilterProps {
 }
 
 const LOCATIONS = [
-  { value: '강남구', label: '강남구' },
-  { value: '서초구', label: '서초구' },
-  { value: '송파구', label: '송파구' },
-  { value: '마포구', label: '마포구' },
-  { value: '용산구', label: '용산구' },
-  { value: '중구', label: '중구' },
-  { value: '영등포구', label: '영등포구' },
-  { value: '종로구', label: '종로구' },
-  { value: '성동구', label: '성동구' },
-  { value: '광진구', label: '광진구' },
+  { value: 'Seoul', label: '서울 (오프라인)' },
+  { value: 'Online', label: '온라인' },
 ]
 
 const TAGS = [
@@ -92,9 +84,9 @@ export function SearchFilter({ onFilterChange, initialFilters = {} }: SearchFilt
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag]
 
-    const newFilters = { 
-      ...filters, 
-      tags: newTags.length > 0 ? newTags : undefined 
+    const newFilters = {
+      ...filters,
+      tags: newTags.length > 0 ? newTags : undefined
     }
     setFilters(newFilters)
     onFilterChange(newFilters)
@@ -108,7 +100,7 @@ export function SearchFilter({ onFilterChange, initialFilters = {} }: SearchFilt
     setShowAdvanced(false)
   }
 
-  const hasActiveFilters = Object.keys(filters).some(key => 
+  const hasActiveFilters = Object.keys(filters).some(key =>
     filters[key as keyof FilterOptions] !== undefined
   )
 
@@ -197,11 +189,10 @@ export function SearchFilter({ onFilterChange, initialFilters = {} }: SearchFilt
                     <button
                       key={tag}
                       onClick={() => handleTagToggle(tag)}
-                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                        isSelected
+                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${isSelected
                           ? 'bg-primary text-white border-primary'
                           : 'bg-white text-gray-600 border-gray-300 hover:border-primary hover:text-primary'
-                      }`}
+                        }`}
                     >
                       {tag}
                     </button>
@@ -227,10 +218,10 @@ export function SearchFilter({ onFilterChange, initialFilters = {} }: SearchFilt
               </button>
             </Badge>
           )}
-          
+
           {(filters.minRate || filters.maxRate) && (
             <Badge variant="info" className="flex items-center gap-1">
-              요금: {filters.minRate ? `${filters.minRate.toLocaleString()}원` : '0원'} - 
+              요금: {filters.minRate ? `${filters.minRate.toLocaleString()}원` : '0원'} -
               {filters.maxRate ? `${filters.maxRate.toLocaleString()}원` : '무제한'}
               <button
                 onClick={() => handleRateRangeChange('')}

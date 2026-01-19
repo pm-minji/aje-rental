@@ -253,26 +253,38 @@ function AjussiProfileContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       활동 가능 지역
                     </label>
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {LOCATIONS.map((area) => {
-                        const isSelected = form.watch('available_areas')?.includes(area)
-                        // Mapping for display
-                        const displayArea = area === 'Seoul' ? '서울 (오프라인)' : (area === 'Online' ? '온라인' : area);
+                    <div className="space-y-2">
+                      {/* Online */}
+                      <div className="flex items-start p-3 border rounded-md hover:bg-gray-50 cursor-pointer mb-2" onClick={() => handleAreaToggle('Online')}>
+                        <div className="flex items-center h-5">
+                          <input
+                            type="checkbox"
+                            checked={form.watch('available_areas')?.includes('Online')}
+                            onChange={() => { }} // Handled by div click
+                            className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          />
+                        </div>
+                        <div className="ml-3 text-sm">
+                          <span className="font-medium text-gray-700">온라인 상담</span>
+                          <p className="text-gray-500">전화, 화상채팅, 메신저 등</p>
+                        </div>
+                      </div>
 
-                        return (
-                          <button
-                            key={area}
-                            type="button"
-                            onClick={() => handleAreaToggle(area)}
-                            className={`px-3 py-2 text-sm rounded-md border transition-colors ${isSelected
-                              ? 'bg-primary text-white border-primary'
-                              : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                              }`}
-                          >
-                            {displayArea}
-                          </button>
-                        )
-                      })}
+                      {/* Seoul */}
+                      <div className="flex items-start p-3 border rounded-md hover:bg-gray-50 cursor-pointer" onClick={() => handleAreaToggle('Seoul')}>
+                        <div className="flex items-center h-5">
+                          <input
+                            type="checkbox"
+                            checked={form.watch('available_areas')?.includes('Seoul')}
+                            onChange={() => { }} // Handled by div click
+                            className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          />
+                        </div>
+                        <div className="ml-3 text-sm">
+                          <span className="font-medium text-gray-700">오프라인 만남 (서울)</span>
+                          <p className="text-gray-500">현재 오프라인 활동은 서울 지역만 지원합니다.</p>
+                        </div>
+                      </div>
                     </div>
                     {form.formState.errors.available_areas && (
                       <p className="text-sm text-red-600 mt-1">
