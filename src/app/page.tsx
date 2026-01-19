@@ -116,26 +116,6 @@ export default function Home() {
                 <Link href="/guide">이용 가이드</Link>
               </Button>
             </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">100+</div>
-                <div className="text-sm text-gray-600">등록된 아저씨</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">500+</div>
-                <div className="text-sm text-gray-600">성사된 만남</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">4.8</div>
-                <div className="text-sm text-gray-600">평균 만족도</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">24/7</div>
-                <div className="text-sm text-gray-600">고객 지원</div>
-              </div>
-            </div>
           </div>
         </Container>
       </section>
@@ -161,7 +141,7 @@ export default function Home() {
                 올바른 걷기 자세와 건강 관리 팁도 함께 배울 수 있습니다.
               </p>
               <div className="text-sm text-primary font-medium">
-                시간당 15,000원부터
+                1시간 20,000원 (첫 만남 고정)
               </div>
             </div>
 
@@ -173,7 +153,7 @@ export default function Home() {
                 고민 상담부터 일상 이야기까지 편안하게 대화할 수 있습니다.
               </p>
               <div className="text-sm text-primary font-medium">
-                시간당 20,000원부터
+                1시간 20,000원 (첫 만남 고정)
               </div>
             </div>
 
@@ -185,7 +165,7 @@ export default function Home() {
                 취업, 인간관계, 인생 설계 등 다양한 분야의 조언을 받을 수 있습니다.
               </p>
               <div className="text-sm text-primary font-medium">
-                시간당 25,000원부터
+                1시간 20,000원 (첫 만남 고정)
               </div>
             </div>
           </div>

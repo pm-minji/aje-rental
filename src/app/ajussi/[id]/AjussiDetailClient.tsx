@@ -325,7 +325,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
               <CardBody className="space-y-4">
                 <div className="flex items-center text-lg font-semibold text-primary">
                   <Clock className="h-5 w-5 mr-2" />
-                  {formatCurrency(ajussi.hourly_rate)}/시간
+                  {formatCurrency(20000)}/1시간 (첫 만남 고정)
                 </div>
 
                 {ajussi.available_areas && ajussi.available_areas.length > 0 && (
@@ -391,7 +391,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
           onClose={() => setShowRequestModal(false)}
           ajussiId={data.ajussi.id}
           ajussiName={data.ajussi.profiles?.nickname || data.ajussi.profiles?.name || '아저씨'}
-          hourlyRate={data.ajussi.hourly_rate}
+          hourlyRate={20000}
           onSubmit={handleSubmitRequest}
         />
       )}

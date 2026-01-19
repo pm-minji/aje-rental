@@ -29,7 +29,7 @@ const AREAS = [
 ]
 
 const TAGS = [
-  '산책', '운동', '건강관리', '대화', '조언', '멘토링', '요리', '생활팁', 
+  '산책', '운동', '건강관리', '대화', '조언', '멘토링', '요리', '생활팁',
   '독서', '철학', '문학', '여행', '맛집', '문화', 'IT', '프로그래밍', '컴퓨터'
 ]
 
@@ -42,7 +42,7 @@ export default function AjussiApplicationPage() {
   const router = useRouter()
   const { success, error } = useToast()
   const { isAjussi } = useAuth()
-  
+
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<ApplicationForm>()
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function AjussiApplicationPage() {
       router.push('/mypage/ajussi')
       return
     }
-    
+
     // 기존 신청 내역 불러오기 (재신청용)
     fetchExistingApplication()
   }, [isAjussi])
@@ -65,7 +65,7 @@ export default function AjussiApplicationPage() {
       if (result.success && result.data) {
         const app = result.data
         setExistingApplication(app)
-        
+
         // 폼에 기존 데이터 채우기 (거절된 경우만)
         if (app.status === 'REJECTED') {
           setValue('title', app.title)
@@ -85,16 +85,16 @@ export default function AjussiApplicationPage() {
   }
 
   const handleAreaToggle = (area: string) => {
-    setSelectedAreas(prev => 
-      prev.includes(area) 
+    setSelectedAreas(prev =>
+      prev.includes(area)
         ? prev.filter(a => a !== area)
         : [...prev, area]
     )
   }
 
   const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     )
@@ -137,8 +137,8 @@ export default function AjussiApplicationPage() {
       if (result.success) {
         const isReapplication = existingApplication && existingApplication.status === 'REJECTED'
         success(
-          '신청 완료', 
-          isReapplication 
+          '신청 완료',
+          isReapplication
             ? '재신청이 완료되었습니다. 검토 후 연락드리겠습니다.'
             : '아저씨 신청이 완료되었습니다. 검토 후 연락드리겠습니다.'
         )
@@ -169,7 +169,7 @@ export default function AjussiApplicationPage() {
       <PageHeader
         title={isReapplication ? "아저씨 재신청" : "아저씨 신청"}
         description={
-          isReapplication 
+          isReapplication
             ? "거절 사유를 참고하여 내용을 수정한 후 다시 신청해주세요"
             : "아저씨로 활동하기 위한 신청서를 작성해주세요"
         }
@@ -252,15 +252,15 @@ export default function AjussiApplicationPage() {
                   </label>
                   <Input
                     type="number"
-                    {...register('hourly_rate', { 
-                      required: '시간당 요금을 입력해주세요',
-                      min: { value: 10000, message: '최소 10,000원 이상 입력해주세요' }
+                    value={20000}
+                    readOnly
+                    className="bg-gray-100"
+                    helperText="첫 만남 1시간 비용은 20,000원으로 고정됩니다. (수수료 50% 공제 후 10,000원 정산)"
+                    {...register('hourly_rate', {
+                      valueAsNumber: true,
+                      value: 20000
                     })}
-                    placeholder="15000"
                   />
-                  {errors.hourly_rate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.hourly_rate.message}</p>
-                  )}
                 </div>
 
                 <div>
@@ -288,11 +288,10 @@ export default function AjussiApplicationPage() {
                           key={area}
                           type="button"
                           onClick={() => handleAreaToggle(area)}
-                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                            isSelected
+                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${isSelected
                               ? 'bg-primary text-white border-primary'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           {area}
                         </button>
@@ -313,11 +312,10 @@ export default function AjussiApplicationPage() {
                           key={tag}
                           type="button"
                           onClick={() => handleTagToggle(tag)}
-                          className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-                            isSelected
+                          className={`px-3 py-1 text-sm rounded-full border transition-colors ${isSelected
                               ? 'bg-primary text-white border-primary'
                               : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           {tag}
                         </button>

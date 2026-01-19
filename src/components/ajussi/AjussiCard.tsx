@@ -60,8 +60,8 @@ export function AjussiCard({
               >
                 <Heart
                   className={`h-4 w-4 ${isFavorited
-                      ? 'fill-red-500 text-red-500'
-                      : 'text-gray-400 hover:text-red-500'
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-gray-400 hover:text-red-500'
                     }`}
                 />
               </Button>
@@ -94,7 +94,7 @@ export function AjussiCard({
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="h-4 w-4 mr-2" />
               <span className="font-semibold text-primary">
-                {formatCurrency(ajussi.hourly_rate)}/시간
+                {formatCurrency(20000)}/1시간 (첫 만남 고정)
               </span>
             </div>
 

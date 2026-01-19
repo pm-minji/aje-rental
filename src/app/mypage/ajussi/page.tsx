@@ -20,7 +20,7 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute'
 const ajussiProfileSchema = z.object({
   title: z.string().min(5, '제목은 5자 이상이어야 합니다').max(50, '제목은 50자 이하여야 합니다'),
   description: z.string().min(20, '설명은 20자 이상이어야 합니다').max(500, '설명은 500자 이하여야 합니다'),
-  hourly_rate: z.number().min(5000, '최소 5,000원 이상이어야 합니다').max(100000, '최대 100,000원 이하여야 합니다'),
+  hourly_rate: z.number().min(20000, '요금은 20,000원이어야 합니다').max(20000, '요금은 20,000원이어야 합니다'),
   available_areas: z.array(z.string()).min(1, '최소 1개 지역을 선택해주세요'),
   open_chat_url: z.string().url('올바른 URL을 입력해주세요').optional().or(z.literal('')),
   is_active: z.boolean(),
@@ -102,7 +102,7 @@ function AjussiProfileContent() {
   const handleSave = async (data: AjussiProfileFormData) => {
     try {
       setSaving(true)
-      
+
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
@@ -132,7 +132,7 @@ function AjussiProfileContent() {
     const newAreas = currentAreas.includes(area)
       ? currentAreas.filter(a => a !== area)
       : [...currentAreas, area]
-    
+
     form.setValue('available_areas', newAreas)
   }
 
@@ -141,7 +141,7 @@ function AjussiProfileContent() {
     const newTags = currentTags.includes(tag)
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag]
-    
+
     form.setValue('tags', newTags)
   }
 
@@ -208,10 +208,12 @@ function AjussiProfileContent() {
                       <Input
                         label="시간당 요금 (원)"
                         type="number"
-                        min="5000"
-                        max="100000"
-                        step="1000"
-                        error={form.formState.errors.hourly_rate?.message}
+                        min="20000"
+                        max="20000"
+                        value={20000}
+                        readOnly
+                        className="bg-gray-100"
+                        helperText="첫 만남 1시간 비용은 20,000원으로 고정됩니다. (수수료 50% 공제 후 10,000원 정산)"
                         {...form.register('hourly_rate', { valueAsNumber: true })}
                       />
                     </FormField>
@@ -245,11 +247,10 @@ function AjussiProfileContent() {
                             key={area}
                             type="button"
                             onClick={() => handleAreaToggle(area)}
-                            className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                              isSelected
-                                ? 'bg-primary text-white border-primary'
-                                : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                            }`}
+                            className={`px-3 py-2 text-sm rounded-md border transition-colors ${isSelected
+                              ? 'bg-primary text-white border-primary'
+                              : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
+                              }`}
                           >
                             {area}
                           </button>
@@ -276,11 +277,10 @@ function AjussiProfileContent() {
                             key={tag}
                             type="button"
                             onClick={() => handleTagToggle(tag)}
-                            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-                              isSelected
-                                ? 'bg-primary text-white border-primary'
-                                : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                            }`}
+                            className={`px-3 py-1 text-sm rounded-full border transition-colors ${isSelected
+                              ? 'bg-primary text-white border-primary'
+                              : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
+                              }`}
                           >
                             {tag}
                           </button>

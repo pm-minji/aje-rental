@@ -224,6 +224,12 @@
   - 반응형 디자인 최종 확인
   - _Requirements: 전체 시스템_
 
+- [x] **Refine UI/UX & SEO** <!-- id: 5 -->
+    - [x] Fix main page CTA button text visibility <!-- id: 6 -->
+    - [x] Mobile optimization (remove hover on touch, better filter UI) <!-- id: 7 -->
+    - [x] Implement GEO/SEO strategies (JSON-LD, meta tags) <!-- id: 8 -->
+    - [x] Refine Main Page content (remove dummy stats) <!-- id: 9 -->
+    - [x] Implement Fixed Pricing Policy (20,000 KRW) <!-- id: 10 -->
 - [x] 10.2 성능 최적화 및 실시간 기능
   - Next.js Image 최적화 및 lazy loading
   - Supabase Realtime 채널 설정 (요청 상태 업데이트)
