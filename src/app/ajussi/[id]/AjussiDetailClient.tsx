@@ -347,8 +347,8 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
         </div>
       </Container>
 
-      {/* Sticky CTA Bar - All screens */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-3 z-50">
+      {/* Sticky CTA Bar - Above bottom nav on mobile */}
+      <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t shadow-lg p-3 z-40">
         <div className="max-w-2xl mx-auto">
           <p className="text-xs text-center text-gray-500 mb-2">
             💬 오픈채팅으로 먼저 일정을 협의한 후 서비스를 요청해주세요

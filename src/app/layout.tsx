@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import { BottomNav } from '@/components/layout/BottomNav'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { ToastProvider } from '@/components/ui/Toast'
@@ -66,10 +67,11 @@ export default function RootLayout({
               <AuthLoadingWrapper>
                 <div className="min-h-screen flex flex-col bg-gray-50">
                   <Header />
-                  <main className="flex-1 bg-white">
+                  <main className="flex-1 bg-white pb-16 lg:pb-0">
                     {children}
                   </main>
                   <Footer />
+                  <BottomNav />
                 </div>
               </AuthLoadingWrapper>
             </AuthProvider>
