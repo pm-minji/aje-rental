@@ -6,7 +6,8 @@ import { Modal, ModalBody, ModalFooter } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Textarea } from '@/components/ui/Textarea'
 import { useToast } from '@/components/ui/Toast'
-import { cn } from '@/lib/utils'
+import { cn, formatDate } from '@/lib/utils'
+import { pushToDataLayer } from '@/lib/gtm'
 
 interface ReviewModalProps {
     isOpen: boolean
@@ -51,6 +52,12 @@ export function ReviewModal({
 
             if (result.success) {
                 success('리뷰 작성 완료', '소중한 리뷰 감사합니다!')
+                pushToDataLayer({
+                    event: 'review_submitted',
+                    requestId,
+                    rating,
+                    hasComment: !!comment.trim(),
+                })
                 handleClose()
                 onSuccess?.()
             } else {

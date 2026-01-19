@@ -23,6 +23,7 @@ import { redirectToLogin } from '@/lib/auth-utils'
 import { RequestModal } from '@/components/request/RequestModal'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { AjussiWithProfile, ReviewWithDetails } from '@/types/database'
+import { pushToDataLayer } from '@/lib/gtm'
 
 interface AjussiDetailData {
   ajussi: AjussiWithProfile
@@ -78,6 +79,11 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
         if (result.success) {
           setIsFavorited(false)
           success('즐겨찾기 해제', '즐겨찾기에서 제거되었습니다.')
+          pushToDataLayer({
+            event: 'favorite_removed',
+            ajussiId: data?.ajussi.user_id,
+            ajussiTitle: data?.ajussi.title,
+          })
         }
       } else {
         // Add to favorites
@@ -94,6 +100,11 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
         if (result.success) {
           setIsFavorited(true)
           success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
+          pushToDataLayer({
+            event: 'favorite_added',
+            ajussiId: data?.ajussi.user_id,
+            ajussiTitle: data?.ajussi.title,
+          })
         }
       }
     } catch (err) {
@@ -134,6 +145,14 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
       if (!result.success) {
         throw new Error(result.error)
       }
+
+      pushToDataLayer({
+        event: 'service_requested',
+        ajussiId: data?.ajussi.user_id,
+        ajussiTitle: data?.ajussi.title,
+        location: requestData.location,
+        duration: requestData.duration,
+      })
     } catch (err) {
       throw err
     }
