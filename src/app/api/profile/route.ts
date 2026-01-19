@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase, getUser } from '@/lib/supabase'
+import { createServerSupabase, createServerClient, getUser } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,20 +13,28 @@ export async function GET() {
       )
     }
 
-    const supabase = await createServerSupabase()
+    // Use admin client to bypass RLS
+    const supabase = createServerClient()
 
     // Get user profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (profileError) {
       console.error('Error fetching profile:', profileError)
       return NextResponse.json(
         { success: false, error: 'Failed to fetch profile' },
         { status: 500 }
+      )
+    }
+
+    if (!profile) {
+      return NextResponse.json(
+        { success: false, error: 'Profile not found' },
+        { status: 404 }
       )
     }
 
@@ -37,7 +45,7 @@ export async function GET() {
         .from('ajussi_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single()
+        .maybeSingle()
 
       if (!error) {
         ajussiProfile = data
@@ -82,7 +90,7 @@ export async function PUT(request: NextRequest) {
         introduction: profileData.introduction,
         profile_image: profileData.profile_image,
       }
-      
+
       // Allow role change only from user to ajussi
       if (profileData.role === 'ajussi') {
         updateData.role = 'ajussi'

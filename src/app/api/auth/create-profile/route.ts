@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase, getUser } from '@/lib/supabase'
+import { createServerClient, getUser } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,14 +15,15 @@ export async function POST(request: NextRequest) {
 
     console.log('Creating profile for user:', user.id)
 
-    const supabase = await createServerSupabase()
+    // Use service role client for profile operations (bypasses RLS)
+    const supabaseAdmin = createServerClient()
 
-    // Check if profile already exists
-    const { data: existingProfile } = await supabase
+    // Check if profile already exists (using admin client to bypass RLS)
+    const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (existingProfile) {
       console.log('Profile already exists')
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create new profile
+    // Create new profile using admin client (bypasses RLS)
     const profileData = {
       id: user.id,
       email: user.email!,
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     console.log('Creating profile with data:', profileData)
 
-    const { data: newProfile, error } = await supabase
+    const { data: newProfile, error } = await supabaseAdmin
       .from('profiles')
       .insert(profileData)
       .select()

@@ -122,7 +122,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               key="chat"
               variant="outline"
               size="sm"
-              onClick={() => window.open(request.ajussi_profiles.open_chat_url, '_blank')}
+              onClick={() => window.open(request.ajussi_profiles?.open_chat_url ?? '', '_blank')}
             >
               <MessageCircle className="h-4 w-4 mr-1" />
               채팅하기
@@ -232,7 +232,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               />
               <div>
                 <h3 className="font-medium text-gray-900">
-                  {otherParty.nickname || otherParty.name}
+                  {otherParty?.nickname || otherParty?.name || '알 수 없음'}
                 </h3>
                 {isClient && request.ajussi_profiles && (
                   <p className="text-sm text-gray-600">
