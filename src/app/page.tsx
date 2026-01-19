@@ -106,7 +106,8 @@ export default function Home() {
             </h1>
             <p className="text-lg text-gray-600 mb-8 break-keep">
               <span className="inline-block">요리사 아저씨도,</span>{' '}
-              <span className="inline-block">변호사 아저씨도.</span><br className="sm:hidden" />
+              <span className="inline-block">변호사 아저씨도,</span>{' '}
+              <span className="inline-block">귀여운 아저씨도.</span><br className="sm:hidden" />
               <span className="inline-block font-semibold text-primary ml-1">이 모든 아저씨가 균일가!</span>
             </p>
             <Button asChild size="lg" className="text-lg px-8 py-3 w-full sm:w-auto">
