@@ -162,13 +162,6 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
 
   return (
     <>
-      <PageHeader
-        title={`${ajussi.title} 아저씨`}
-        breadcrumbs={[
-          { label: '아저씨 찾기', href: '/ajussi' },
-          { label: `${ajussi.title} 아저씨` }
-        ]}
-      />
 
       <Container className="py-8 pb-32">
         <div className="max-w-2xl mx-auto space-y-6">
@@ -248,6 +241,7 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
                 <div className="bg-gray-100 p-4 rounded-lg text-center">
                   <p className="text-xl font-bold text-gray-700">10,000원</p>
                   <p className="text-sm text-gray-600">추가 시간당</p>
+                  <p className="text-xs text-gray-500 mt-1">(현장 정산)</p>
                 </div>
               </div>
               {ajussi.available_areas && ajussi.available_areas.length > 0 && (
