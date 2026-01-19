@@ -31,6 +31,13 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
   const isClient = userType === 'client'
   const isAjussi = userType === 'ajussi'
 
+  // Check if the scheduled service time has passed (date + duration)
+  const isServiceTimeOver = (() => {
+    const serviceDate = new Date(request.date)
+    const endTime = new Date(serviceDate.getTime() + request.duration * 60 * 1000)
+    return new Date() > endTime
+  })()
+
   const handleStatusChange = async (newStatus: string) => {
     try {
       setLoading(true)
@@ -106,15 +113,29 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
         break
 
       case 'CONFIRMED':
-        buttons.push(
-          <Button
-            key="complete"
-            size="sm"
-            onClick={(e) => openConfirmModal('COMPLETED', e)}
-          >
-            완료하기
-          </Button>
-        )
+        if (isServiceTimeOver) {
+          buttons.push(
+            <Button
+              key="complete"
+              size="sm"
+              onClick={(e) => openConfirmModal('COMPLETED', e)}
+            >
+              완료하기
+            </Button>
+          )
+        } else {
+          buttons.push(
+            <Button
+              key="complete-disabled"
+              size="sm"
+              variant="outline"
+              disabled
+              title="예약 시간 이후에 완료할 수 있습니다"
+            >
+              예약시간 전
+            </Button>
+          )
+        }
         // 채팅하기 버튼은 클라이언트(유저)에게만 표시
         if (isClient && request.ajussi_profiles?.open_chat_url) {
           buttons.push(
