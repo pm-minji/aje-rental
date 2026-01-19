@@ -5,6 +5,7 @@ import { User, Session } from '@supabase/supabase-js'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClientSupabase } from '@/lib/supabase'
 import { Profile } from '@/types/database'
+import { pushToDataLayer } from '@/lib/gtm'
 
 interface AuthContextType {
   user: User | null
@@ -145,6 +146,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe()
     }
   }, [supabase.auth, initialLoadComplete, pathname])
+
+  // Push user to GTM dataLayer
+  useEffect(() => {
+    if (user) {
+      pushToDataLayer({
+        event: 'user_identified',
+        userId: user.id,
+        userRole: profile?.role || 'user',
+        email: user.email,
+      })
+    } else if (initialLoadComplete && !user) {
+      pushToDataLayer({
+        event: 'user_identified',
+        userId: null,
+        userRole: null,
+        email: null,
+      })
+    }
+  }, [user, profile, initialLoadComplete])
 
   const fetchProfile = async (userId: string, allowRedirect: boolean = false): Promise<Profile | null> => {
     try {

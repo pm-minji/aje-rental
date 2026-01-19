@@ -9,6 +9,8 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 import { ToastProvider } from '@/components/ui/Toast'
 import AuthLoadingWrapper from '@/components/auth/AuthLoadingWrapper'
 import Script from 'next/script'
+import GTMTracker from '@/components/analytics/GTMTracker'
+import { Suspense } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -89,6 +91,9 @@ export default function RootLayout({
         `}
       </Script>
       <body className={inter.className}>
+        <Suspense>
+          <GTMTracker />
+        </Suspense>
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-PLQSBK8B"
