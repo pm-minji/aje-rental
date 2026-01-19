@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Combine date and time
     const requestDateTime = new Date(`${date}T${time}:00`)
-    
+
     // Check if the date is in the future
     if (requestDateTime <= new Date()) {
       return NextResponse.json(
@@ -116,10 +116,10 @@ export async function GET(request: NextRequest) {
     // Try to get user from session directly
     const supabase = await createServerSupabase()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+
     console.log('GET /api/requests - User:', user?.id)
     console.log('GET /api/requests - Error:', userError)
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -182,18 +182,28 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Get ajussi_profiles for each request
+    // Get ajussi_profiles and reviews for each request
     if (requests && requests.length > 0) {
       const ajussiIds = requests.map(req => req.ajussi_id)
+      const requestIds = requests.map(req => req.id)
+
+      // Fetch ajussi profiles
       const { data: ajussiProfiles } = await supabase
         .from('ajussi_profiles')
         .select('user_id, id, title, hourly_rate, open_chat_url')
         .in('user_id', ajussiIds)
 
-      // Add ajussi_profiles to each request
+      // Fetch reviews for these requests
+      const { data: reviews } = await supabase
+        .from('reviews')
+        .select('request_id, rating, comment, created_at')
+        .in('request_id', requestIds)
+
+      // Add ajussi_profiles and review to each request
       const requestsWithProfiles = requests.map(request => ({
         ...request,
-        ajussi_profiles: ajussiProfiles?.find(profile => profile.user_id === request.ajussi_id) || null
+        ajussi_profiles: ajussiProfiles?.find(profile => profile.user_id === request.ajussi_id) || null,
+        review: reviews?.find(review => review.request_id === request.id) || null
       }))
 
       return NextResponse.json({

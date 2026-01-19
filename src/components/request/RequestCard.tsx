@@ -154,8 +154,8 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
         break
 
       case 'COMPLETED':
-        // 클라이언트만 리뷰 작성 가능
-        if (isClient && !hasReviewed) {
+        // 클라이언트만 리뷰 작성 가능 (리뷰가 없는 경우에만)
+        if (isClient && !request.review && !hasReviewed) {
           buttons.push(
             <Button
               key="review"
@@ -292,6 +292,29 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               {request.description}
             </p>
           </div>
+
+          {/* Review Display (if exists) */}
+          {request.review && (
+            <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-3">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="text-sm font-medium text-gray-700">내 리뷰</span>
+                <div className="flex items-center ml-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-3 w-3 ${star <= request.review!.rating
+                          ? 'text-yellow-400 fill-yellow-400'
+                          : 'text-gray-300'
+                        }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              {request.review.comment && (
+                <p className="text-sm text-gray-600">{request.review.comment}</p>
+              )}
+            </div>
+          )}
 
           {/* Actions */}
           {getActionButtons().length > 0 && (

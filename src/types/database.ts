@@ -122,6 +122,12 @@ export interface RequestWithDetails extends Request {
   client: Profile;
   ajussi: Profile;
   ajussi_profiles: AjussiProfile;
+  review?: {
+    request_id: string;
+    rating: number;
+    comment: string | null;
+    created_at: string;
+  } | null;
 }
 
 export interface AjussiWithReviews extends AjussiProfile {
