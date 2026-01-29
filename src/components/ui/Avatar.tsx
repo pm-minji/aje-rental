@@ -1,4 +1,7 @@
+'use client'
+
 import { useState } from 'react'
+import Image from 'next/image'
 import { User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -8,6 +11,7 @@ interface AvatarProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   className?: string
   fallback?: string
+  unoptimized?: boolean
 }
 
 export function Avatar({ 
@@ -15,7 +19,8 @@ export function Avatar({
   alt = '', 
   size = 'md', 
   className, 
-  fallback 
+  fallback,
+  unoptimized = false,
 }: AvatarProps) {
   const [imageError, setImageError] = useState(false)
 
@@ -43,17 +48,28 @@ export function Avatar({
     xl: 'text-xl',
   }
 
+  const pixelSizes = {
+    xs: 24,
+    sm: 32,
+    md: 40,
+    lg: 48,
+    xl: 64,
+  }
+
   if (src && !imageError) {
     return (
-      <img
+      <Image
         src={src}
         alt={alt}
+        width={pixelSizes[size]}
+        height={pixelSizes[size]}
         className={cn(
           'rounded-full object-cover',
           sizes[size],
           className
         )}
         onError={() => setImageError(true)}
+        unoptimized={unoptimized}
       />
     )
   }
