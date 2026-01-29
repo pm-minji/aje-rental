@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { Button } from '@/components/ui/Button'
 import { Menu, X, User, LogOut, Settings, Heart, Shield } from 'lucide-react'
@@ -139,10 +140,12 @@ export default function Header() {
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         {profile?.profile_image ? (
-                          <img
+                          <Image
                             src={profile.profile_image}
                             alt="프로필"
                             className="h-8 w-8 rounded-full"
+                            width={32}
+                            height={32}
                           />
                         ) : (
                           <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
