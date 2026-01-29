@@ -187,17 +187,17 @@ export async function GET(request: NextRequest) {
       const ajussiIds = requests.map(req => req.ajussi_id)
       const requestIds = requests.map(req => req.id)
 
-      // Fetch ajussi profiles
-      const { data: ajussiProfiles } = await supabase
-        .from('ajussi_profiles')
-        .select('user_id, id, title, hourly_rate, open_chat_url')
-        .in('user_id', ajussiIds)
-
-      // Fetch reviews for these requests
-      const { data: reviews } = await supabase
-        .from('reviews')
-        .select('request_id, rating, comment, created_at')
-        .in('request_id', requestIds)
+      // Fetch ajussi profiles and reviews in parallel
+      const [{ data: ajussiProfiles }, { data: reviews }] = await Promise.all([
+        supabase
+          .from('ajussi_profiles')
+          .select('user_id, id, title, hourly_rate, open_chat_url')
+          .in('user_id', ajussiIds),
+        supabase
+          .from('reviews')
+          .select('request_id, rating, comment, created_at')
+          .in('request_id', requestIds),
+      ])
 
       // Add ajussi_profiles and review to each request
       const requestsWithProfiles = requests.map(request => ({
