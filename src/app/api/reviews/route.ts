@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
             nickname,
             profile_image
           ),
-          request:requests!request_id (
+          request:requests!request_id!inner (
             ajussi_id,
             client_id,
             date,
@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
             location
           )
         `)
+        .eq('request.ajussi_id', user.id)
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -59,12 +60,7 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      // 내가 받은 리뷰만 필터링
-      const receivedReviews = reviews?.filter(
-        (r) => r.request?.ajussi_id === user.id
-      ) || []
-
-      return NextResponse.json({ success: true, data: receivedReviews })
+      return NextResponse.json({ success: true, data: reviews || [] })
     }
 
     if (isWritten) {
