@@ -19,7 +19,7 @@ export async function GET() {
     // Get user profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, role, nickname, introduction, profile_image')
       .eq('id', user.id)
       .returns<any>()
       .maybeSingle()
@@ -44,7 +44,7 @@ export async function GET() {
     if ((profile as any).role === 'ajussi' || (profile as any).role === 'admin') {
       const { data, error } = await supabase
         .from('ajussi_profiles')
-        .select('*')
+        .select('title, description, hourly_rate, available_areas, open_chat_url, is_active, tags')
         .eq('user_id', user.id)
         .returns<any>()
         .maybeSingle()
