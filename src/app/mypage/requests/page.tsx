@@ -51,26 +51,34 @@ function RequestsContent() {
         ...(statusFilter && { status: statusFilter }),
       })
 
-      const sentResponse = await fetch(`/api/requests?${sentParams}`)
-      const sentResult = await sentResponse.json()
-
-      if (sentResult.success) {
-        setSentRequests(sentResult.data)
-      }
+      const sentPromise = fetch(`/api/requests?${sentParams}`).then((res) =>
+        res.json()
+      )
 
       // Fetch received requests (only for ajussi)
+      let receivedPromise = Promise.resolve(null)
       if (isAjussi) {
         const receivedParams = new URLSearchParams({
           type: 'received',
           ...(statusFilter && { status: statusFilter }),
         })
 
-        const receivedResponse = await fetch(`/api/requests?${receivedParams}`)
-        const receivedResult = await receivedResponse.json()
+        receivedPromise = fetch(`/api/requests?${receivedParams}`).then((res) =>
+          res.json()
+        )
+      }
 
-        if (receivedResult.success) {
-          setReceivedRequests(receivedResult.data)
-        }
+      const [sentResult, receivedResult] = await Promise.all([
+        sentPromise,
+        receivedPromise,
+      ])
+
+      if (sentResult.success) {
+        setSentRequests(sentResult.data)
+      }
+
+      if (receivedResult && receivedResult.success) {
+        setReceivedRequests(receivedResult.data)
       }
     } catch (err) {
       console.error('Error fetching requests:', err)
