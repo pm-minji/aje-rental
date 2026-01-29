@@ -38,11 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Simple redirect disable mechanism
   const disableRedirect = () => {
-    console.log('Redirect disabled - no-op for now')
+    // console.log('Redirect disabled - no-op for now')
   }
 
   const enableRedirect = () => {
-    console.log('Redirect enabled - no-op for now')
+    // console.log('Redirect enabled - no-op for now')
   }
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!mounted) return
 
         if (session?.user) {
-          console.log('Initial session found:', session.user.id)
+          // console.log('Initial session found:', session.user.id)
 
           // Check if user still exists in database
           try {
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // If profile fetch fails (user deleted), sign out
             if (!profileData) {
-              console.log('User profile not found, signing out...')
+              // console.log('User profile not found, signing out...')
               await supabase.auth.signOut()
               setUser(null)
               setProfile(null)
@@ -103,12 +103,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id)
+        // console.log('Auth state change:', event, session?.user?.id)
 
         if (!mounted) return
 
         if (session?.user) {
-          console.log('Processing user session...')
+          // console.log('Processing user session...')
 
           // Only fetch profile and potentially redirect after initial load is complete
           // and if we're not on the setup page
@@ -128,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(session)
           }
         } else {
-          console.log('No user session, clearing state')
+          // console.log('No user session, clearing state')
           setUser(null)
           setProfile(null)
           setSession(null)
@@ -168,7 +168,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string, allowRedirect: boolean = false): Promise<Profile | null> => {
     try {
-      console.log('Fetching profile for user:', userId, 'allowRedirect:', allowRedirect)
+      // console.log('Fetching profile for user:', userId, 'allowRedirect:', allowRedirect)
 
       const response = await fetch('/api/auth/create-profile', {
         method: 'POST',
@@ -179,16 +179,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Check if response is 401 (unauthorized)
       if (response.status === 401) {
-        console.log('API returned 401, user session invalid, signing out...')
+        // console.log('API returned 401, user session invalid, signing out...')
         await supabase.auth.signOut()
         return null
       }
 
       const result = await response.json()
-      console.log('API create profile result:', result)
+      // console.log('API create profile result:', result)
 
       if (result.success) {
-        console.log('Profile created/fetched successfully via API')
+        // console.log('Profile created/fetched successfully via API')
 
         // Only redirect if explicitly allowed and conditions are met
         if (allowRedirect) {
@@ -196,7 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const isOnSetupPage = pathname.includes('/auth/setup-profile')
 
           if (needsProfileSetup && !isOnSetupPage) {
-            console.log('New user detected, redirecting to profile setup')
+            // console.log('New user detected, redirecting to profile setup')
 
             const redirectParam = new URLSearchParams(window.location.search).get('redirect')
             const setupUrl = redirectParam
@@ -261,7 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(result.error || 'Failed to delete account')
       }
 
-      console.log('User data deleted successfully, now signing out...')
+      // console.log('User data deleted successfully, now signing out...')
 
       // Clear local state immediately BEFORE signOut to prevent race conditions
       setUser(null)
@@ -314,7 +314,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear cookies again after signOut (signOut might have set new ones)
       clearSupabaseCookies()
 
-      console.log('Account deletion and sign out completed')
+      // console.log('Account deletion and sign out completed')
 
       // Force reload immediately to reset all state
       window.location.href = '/'
