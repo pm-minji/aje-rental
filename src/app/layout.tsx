@@ -72,13 +72,8 @@ export const metadata: Metadata = {
   verification: {
     google: 'jcGSsidXGfZXE4Fj5ne1aPLH2-EzvgbU51uMfp6zry8',
   },
-  // Geo SEO: 서울 지역 타겟팅
   other: {
-    'geo.region': 'KR-11', // 대한민국 서울특별시 ISO 코드
-    'geo.placename': 'Seoul',
-    'geo.position': '37.5665;126.9780', // 서울 시청 좌표
-    'ICBM': '37.5665, 126.9780',
-    'naver-site-verification': '4bf4d478500fe1c1bdf8efbef23f553b', // 네이버 소유권 확인 메타태그 백업
+    'naver-site-verification': '4bf4d478500fe1c1bdf8efbef23f553b',
   },
 }
 
