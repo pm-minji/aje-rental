@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { AjussiWithProfile } from '@/types/database'
 
-// ISR: 30초마다 재생성
-export const revalidate = 30
+// ISR: 5분마다 재생성 (대부분의 방문자가 캐시된 버전을 봄)
+export const revalidate = 300
 
 async function getFeaturedAjussi(): Promise<AjussiWithProfile[]> {
   const supabase = await createServerSupabase()
