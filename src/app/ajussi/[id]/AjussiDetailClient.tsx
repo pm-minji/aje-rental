@@ -113,10 +113,19 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
   }
 
   const handleOpenChat = () => {
+    if (!isAuthenticated) {
+      redirectToLogin()
+      return
+    }
     if (!data?.ajussi.open_chat_url) {
       error('오류', '오픈채팅 링크가 설정되지 않았습니다.')
       return
     }
+    pushToDataLayer({
+      event: 'open_chat_clicked',
+      ajussiId: data?.ajussi.user_id,
+      ajussiTitle: data?.ajussi.title,
+    })
     window.open(data.ajussi.open_chat_url, '_blank')
   }
 
