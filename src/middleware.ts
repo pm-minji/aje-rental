@@ -2,6 +2,17 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+    // Vercel 서브도메인에서 메인 도메인으로 리다이렉트
+    const hostname = request.headers.get('host') || ''
+    const isVercelSubdomain = hostname.includes('vercel.app')
+
+    if (isVercelSubdomain) {
+        const mainDomain = 'https://ajussirental.com'
+        const url = new URL(request.url)
+        const redirectUrl = `${mainDomain}${url.pathname}${url.search}`
+        return NextResponse.redirect(redirectUrl, { status: 301 })
+    }
+
     let supabaseResponse = NextResponse.next({
         request,
     })
