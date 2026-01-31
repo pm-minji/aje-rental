@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { SearchFilter, FilterOptions } from '@/components/ajussi/SearchFilter'
 import { AjussiCard } from '@/components/ajussi/AjussiCard'
 import { Loading } from '@/components/ui/Loading'
@@ -34,7 +33,7 @@ export default function AjussiListPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
-  
+
   const { isAuthenticated } = useAuth()
   const { success, error } = useToast()
 
@@ -47,7 +46,7 @@ export default function AjussiListPage() {
     try {
       const response = await fetch('/api/favorites')
       const result = await response.json()
-      
+
       if (result.success) {
         const ids = new Set<string>(result.data.map((fav: any) => fav.ajussi_id))
         setFavoriteIds(ids)
@@ -60,7 +59,7 @@ export default function AjussiListPage() {
   const fetchAjussiList = async (page = 1, newFilters = filters) => {
     try {
       setLoading(true)
-      
+
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '12',
@@ -120,9 +119,9 @@ export default function AjussiListPage() {
         },
         body: JSON.stringify({ ajussiId }),
       })
-      
+
       const result = await response.json()
-      
+
       if (result.success) {
         if (result.action === 'added') {
           success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
@@ -146,15 +145,12 @@ export default function AjussiListPage() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 찾기"
-        description="다양한 활동을 함께할 아저씨를 찾아보세요"
-        breadcrumbs={[
-          { label: '아저씨 찾기' }
-        ]}
-      />
-
       <Container className="py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">아저씨 찾기</h1>
+          <p className="text-gray-600 mt-1">다양한 활동을 함께할 아저씨를 찾아보세요</p>
+        </div>
+
         <div className="space-y-6">
           {/* Search and Filter */}
           <SearchFilter

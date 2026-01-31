@@ -10,7 +10,7 @@
 - [x] 2.1 Supabase 프로젝트 설정 및 데이터베이스 스키마 생성
   - Supabase 프로젝트 생성 및 환경 변수 설정
   - profiles, ajussi_profiles, requests, reviews, favorites 테이블 생성
-  - RLS 정책 및 인덱스 설정
+  - ~~RLS 정칽 및 인덱스 설정~~ (API 레벨 권한 검증으로 대체, RLS 비활성화 완료)
   - _Requirements: 1.1, 2.1, 4.1, 5.1, 7.1_
 
 - [x] 2.2 Supabase Auth 인증 시스템 구현
@@ -25,7 +25,7 @@
   - _Requirements: 3.1, 3.2, 3.3_
 
 - [ ] 3. 기본 레이아웃 및 공통 컴포넌트
-- [x] 3.1 전역 레이아웃 및 네비게이션 구현
+- [x] 3.1 전역 레이아웃 및 네비게이션 구현         
   - RootLayout, Header, Footer 컴포넌트 생성
   - 반응형 네비게이션 메뉴
   - 로그인/로그아웃 상태 표시
@@ -161,21 +161,22 @@
   - 컴포넌트 상호작용 테스트
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-- [ ] 8. 리뷰 시스템
+- [x] 8. 리뷰 시스템
 - [x] 8.1 리뷰 CRUD API 구현
-  - POST /api/reviews 리뷰 작성 엔드포인트 (Supabase insert)
-  - GET /api/ajussi/[id]/reviews 리뷰 목록 조회
-  - RLS 정책으로 리뷰 작성 권한 검증
+  - POST /api/reviews 리뷰 작성 엔드포인트
+  - GET /api/reviews 리뷰 목록 조회 (내가 쓴/받은 리뷰)
+  - API 레벨 권한 검증
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 8.2 리뷰 작성 컴포넌트 구현
-  - ReviewForm 컴포넌트 생성
-  - 별점 선택 UI
+- [x] 8.2 리뷰 작성 컴포넌트 구현
+  - ReviewModal 컴포넌트 생성
+  - 별점 선택 UI (1-5점)
   - 코멘트 입력 및 검증
+  - RequestCard에서 완료된 의뢰 리뷰 작성 버튼
   - _Requirements: 7.2, 7.3_
 
-- [ ] 8.3 리뷰 목록 컴포넌트 구현
-  - ReviewList 컴포넌트 생성
+- [x] 8.3 리뷰 목록 컴포넌트 구현
+  - /mypage/reviews 페이지 생성
   - 리뷰 카드 표시
   - 평균 평점 계산 및 표시
   - _Requirements: 7.1, 7.4_
@@ -186,26 +187,32 @@
   - 컴포넌트 렌더링 테스트
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 9. 즐겨찾기 및 부가 기능
+- [x] 9. 즐겨찾기 및 부가 기능
 - [x] 9.1 즐겨찾기 API 구현
-  - POST/DELETE /api/favorites 엔드포인트 생성 (Supabase upsert/delete)
-  - RLS 정책으로 사용자별 즐겨찾기 관리
+  - POST/DELETE /api/favorites 엔드포인트 생성
+  - API 레벨 권한 검증
   - UNIQUE 제약조건으로 중복 방지
   - _Requirements: 2.2_
 
-- [x] 9.2 이용 가이드 페이지 구현
+- [x] 9.2 즐겨찾기 페이지 구현
+  - /mypage/favorites 페이지 생성
+  - 즐겨찾기한 아저씨 목록 표시
+  - 즐겨찾기 제거 기능
+  - _Requirements: 2.2_
+
+- [x] 9.3 이용 가이드 페이지 구현
   - 정적 페이지로 이용 절차 안내
   - FAQ 아코디언 UI
   - 주의사항 및 안전수칙 표시
   - _Requirements: 8.1, 8.2, 8.3_
 
-- [x] 9.3 시스템 페이지 구현
+- [x] 9.4 시스템 페이지 구현
   - 404 오류 페이지
   - 이용약관 및 개인정보처리방침 페이지
   - 리마인드 배너 컴포넌트
   - _Requirements: 9.1, 9.2, 9.4_
 
-- [ ]* 9.4 부가 기능 단위 테스트
+- [ ]* 9.5 부가 기능 단위 테스트
   - 즐겨찾기 API 테스트
   - 정적 페이지 렌더링 테스트
   - _Requirements: 2.2, 8.1, 8.2, 8.3, 9.1, 9.2, 9.4_
@@ -217,6 +224,12 @@
   - 반응형 디자인 최종 확인
   - _Requirements: 전체 시스템_
 
+- [x] **Refine UI/UX & SEO** <!-- id: 5 -->
+    - [x] Fix main page CTA button text visibility <!-- id: 6 -->
+    - [x] Mobile optimization (remove hover on touch, better filter UI) <!-- id: 7 -->
+    - [x] Implement GEO/SEO strategies (JSON-LD, meta tags) <!-- id: 8 -->
+    - [x] Refine Main Page content (remove dummy stats) <!-- id: 9 -->
+    - [x] Implement Fixed Pricing Policy (20,000 KRW) <!-- id: 10 -->
 - [x] 10.2 성능 최적화 및 실시간 기능
   - Next.js Image 최적화 및 lazy loading
   - Supabase Realtime 채널 설정 (요청 상태 업데이트)

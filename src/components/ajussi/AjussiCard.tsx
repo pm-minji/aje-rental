@@ -16,11 +16,11 @@ interface AjussiCardProps {
   showFavorite?: boolean
 }
 
-export function AjussiCard({ 
-  ajussi, 
-  onFavorite, 
+export function AjussiCard({
+  ajussi,
+  onFavorite,
   isFavorited = false,
-  showFavorite = true 
+  showFavorite = true
 }: AjussiCardProps) {
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -36,21 +36,18 @@ export function AjussiCard({
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               <Avatar
-                src={ajussi.profiles.profile_image}
-                alt={ajussi.profiles.name}
+                src={ajussi.profiles?.profile_image}
+                alt={ajussi.profiles?.name || '아저씨'}
                 size="lg"
-                fallback={ajussi.profiles.name}
+                fallback={ajussi.profiles?.name || '?'}
               />
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900 truncate">
-                  {ajussi.title}
+                  {ajussi.title} 아저씨
                 </h3>
-                <p className="text-sm text-gray-600">
-                  {ajussi.profiles.nickname || ajussi.profiles.name}
-                </p>
               </div>
             </div>
-            
+
             {showFavorite && (
               <Button
                 variant="ghost"
@@ -59,32 +56,31 @@ export function AjussiCard({
                 className="h-8 w-8 p-0 hover:bg-red-50"
               >
                 <Heart
-                  className={`h-4 w-4 ${
-                    isFavorited 
-                      ? 'fill-red-500 text-red-500' 
-                      : 'text-gray-400 hover:text-red-500'
-                  }`}
+                  className={`h-4 w-4 ${isFavorited
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-gray-400 hover:text-red-500'
+                    }`}
                 />
               </Button>
             )}
           </div>
 
           {/* Description */}
-          <p className="text-sm text-gray-600 line-clamp-2">
+          <p className="text-sm text-gray-600 line-clamp-2 min-h-[40px]">
             {ajussi.description}
           </p>
 
           {/* Tags */}
           {ajussi.tags && ajussi.tags.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {ajussi.tags.slice(0, 3).map((tag) => (
+              {ajussi.tags.slice(0, 5).map((tag) => (
                 <Badge key={tag} variant="secondary" size="sm">
                   {tag}
                 </Badge>
               ))}
-              {ajussi.tags.length > 3 && (
+              {ajussi.tags.length > 5 && (
                 <Badge variant="secondary" size="sm">
-                  +{ajussi.tags.length - 3}
+                  +{ajussi.tags.length - 5}
                 </Badge>
               )}
             </div>
@@ -95,16 +91,17 @@ export function AjussiCard({
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="h-4 w-4 mr-2" />
               <span className="font-semibold text-primary">
-                {formatCurrency(ajussi.hourly_rate)}/시간
+                1시간 {ajussi.hourly_rate.toLocaleString()}원
               </span>
             </div>
-            
+
             {ajussi.available_areas && ajussi.available_areas.length > 0 && (
               <div className="flex items-center text-sm text-gray-600">
                 <MapPin className="h-4 w-4 mr-2" />
                 <span className="truncate">
-                  {ajussi.available_areas.slice(0, 2).join(', ')}
-                  {ajussi.available_areas.length > 2 && ` 외 ${ajussi.available_areas.length - 2}곳`}
+                  {ajussi.available_areas.map(area =>
+                    area === 'Seoul' ? '서울' : area === 'Online' ? '온라인' : area
+                  ).join(', ')}
                 </span>
               </div>
             )}

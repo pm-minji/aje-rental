@@ -5,7 +5,7 @@ import { Database } from '@/types/database'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Client-side Supabase client
+// Client-side Supabase client (deprecated - use createClientSupabase instead)
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
 // Client component client (for use in client components)
@@ -13,23 +13,36 @@ export const createClientSupabase = () => {
   return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
 }
 
-// Server component client (for use in server components)
+// Server component client (for use in server components and route handlers)
+// Note: next/headers is dynamically imported to avoid issues with client components
 export const createServerSupabase = async () => {
   const { cookies } = await import('next/headers')
+  const cookieStore = await cookies()
+
   return createSSRServerClient<Database>(
     supabaseUrl,
     supabaseAnonKey,
     {
       cookies: {
-        get(name: string) {
-          return cookies().get(name)?.value
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing sessions.
+          }
         },
       },
     }
   )
 }
 
-// Server-side client for admin operations
+// Server-side client for admin operations (서비스 역할 키 사용)
 export const createServerClient = () => {
   return createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

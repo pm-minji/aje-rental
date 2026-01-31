@@ -5,7 +5,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/ajussi/${params.id}`)
     const result = await response.json()
-    
+
     if (result.success) {
       const { ajussi } = result.data
       return {
@@ -21,10 +21,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   } catch (error) {
     console.error('Error generating metadata:', error)
   }
-  
+
   return {
     title: '아저씨 상세정보',
-    description: '아저씨의 상세 정보를 확인하고 서비스를 요청하세요.',
+    description: '아저씨렌탈에서 아저씨의 상세 정보를 확인하고 서비스를 요청하세요.',
   }
 }
 

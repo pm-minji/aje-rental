@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerSupabase } from '@/lib/supabase'
+import { createServerSupabase, createServerClient } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,9 +10,9 @@ export async function POST(
   try {
     const supabase = await createServerSupabase()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+
     console.log('POST /api/admin/applications/[id]/reject - User:', user?.id)
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -20,12 +20,15 @@ export async function POST(
       )
     }
 
+    // Use admin client to bypass RLS for everything
+    const supabaseAdmin = createServerClient()
+
     // Check if user is admin
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .maybeSingle()
 
     if (!profile || profile.role !== 'admin') {
       return NextResponse.json(
@@ -46,7 +49,7 @@ export async function POST(
     }
 
     // Get the application
-    const { data: application, error: appError } = await supabase
+    const { data: application, error: appError } = await supabaseAdmin
       .from('ajussi_applications')
       .select('*')
       .eq('id', id)
@@ -59,25 +62,49 @@ export async function POST(
       )
     }
 
-    if (application.status !== 'PENDING') {
+    if (application.status !== 'PENDING' && application.status !== 'APPROVED') {
       return NextResponse.json(
-        { success: false, error: 'Application already processed' },
+        { success: false, error: 'Application already processed and cannot be rejected' },
         { status: 400 }
       )
     }
 
-    // Update application status to rejected
-    const { error: updateError } = await supabase
-      .from('ajussi_applications')
-      .update({ 
-        status: 'REJECTED',
-        admin_notes: `Rejected: ${reason}`,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', id)
+    // Start transaction-like operations
+    try {
+      // 1. Update application status
+      const { error: updateError } = await supabaseAdmin
+        .from('ajussi_applications')
+        .update({
+          status: 'REJECTED',
+          admin_notes: `Rejected: ${reason} (Date: ${new Date().toISOString()})`,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
 
-    if (updateError) {
-      console.error('Error updating application status:', updateError)
+      if (updateError) throw updateError
+
+      // 2. If it was previously approved, we need to revert the user role and deactivate profile
+      if (application.status === 'APPROVED') {
+        const userId = application.user_id
+
+        // Revert role to user
+        const { error: roleError } = await supabaseAdmin
+          .from('profiles')
+          .update({ role: 'user' })
+          .eq('id', userId)
+
+        if (roleError) console.error('Error reverting user role:', roleError)
+
+        // Deactivate ajussi profile (or could delete, but soft delete/deactivate is safer)
+        const { error: profileError } = await supabaseAdmin
+          .from('ajussi_profiles')
+          .update({ is_active: false })
+          .eq('user_id', userId)
+
+        if (profileError) console.error('Error deactivating ajussi profile:', profileError)
+      }
+    } catch (err) {
+      console.error('Error rejecting application:', err)
       return NextResponse.json(
         { success: false, error: 'Failed to reject application' },
         { status: 500 }

@@ -75,18 +75,6 @@ function MyPageContent() {
             </Button>
           </div>
 
-          {/* 리뷰 관리 */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">리뷰 관리</h2>
-            <p className="text-gray-600 mb-4">
-              {isAjussi ? '받은 리뷰를 확인하세요.' : '작성한 리뷰를 관리하세요.'}
-            </p>
-            <Button asChild variant="ghost">
-              <Link href="/mypage/reviews">리뷰 보기</Link>
-            </Button>
-          </div>
-
-
 
           {/* 일반 사용자가 아저씨 되기 */}
           {!isAjussi && (

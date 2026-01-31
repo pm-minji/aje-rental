@@ -6,53 +6,65 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { AjussiApplication } from '@/types/database'
+import { CheckCircle2, ChevronRight, AlertCircle, Info } from 'lucide-react'
+import { Badge } from '@/components/ui/Badge'
 
 interface ApplicationForm {
-  title: string
+  // Step 1: Basic Info
+  real_name: string
+  birth_date: string // YYYY-MM-DD
+  phone_number: string
+
+  // Step 2: Career & Tags
+  career_history: string
+  // specialties handled by local state
+
+  // Step 3: Service & Location
+  title: string // Nickname
   description: string
-  hourly_rate: number
-  available_areas: string[]
+  available_areas: string[] // Handled by local state
   open_chat_url: string
-  tags: string[]
+
+  // Consents
+  consent_terms: boolean
+  consent_privacy: boolean
+  consent_settlement: boolean
+  consent_chat_policy: boolean
+  consent_safety: boolean
 }
 
-const AREAS = [
-  '강남구', '서초구', '송파구', '강동구', '마포구', '용산구', '중구', '종로구',
-  '성동구', '광진구', '동대문구', '중랑구', '성북구', '강북구', '도봉구', '노원구',
-  '은평구', '서대문구', '양천구', '강서구', '구로구', '금천구', '영등포구', '동작구', '관악구'
-]
-
-const TAGS = [
-  '산책', '운동', '건강관리', '대화', '조언', '멘토링', '요리', '생활팁', 
-  '독서', '철학', '문학', '여행', '맛집', '문화', 'IT', '프로그래밍', '컴퓨터'
-]
-
 export default function AjussiApplicationPage() {
+  const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
-  const [selectedAreas, setSelectedAreas] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [existingApplication, setExistingApplication] = useState<AjussiApplication | null>(null)
+
+  // Custom states for data not easily handled by simple inputs
+  const [specialties, setSpecialties] = useState<string[]>([])
+  const [specialtyInput, setSpecialtyInput] = useState('')
+  const [selectedAreas, setSelectedAreas] = useState<string[]>([])
+
   const router = useRouter()
   const { success, error } = useToast()
-  const { isAjussi } = useAuth()
-  
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<ApplicationForm>()
+  const { isAjussi, user } = useAuth()
+
+  const { register, handleSubmit, watch, formState: { errors, isValid }, setValue, trigger } = useForm<ApplicationForm>({
+    mode: 'onChange'
+  })
+
+  // Watch fields for validation
+  const birthDate = watch('birth_date')
 
   useEffect(() => {
-    // 이미 아저씨인 경우 리다이렉트
     if (isAjussi) {
       router.push('/mypage/ajussi')
       return
     }
-    
-    // 기존 신청 내역 불러오기 (재신청용)
     fetchExistingApplication()
   }, [isAjussi])
 
@@ -65,90 +77,127 @@ export default function AjussiApplicationPage() {
       if (result.success && result.data) {
         const app = result.data
         setExistingApplication(app)
-        
-        // 폼에 기존 데이터 채우기 (거절된 경우만)
+
         if (app.status === 'REJECTED') {
+          // Prefill logic
           setValue('title', app.title)
           setValue('description', app.description)
-          setValue('hourly_rate', app.hourly_rate)
           setValue('open_chat_url', app.open_chat_url)
-          setSelectedAreas(app.available_areas)
-          setSelectedTags(app.tags)
+          setValue('real_name', app.real_name || '')
+          setValue('birth_date', app.birth_date || '')
+          setValue('phone_number', app.phone_number || '')
+          setValue('career_history', app.career_history || '')
+
+          if (app.specialties) setSpecialties(app.specialties)
+          if (app.tags) setSpecialties(app.tags) // Fallback for old data
+          if (app.available_areas) setSelectedAreas(app.available_areas)
         }
       }
     } catch (err) {
       console.error('Error fetching existing application:', err)
-      // 기존 신청이 없는 경우는 정상적인 상황이므로 에러 표시하지 않음
     } finally {
       setPageLoading(false)
     }
   }
 
-  const handleAreaToggle = (area: string) => {
-    setSelectedAreas(prev => 
-      prev.includes(area) 
-        ? prev.filter(a => a !== area)
-        : [...prev, area]
+  // Calculate age
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return 0
+    const today = new Date()
+    const birth = new Date(birthDate)
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age
+  }
+
+  const userAge = calculateAge(birthDate)
+  const isAgeValid = userAge >= 34
+
+  // Tag Handlers
+  const handleAddSpecialty = (e: React.KeyboardEvent) => {
+    if (e.nativeEvent.isComposing) return
+
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (specialtyInput.trim()) {
+        if (!specialties.includes(specialtyInput.trim())) {
+          setSpecialties([...specialties, specialtyInput.trim()])
+        }
+        setSpecialtyInput('')
+      }
+    }
+  }
+
+  const removeSpecialty = (tag: string) => {
+    setSpecialties(specialties.filter(t => t !== tag))
+  }
+
+  // Location Handlers
+  const toggleArea = (area: string) => {
+    setSelectedAreas(prev =>
+      prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]
     )
   }
 
-  const handleTagToggle = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    )
+  // Navigation
+  const nextStep = async () => {
+    let valid = false
+    if (step === 1) {
+      valid = await trigger(['real_name', 'birth_date', 'phone_number'])
+      if (valid && !isAgeValid) {
+        error('연령 제한', '만 34세 이상만 신청 가능합니다.')
+        return
+      }
+    } else if (step === 2) {
+      valid = await trigger(['career_history'])
+      if (valid && specialties.length === 0) {
+        error('입력 확인', '전문 분야 태그를 최소 1개 이상 입력해주세요.')
+        return
+      }
+    }
+
+    if (valid) setStep(prev => prev + 1)
   }
+
+  const prevStep = () => setStep(prev => prev - 1)
 
   const onSubmit = async (data: ApplicationForm) => {
     if (selectedAreas.length === 0) {
-      error('입력 오류', '활동 가능 지역을 최소 1개 이상 선택해주세요.')
+      error('입력 오류', '활동 지역을 최소 1개 이상 선택해주세요.')
       return
     }
 
-    if (selectedTags.length === 0) {
-      error('입력 오류', '서비스 태그를 최소 1개 이상 선택해주세요.')
-      return
-    }
-
-    // 이미 대기 중인 신청이 있는지 확인
-    if (existingApplication && existingApplication.status === 'PENDING') {
-      error('신청 불가', '이미 검토 중인 신청이 있습니다.')
+    if (!data.consent_terms || !data.consent_privacy || !data.consent_settlement || !data.consent_chat_policy || !data.consent_safety) {
+      error('동의 필요', '모든 필수 항목에 동의해야 신청 가능합니다.')
       return
     }
 
     setLoading(true)
-
     try {
       const response = await fetch('/api/ajussi-application', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...data,
+          hourly_rate: 20000, // Fixed first hour rate
           available_areas: selectedAreas,
-          tags: selectedTags,
+          tags: specialties, // Mapping specialties to tags
+          specialties: specialties,
         }),
       })
 
       const result = await response.json()
-
       if (result.success) {
-        const isReapplication = existingApplication && existingApplication.status === 'REJECTED'
-        success(
-          '신청 완료', 
-          isReapplication 
-            ? '재신청이 완료되었습니다. 검토 후 연락드리겠습니다.'
-            : '아저씨 신청이 완료되었습니다. 검토 후 연락드리겠습니다.'
-        )
+        success('신청 완료', '검토 후 곧 연락드리겠습니다.')
         router.push('/mypage/become-ajussi')
       } else {
-        error('신청 실패', result.error || '신청 처리 중 오류가 발생했습니다.')
+        error('신청 실패', result.error)
       }
     } catch (err) {
-      console.error('Error submitting application:', err)
-      error('신청 실패', '신청 처리 중 오류가 발생했습니다.')
+      error('오류 발생', '서버와 통신 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
     }
@@ -162,183 +211,308 @@ export default function AjussiApplicationPage() {
     )
   }
 
-  const isReapplication = existingApplication && existingApplication.status === 'REJECTED'
+  const onInvalid = () => {
+    error('입력 확인', '모든 필수 항목을 입력하고 동의해주세요.')
+  }
 
   return (
     <>
-      <PageHeader
-        title={isReapplication ? "아저씨 재신청" : "아저씨 신청"}
-        description={
-          isReapplication 
-            ? "거절 사유를 참고하여 내용을 수정한 후 다시 신청해주세요"
-            : "아저씨로 활동하기 위한 신청서를 작성해주세요"
-        }
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '아저씨 되기', href: '/mypage/become-ajussi' },
-          { label: isReapplication ? '재신청' : '신청' }
-        ]}
-      />
+      <Container className="py-8 max-w-3xl">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">아저씨 등록 신청</h1>
+          <p className="text-gray-600 mt-1">당신의 경험이 누군가에게는 큰 힘이 됩니다</p>
+        </div>
+        {/* Progress Bar */}
+        <div className="mb-8">
+          <div className="flex justify-between mb-2">
+            <span className={`text-sm font-medium ${step >= 1 ? 'text-primary' : 'text-gray-400'}`}>1. 본인 확인</span>
+            <span className={`text-sm font-medium ${step >= 2 ? 'text-primary' : 'text-gray-400'}`}>2. 전문성</span>
+            <span className={`text-sm font-medium ${step >= 3 ? 'text-primary' : 'text-gray-400'}`}>3. 활동 설정</span>
+          </div>
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-300 ease-in-out"
+              style={{ width: `${(step / 3) * 100}%` }}
+            />
+          </div>
+        </div>
 
-      <Container className="py-8">
-        <div className="max-w-2xl mx-auto">
-          {/* 재신청 안내 */}
-          {isReapplication && existingApplication && (
-            <Card className="mb-6 border-orange-200 bg-orange-50">
-              <CardHeader>
-                <h3 className="text-lg font-semibold text-orange-800">재신청 안내</h3>
-              </CardHeader>
-              <CardBody>
-                <div className="space-y-3">
-                  <p className="text-orange-700 text-sm">
-                    이전 신청이 거절되었습니다. 아래 사유를 참고하여 내용을 수정해주세요.
-                  </p>
-                  {existingApplication.admin_notes && (
-                    <div className="bg-white border border-orange-200 rounded p-3">
-                      <h4 className="font-medium text-orange-800 mb-1">거절 사유</h4>
-                      <p className="text-sm text-orange-700">{existingApplication.admin_notes}</p>
-                    </div>
-                  )}
-                  <p className="text-orange-700 text-sm">
-                    폼에 이전 신청 내용이 자동으로 채워져 있습니다. 필요한 부분을 수정한 후 다시 제출해주세요.
-                  </p>
-                </div>
-              </CardBody>
-            </Card>
-          )}
-
-          <Card>
-            <CardHeader>
-              <h2 className="text-xl font-semibold">
-                {isReapplication ? "아저씨 재신청서" : "아저씨 신청서"}
-              </h2>
-              <p className="text-gray-600">
-                신청서 검토 후 승인되면 아저씨로 활동할 수 있습니다.
-              </p>
-            </CardHeader>
+        {/* Service Flow Guide */}
+        {step === 1 && (
+          <Card className="mb-8 bg-blue-50 border-blue-200">
             <CardBody>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    서비스 제목 *
-                  </label>
-                  <Input
-                    {...register('title', { required: '서비스 제목을 입력해주세요' })}
-                    placeholder="예: 인생 선배의 따뜻한 조언"
-                  />
-                  {errors.title && (
-                    <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-                  )}
+              <h3 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
+                <Info className="w-5 h-5 mr-2" />
+                아저씨 활동 프로세스 안내
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                <div className="bg-white p-3 rounded-lg shadow-sm">
+                  <div className="text-2xl mb-1">📝</div>
+                  <div className="font-semibold text-blue-900 text-sm">신청서 제출</div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    서비스 설명 *
-                  </label>
-                  <textarea
-                    {...register('description', { required: '서비스 설명을 입력해주세요' })}
-                    rows={4}
-                    placeholder="제공할 수 있는 서비스에 대해 자세히 설명해주세요"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-                  />
-                  {errors.description && (
-                    <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
-                  )}
+                <div className="flex items-center justify-center md:hidden">↓</div>
+                <div className="bg-white p-3 rounded-lg shadow-sm">
+                  <div className="text-2xl mb-1">📞</div>
+                  <div className="font-semibold text-blue-900 text-sm">전화 인터뷰</div>
+                  <div className="text-xs text-blue-600">관리자 검증</div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    시간당 요금 (원) *
-                  </label>
-                  <Input
-                    type="number"
-                    {...register('hourly_rate', { 
-                      required: '시간당 요금을 입력해주세요',
-                      min: { value: 10000, message: '최소 10,000원 이상 입력해주세요' }
-                    })}
-                    placeholder="15000"
-                  />
-                  {errors.hourly_rate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.hourly_rate.message}</p>
-                  )}
+                <div className="flex items-center justify-center md:hidden">↓</div>
+                <div className="bg-white p-3 rounded-lg shadow-sm">
+                  <div className="text-2xl mb-1">💬</div>
+                  <div className="font-semibold text-blue-900 text-sm">오픈채팅 협의</div>
+                  <div className="text-xs text-blue-600">고객 문의 응대</div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    오픈채팅 URL *
-                  </label>
-                  <Input
-                    {...register('open_chat_url', { required: '오픈채팅 URL을 입력해주세요' })}
-                    placeholder="https://open.kakao.com/o/..."
-                  />
-                  {errors.open_chat_url && (
-                    <p className="text-red-500 text-sm mt-1">{errors.open_chat_url.message}</p>
-                  )}
+                <div className="flex items-center justify-center md:hidden">↓</div>
+                <div className="bg-white p-3 rounded-lg shadow-sm">
+                  <div className="text-2xl mb-1">🤝</div>
+                  <div className="font-semibold text-blue-900 text-sm">의뢰 확정</div>
+                  <div className="text-xs text-blue-600">매칭 및 결제</div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    활동 가능 지역 * (최소 1개)
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {AREAS.map((area) => {
-                      const isSelected = selectedAreas.includes(area)
-                      return (
-                        <button
-                          key={area}
-                          type="button"
-                          onClick={() => handleAreaToggle(area)}
-                          className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                            isSelected
-                              ? 'bg-primary text-white border-primary'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {area}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    서비스 태그 * (최소 1개)
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {TAGS.map((tag) => {
-                      const isSelected = selectedTags.includes(tag)
-                      return (
-                        <button
-                          key={tag}
-                          type="button"
-                          onClick={() => handleTagToggle(tag)}
-                          className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-                            isSelected
-                              ? 'bg-primary text-white border-primary'
-                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                          }`}
-                        >
-                          {tag}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div className="pt-4">
-                  <Button
-                    type="submit"
-                    loading={loading}
-                    className="w-full"
-                  >
-                    {isReapplication ? "재신청서 제출" : "신청서 제출"}
-                  </Button>
-                </div>
-              </form>
+              </div>
             </CardBody>
           </Card>
-        </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)}>
+          <Card>
+            <CardBody className="p-6 md:p-8">
+
+              {/* Step 1: Basic Info */}
+              {step === 1 && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-bold flex items-center">
+                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
+                    기본 정보 및 본인 확인
+                  </h2>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">실명 (본인 확인용) *</label>
+                    <Input {...register('real_name', { required: '실명을 입력해주세요' })} placeholder="홍길동" />
+                    {errors.real_name && <p className="text-red-500 text-sm mt-1">{errors.real_name.message}</p>}
+                    <p className="text-xs text-gray-500 mt-1">실명은 관리자 확인 용도로만 사용되며, 대외적으로 공개되지 않습니다.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">생년월일 *</label>
+                      <Input
+                        type="date"
+                        {...register('birth_date', { required: '생년월일을 입력해주세요' })}
+                      />
+                      {birthDate && (
+                        <div className={`text-sm mt-1 flex items-center ${isAgeValid ? 'text-green-600' : 'text-red-500'}`}>
+                          {isAgeValid ? (
+                            <><CheckCircle2 className="w-4 h-4 mr-1" /> 만 {userAge}세 (신청 가능)</>
+                          ) : (
+                            <><AlertCircle className="w-4 h-4 mr-1" /> 만 {userAge}세 (만 34세 이상만 가능)</>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">휴대폰 번호 *</label>
+                      <Input {...register('phone_number', { required: '연락처를 입력해주세요' })} placeholder="010-1234-5678" />
+                      {errors.phone_number && <p className="text-red-500 text-sm mt-1">{errors.phone_number.message}</p>}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Specialist Info */}
+              {step === 2 && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-bold flex items-center">
+                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
+                    경력 및 전문성
+                  </h2>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">주요 경력 및 소개 *</label>
+                    <textarea
+                      {...register('career_history', { required: '경력 및 소개를 입력해주세요' })}
+                      className="w-full min-h-[150px] p-3 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder={`예시:\n- OO전자 개발팀 15년 근무\n- 취미로 목공 및 인테리어 5년\n- 두 자녀 입시 지도 경험`}
+                    />
+                    {errors.career_history && <p className="text-red-500 text-sm mt-1">{errors.career_history.message}</p>}
+                    <p className="text-xs text-gray-500 mt-1">이 내용은 인터뷰 시 참고자료로 활용됩니다.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">자신을 나타내는 태그 (전문 분야) *</label>
+                    <div className="flex gap-2 mb-2">
+                      <Input
+                        value={specialtyInput}
+                        onChange={(e) => setSpecialtyInput(e.target.value)}
+                        onKeyDown={handleAddSpecialty}
+                        placeholder="태그 입력 후 Enter (예: #고민상담, #낚시, #코딩)"
+                      />
+                      <Button type="button" onClick={() => {
+                        if (specialtyInput.trim() && !specialties.includes(specialtyInput.trim())) {
+                          setSpecialties([...specialties, specialtyInput.trim()])
+                          setSpecialtyInput('')
+                        }
+                      }}>추가</Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {specialties.map(tag => (
+                        <Badge key={tag} variant="secondary" className="px-3 py-1 text-sm flex items-center gap-1">
+                          #{tag.replace(/^#/, '')}
+                          <button type="button" onClick={() => removeSpecialty(tag)} className="hover:text-red-500 ml-1">×</button>
+                        </Badge>
+                      ))}
+                    </div>
+                    {specialties.length === 0 && <p className="text-red-500 text-sm mt-1">태그를 최소 1개 이상 입력해주세요.</p>}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Activity & Policy */}
+              {step === 3 && (
+                <div className="space-y-6">
+                  <h2 className="text-xl font-bold flex items-center">
+                    <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">3</span>
+                    활동 설정 및 동의
+                  </h2>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">아저씨 닉네임 *</label>
+                    <div className="flex items-center">
+                      <Input {...register('title', { required: '닉네임을 입력해주세요' })} placeholder="낚시왕" className="rounded-r-none border-r-0" />
+                      <div className="bg-gray-100 border border-l-0 border-gray-300 px-3 py-2 rounded-r-md text-gray-600">
+                        아저씨
+                      </div>
+                    </div>
+                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+                    <p className="text-xs text-gray-500 mt-1">서비스에는 "{watch('title') || 'OOO'} 아저씨"로 표시됩니다.</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">아저씨 설명 (한줄 소개) *</label>
+                    <Input {...register('description', { required: '한줄 소개를 입력해주세요' })} placeholder="따뜻한 조언과 맛집 투어를 함께해요" />
+                    {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">오픈채팅방 주소 *</label>
+                    <Input {...register('open_chat_url', {
+                      required: '오픈채팅 주소를 입력해주세요',
+                      pattern: {
+                        value: /^https?:\/\/(open|pf)\.kakao\.com\/.+/i,
+                        message: '올바른 카카오톡 오픈채팅 주소를 입력해주세요'
+                      }
+                    })} placeholder="https://open.kakao.com/o/..." />
+
+                    <details className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-md">
+                      <summary className="p-3 cursor-pointer font-medium hover:text-primary list-none flex items-center">
+                        <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center mr-2 text-xs">?</span>
+                        오픈채팅방이 왜 필요한가요? / 만드는 방법
+                      </summary>
+                      <div className="px-4 pb-4 space-y-3 border-t border-gray-100 pt-3">
+                        <div>
+                          <p className="font-semibold text-gray-800 mb-1">💡 왜 필요한가요?</p>
+                          <p>
+                            아저씨렌탈은 개인 연락처 노출 없이 안전하게 소통하기 위해 카카오톡 오픈채팅을 사용합니다.
+                            고객과의 상담 및 일정 조율이 이 링크를 통해 이루어집니다.
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-800 mb-1">🛠 만드는 방법</p>
+                          <ol className="list-decimal pl-5 space-y-1">
+                            <li>카카오톡 앱 실행 → '채팅' 탭 → 우측 상단 말풍선(+) 아이콘 터치</li>
+                            <li><strong>[오픈채팅]</strong> 선택 → <strong>[오픈프로필]</strong> 탭 선택 → <strong>[+ 만들기]</strong></li>
+                            <li>프로필 이름(예: OOO 아저씨) 설정 후 '완료'</li>
+                            <li>생성된 프로필의 <strong>[링크 공유]</strong> 버튼을 눌러 주소를 복사하여 위 칸에 붙여넣기</li>
+                          </ol>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">활동 가능 지역 *</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center p-3 border rounded-md hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedAreas.includes('Online')}
+                          onChange={() => toggleArea('Online')}
+                          className="mr-3 h-5 w-5 text-primary"
+                        />
+                        <div>
+                          <span className="font-medium">온라인 상담</span>
+                          <p className="text-xs text-gray-500">전화, 화상채팅, 메신저 등</p>
+                        </div>
+                      </label>
+                      <label className="flex items-center p-3 border rounded-md hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedAreas.includes('Seoul')}
+                          onChange={() => toggleArea('Seoul')}
+                          className="mr-3 h-5 w-5 text-primary"
+                        />
+                        <div>
+                          <span className="font-medium">오프라인 만남 (서울)</span>
+                          <p className="text-xs text-gray-500">현재 오프라인 활동은 서울 지역만 지원합니다.</p>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 text-sm text-gray-700 space-y-2">
+                    <h4 className="font-bold mb-2">💰 요금 및 정산 정책</h4>
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li><strong>첫 1시간 (매칭)</strong>: 고객 결제 20,000원 → 플랫폼 수수료 1만원 공제 후 <strong>10,000원 정산</strong></li>
+                      <li><strong>시간 연장</strong>: 시간당 10,000원 (현장에서 고객과 직접 협의/정산, 플랫폼 수수료 0원)</li>
+                      <li><strong>인원 추가</strong>: 1명 추가 시마다 시간당 요금 100% 가산</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t">
+                    <h4 className="font-bold">필수 동의 항목</h4>
+                    {[
+                      { key: 'consent_terms', label: '서비스 이용약관 동의 (필수)' },
+                      { key: 'consent_privacy', label: '개인정보 수집 및 이용 동의 (필수)' },
+                      { key: 'consent_settlement', label: '위 정산 및 수수료 정책을 확인하였으며 이에 동의합니다 (필수)' },
+                      { key: 'consent_chat_policy', label: '오픈채팅 응대 및 외부 거래 정책에 동의합니다 (필수)' },
+                      { key: 'consent_safety', label: '안전 수칙 및 매너 서약을 준수하겠습니다 (필수)' },
+                    ].map(item => (
+                      <label key={item.key} className="flex items-start cursor-pointer">
+                        <input
+                          type="checkbox"
+                          {...register(item.key as any, { required: true })}
+                          className="mt-1 mr-2 h-4 w-4 text-primary"
+                        />
+                        <span className="text-sm text-gray-700">{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-between mt-8">
+                {step > 1 ? (
+                  <Button type="button" variant="outline" onClick={prevStep}>
+                    이전 단계
+                  </Button>
+                ) : (
+                  <div></div> // Spacer
+                )}
+
+                {step < 3 ? (
+                  <Button type="button" onClick={nextStep} disabled={step === 1 && !isAgeValid}>
+                    다음 단계 <ChevronRight className="ml-1 w-4 h-4" />
+                  </Button>
+                ) : (
+                  <Button type="submit" loading={loading} disabled={!isValid || selectedAreas.length === 0}>
+                    신청서 제출
+                  </Button>
+                )}
+              </div>
+
+            </CardBody>
+          </Card>
+        </form>
       </Container>
     </>
   )

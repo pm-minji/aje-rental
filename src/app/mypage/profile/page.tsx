@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Form, FormField, FormGroup, FormActions } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Input'
@@ -62,7 +61,7 @@ function ProfileContent() {
 
       if (result.success) {
         setProfileData(result.data)
-        
+
         // Set form values
         profileForm.reset({
           nickname: result.data.profile.nickname || '',
@@ -85,7 +84,7 @@ function ProfileContent() {
   const handleSaveProfile = async (data: ProfileFormData) => {
     try {
       setSaving(true)
-      
+
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
@@ -127,12 +126,12 @@ function ProfileContent() {
     try {
       setDeleting(true)
       await deleteAccount()
-      
+
       // Show success message
       success('계정 삭제 완료', '계정이 성공적으로 삭제되었습니다.')
-      
+
       // AuthProvider will handle the page reload
-      
+
     } catch (err) {
       console.error('Error deleting account:', err)
       error('삭제 실패', '계정 삭제 중 오류가 발생했습니다.')
@@ -150,17 +149,12 @@ function ProfileContent() {
 
   return (
     <>
-      <PageHeader
-        title="프로필 관리"
-        description="개인정보 및 서비스 정보를 관리하세요"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '프로필 관리' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">프로필 관리</h1>
+            <p className="text-gray-600 mt-1">개인정보 및 서비스 정보를 관리하세요</p>
+          </div>
           {/* Basic Profile */}
           <Card>
             <CardHeader>

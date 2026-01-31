@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
@@ -90,13 +89,6 @@ function BecomeAjussiContent() {
   if (isAjussi) {
     return (
       <>
-        <PageHeader
-          title="아저씨 되기"
-          breadcrumbs={[
-            { label: '마이페이지', href: '/mypage' },
-            { label: '아저씨 되기' }
-          ]}
-        />
         <Container className="py-8">
           <div className="max-w-2xl mx-auto text-center">
             <div className="text-6xl mb-6">🎉</div>
@@ -117,17 +109,12 @@ function BecomeAjussiContent() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 되기"
-        description="다른 사람들에게 도움을 주는 아저씨가 되어보세요"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '아저씨 되기' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto space-y-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">아저씨 되기</h1>
+            <p className="text-gray-600 mt-1">다른 사람들에게 도움을 주는 아저씨가 되어보세요</p>
+          </div>
           {/* Application Status Section - Show if user has applied */}
           {!applicationLoading && application && (
             <Card className="border-2 border-blue-200 bg-blue-50">
@@ -180,7 +167,7 @@ function BecomeAjussiContent() {
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </a>
                   </Button>
-                  
+
                   {application.status === 'REJECTED' && (
                     <Button
                       onClick={handleBecomeAjussi}
@@ -196,13 +183,13 @@ function BecomeAjussiContent() {
 
           {/* Hero Section */}
           <div className="text-center">
-            <div className="text-6xl mb-6">👨‍🏫</div>
+            <div className="text-6xl mb-6">🥸</div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              아저씨가 되어 다른 사람들을 도와주세요
+              당신의 숨겨진 재능이 누군가에게는 큰 힘이 됩니다
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              당신의 경험과 지혜를 나누어 다른 사람들에게 도움을 주고, 
-              동시에 의미있는 수입도 얻을 수 있습니다.
+              경험과 노하우를 이웃과 나누고, 합리적인 수입도 창출해보세요.<br />
+              검증된 '동네 전문가'로서의 새로운 삶이 시작됩니다.
             </p>
           </div>
 
@@ -213,9 +200,9 @@ function BecomeAjussiContent() {
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Star className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">의미있는 활동</h3>
+                <h3 className="font-semibold mb-2">재능의 가치 발견</h3>
                 <p className="text-sm text-gray-600">
-                  다른 사람들에게 도움을 주며 보람을 느껴보세요
+                  사소해 보이는 취미나 특기도<br />누군가에게는 훌륭한 배움이 됩니다.
                 </p>
               </CardBody>
             </Card>
@@ -225,9 +212,9 @@ function BecomeAjussiContent() {
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Clock className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">유연한 시간</h3>
+                <h3 className="font-semibold mb-2">자유로운 활동</h3>
                 <p className="text-sm text-gray-600">
-                  원하는 시간에 원하는 만큼 활동할 수 있습니다
+                  원하는 시간, 원하는 장소에서<br />부담 없이 활동할 수 있습니다.
                 </p>
               </CardBody>
             </Card>
@@ -235,11 +222,11 @@ function BecomeAjussiContent() {
             <Card className="text-center">
               <CardBody>
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-primary" />
+                  <RefreshCw className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">새로운 만남</h3>
+                <h3 className="font-semibold mb-2">합리적 수익</h3>
                 <p className="text-sm text-gray-600">
-                  다양한 사람들과 만나며 인맥을 넓혀보세요
+                  플랫폼 수수료를 최소화하여<br />노력한 만큼의 정당한 보상을 받으세요.
                 </p>
               </CardBody>
             </Card>
@@ -249,9 +236,9 @@ function BecomeAjussiContent() {
                 <div className="bg-primary/10 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <Shield className="h-8 w-8 text-primary" />
                 </div>
-                <h3 className="font-semibold mb-2">안전한 환경</h3>
+                <h3 className="font-semibold mb-2">검증된 전문가</h3>
                 <p className="text-sm text-gray-600">
-                  검증된 플랫폼에서 안전하게 활동하세요
+                  까다로운 검증을 통과한 '선생님'으로서<br />존중받으며 활동합니다.
                 </p>
               </CardBody>
             </Card>
@@ -267,32 +254,32 @@ function BecomeAjussiContent() {
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                   <div>
-                    <h4 className="font-medium">만 20세 이상</h4>
-                    <p className="text-sm text-gray-600">성인 인증이 완료된 회원</p>
+                    <h4 className="font-medium">만 34세 이상 남성</h4>
+                    <p className="text-sm text-gray-600">인생의 경험이 충분히 쌓인 대한민국 성인 남성</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                   <div>
-                    <h4 className="font-medium">서비스 제공 의지</h4>
-                    <p className="text-sm text-gray-600">다른 사람들을 도우려는 진정성 있는 마음</p>
+                    <h4 className="font-medium">확실한 신원 인증</h4>
+                    <p className="text-sm text-gray-600">본인 명의 휴대폰 및 실명 인증이 가능한 분</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                   <div>
-                    <h4 className="font-medium">기본 매너</h4>
-                    <p className="text-sm text-gray-600">상대방을 존중하고 예의를 지키는 태도</p>
+                    <h4 className="font-medium">자신만의 특기/재능</h4>
+                    <p className="text-sm text-gray-600">전문 지식, 취미, 혹은 경청하는 능력이 있으신 분</p>
                   </div>
                 </div>
 
                 <div className="flex items-start space-x-3">
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                   <div>
-                    <h4 className="font-medium">약속 준수</h4>
-                    <p className="text-sm text-gray-600">정해진 시간과 약속을 지키는 책임감</p>
+                    <h4 className="font-medium">신뢰와 책임감</h4>
+                    <p className="text-sm text-gray-600">약속을 생명처럼 여기고 매너를 갖추신 분</p>
                   </div>
                 </div>
               </div>
@@ -310,9 +297,9 @@ function BecomeAjussiContent() {
                   <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-3 text-sm font-semibold">
                     1
                   </div>
-                  <h4 className="font-medium mb-2">아저씨 등록</h4>
+                  <h4 className="font-medium mb-2">신청서 작성</h4>
                   <p className="text-sm text-gray-600">
-                    아래 버튼을 클릭하여 아저씨로 등록합니다
+                    경력, 전문 분야, 활동 계획 등을 상세히 작성하여 제출합니다.
                   </p>
                 </div>
 
@@ -320,9 +307,9 @@ function BecomeAjussiContent() {
                   <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-3 text-sm font-semibold">
                     2
                   </div>
-                  <h4 className="font-medium mb-2">프로필 작성</h4>
+                  <h4 className="font-medium mb-2">인터뷰 심사</h4>
                   <p className="text-sm text-gray-600">
-                    서비스 내용, 요금, 활동 지역 등을 설정합니다
+                    관리자와의 전화 인터뷰를 통해 신원과 전문성을 검증받습니다.
                   </p>
                 </div>
 
@@ -330,9 +317,9 @@ function BecomeAjussiContent() {
                   <div className="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-3 text-sm font-semibold">
                     3
                   </div>
-                  <h4 className="font-medium mb-2">활동 시작</h4>
+                  <h4 className="font-medium mb-2">활동 승인</h4>
                   <p className="text-sm text-gray-600">
-                    프로필이 공개되어 서비스 요청을 받을 수 있습니다
+                    승인 즉시 검색 목록에 노출되며 활동을 시작할 수 있습니다.
                   </p>
                 </div>
               </div>

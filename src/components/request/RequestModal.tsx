@@ -148,18 +148,21 @@ export function RequestModal({
             {/* Duration */}
             <FormField>
               <Select
-                label="소요 시간"
+                label="예상 소요 시간"
                 options={DURATION_OPTIONS}
                 error={errors.duration?.message}
                 {...register('duration', { valueAsNumber: true })}
               />
-              {estimatedCost > 0 && (
-                <p className="text-sm text-gray-600 mt-1">
-                  예상 비용: <span className="font-semibold text-primary">
-                    {formatCurrency(estimatedCost)}
-                  </span>
-                </p>
-              )}
+              <div className="mt-2 p-3 bg-gray-50 rounded-md text-sm">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">기본 요금 (첫 1시간)</span>
+                  <span className="font-semibold text-primary">20,000원</span>
+                </div>
+                <div className="flex justify-between items-center text-gray-500 text-xs">
+                  <span>추가 시간</span>
+                  <span>시간당 10,000원 (현장 정산)</span>
+                </div>
+              </div>
             </FormField>
 
             {/* Location */}
@@ -190,9 +193,10 @@ export function RequestModal({
               </h4>
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• 요청 후 아저씨의 수락을 기다려주세요</li>
+                <li>• 기본 1시간 요금(20,000원)은 선결제됩니다</li>
+                <li>• 이동, 식사, 체험 비용 등은 의뢰인이 부담합니다</li>
                 <li>• 공개된 장소에서 만나시기를 권장합니다</li>
                 <li>• 서비스 이용 후 리뷰를 남겨주세요</li>
-                <li>• 취소는 24시간 전까지 가능합니다</li>
               </ul>
             </div>
           </div>

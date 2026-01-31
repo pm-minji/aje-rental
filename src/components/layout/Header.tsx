@@ -29,24 +29,24 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             className="text-xl font-bold text-primary hover:text-primary/80 transition-colors"
             onClick={closeMobileMenu}
           >
-            나의아저씨
+            아저씨렌탈
           </Link>
-          
+
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              href="/ajussi" 
+            <Link
+              href="/ajussi"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               아저씨 찾기
             </Link>
-            <Link 
-              href="/guide" 
+            <Link
+              href="/guide"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               이용 가이드
@@ -63,21 +63,21 @@ export default function Header() {
                   안녕하세요, {profile?.nickname || profile?.name}님
                 </span>
                 {isAdmin && (
-                  <Link 
-                    href="/admin" 
+                  <Link
+                    href="/admin"
                     className="text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     관리자
                   </Link>
                 )}
-                <Link 
-                  href="/mypage" 
+                <Link
+                  href="/mypage"
                   className="text-gray-600 hover:text-gray-900 transition-colors"
                 >
                   마이페이지
                 </Link>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   onClick={handleSignOut}
                   className="text-gray-600 hover:text-gray-900"
                 >
@@ -172,7 +172,7 @@ export default function Header() {
                       관리자
                     </Link>
                   )}
-                  
+
                   <Link
                     href="/mypage"
                     className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
@@ -181,7 +181,7 @@ export default function Header() {
                     <User className="h-4 w-4 mr-3" />
                     마이페이지
                   </Link>
-                  
+
                   <Link
                     href="/mypage/favorites"
                     className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
@@ -191,14 +191,6 @@ export default function Header() {
                     즐겨찾기
                   </Link>
 
-                  <Link
-                    href="/mypage/settings"
-                    className="flex items-center px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
-                    onClick={closeMobileMenu}
-                  >
-                    <Settings className="h-4 w-4 mr-3" />
-                    설정
-                  </Link>
 
                   <button
                     onClick={handleSignOut}

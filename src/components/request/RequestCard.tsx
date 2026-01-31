@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Calendar, Clock, MapPin, User, MessageCircle, ExternalLink } from 'lucide-react'
+import { Calendar, Clock, MapPin, User, MessageCircle, ExternalLink, Star } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
@@ -9,8 +9,9 @@ import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
-import { formatCurrency, formatDateTime } from '@/lib/utils'
+import { formatDateTime } from '@/lib/utils'
 import { RequestWithDetails } from '@/types/database'
+import { ReviewModal } from '@/components/review/ReviewModal'
 
 interface RequestCardProps {
   request: RequestWithDetails
@@ -20,13 +21,22 @@ interface RequestCardProps {
 
 export function RequestCard({ request, userType, onStatusChange }: RequestCardProps) {
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showReviewModal, setShowReviewModal] = useState(false)
   const [pendingAction, setPendingAction] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [hasReviewed, setHasReviewed] = useState(false)
   const { success, error } = useToast()
 
   const otherParty = userType === 'client' ? request.ajussi : request.client
   const isClient = userType === 'client'
   const isAjussi = userType === 'ajussi'
+
+  // Check if the scheduled service time has passed (date + duration)
+  const isServiceTimeOver = (() => {
+    const serviceDate = new Date(request.date)
+    const endTime = new Date(serviceDate.getTime() + request.duration * 60 * 1000)
+    return new Date() > endTime
+  })()
 
   const handleStatusChange = async (newStatus: string) => {
     try {
@@ -103,15 +113,29 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
         break
 
       case 'CONFIRMED':
-        buttons.push(
-          <Button
-            key="complete"
-            size="sm"
-            onClick={(e) => openConfirmModal('COMPLETED', e)}
-          >
-            완료하기
-          </Button>
-        )
+        if (isServiceTimeOver) {
+          buttons.push(
+            <Button
+              key="complete"
+              size="sm"
+              onClick={(e) => openConfirmModal('COMPLETED', e)}
+            >
+              완료하기
+            </Button>
+          )
+        } else {
+          buttons.push(
+            <Button
+              key="complete-disabled"
+              size="sm"
+              variant="outline"
+              disabled
+              title="예약 시간 이후에 완료할 수 있습니다"
+            >
+              예약시간 전
+            </Button>
+          )
+        }
         // 채팅하기 버튼은 클라이언트(유저)에게만 표시
         if (isClient && request.ajussi_profiles?.open_chat_url) {
           buttons.push(
@@ -119,7 +143,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               key="chat"
               variant="outline"
               size="sm"
-              onClick={() => window.open(request.ajussi_profiles.open_chat_url, '_blank')}
+              onClick={() => window.open(request.ajussi_profiles?.open_chat_url ?? '', '_blank')}
             >
               <MessageCircle className="h-4 w-4 mr-1" />
               채팅하기
@@ -130,7 +154,23 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
         break
 
       case 'COMPLETED':
-        // TODO: Add review button
+        // 클라이언트만 리뷰 작성 가능 (리뷰가 없는 경우에만)
+        if (isClient && !request.review && !hasReviewed) {
+          buttons.push(
+            <Button
+              key="review"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setShowReviewModal(true)
+              }}
+            >
+              <Star className="h-4 w-4 mr-1" />
+              리뷰 작성
+            </Button>
+          )
+        }
         break
     }
 
@@ -184,20 +224,20 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
     if ((e.target as HTMLElement).closest('button')) {
       return
     }
-    
+
     if (isClient) {
-      // Navigate to specific ajussi detail page
-      const ajussiId = request.ajussi_id
-      if (ajussiId) {
-        window.location.href = `/ajussi/${ajussiId}`
+      // Navigate to specific ajussi detail page using ajussi_profiles.id
+      const ajussiProfileId = request.ajussi_profiles?.id
+      if (ajussiProfileId) {
+        window.location.href = `/ajussi/${ajussiProfileId}`
       }
     }
   }
 
   return (
     <>
-      <Card 
-        hover 
+      <Card
+        hover
         className={`${isClient ? 'cursor-pointer' : ''}`}
         onClick={isClient ? handleCardClick : undefined}
       >
@@ -206,14 +246,14 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
               <Avatar
-                src={otherParty.profile_image}
-                alt={otherParty.name}
+                src={otherParty?.profile_image}
+                alt={otherParty?.name || '사용자'}
                 size="md"
-                fallback={otherParty.name}
+                fallback={otherParty?.name || '?'}
               />
               <div>
                 <h3 className="font-medium text-gray-900">
-                  {otherParty.nickname || otherParty.name}
+                  {otherParty?.nickname || otherParty?.name || '알 수 없음'}
                 </h3>
                 {isClient && request.ajussi_profiles && (
                   <p className="text-sm text-gray-600">
@@ -231,15 +271,13 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               <Calendar className="h-4 w-4 mr-2" />
               <span>{formatDateTime(request.date)}</span>
             </div>
-            
+
             <div className="flex items-center text-sm text-gray-600">
               <Clock className="h-4 w-4 mr-2" />
               <span>{request.duration}분</span>
-              {request.ajussi_profiles && (
-                <span className="ml-2 font-medium text-primary">
-                  ({formatCurrency((request.duration / 60) * request.ajussi_profiles.hourly_rate)})
-                </span>
-              )}
+              <span className="ml-2 font-medium text-primary">
+                (20,000원 / 첫 1시간)
+              </span>
             </div>
 
             <div className="flex items-center text-sm text-gray-600">
@@ -254,6 +292,29 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               {request.description}
             </p>
           </div>
+
+          {/* Review Display (if exists) */}
+          {request.review && (
+            <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-3">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="text-sm font-medium text-gray-700">내 리뷰</span>
+                <div className="flex items-center ml-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`h-3 w-3 ${star <= request.review!.rating
+                          ? 'text-yellow-400 fill-yellow-400'
+                          : 'text-gray-300'
+                        }`}
+                    />
+                  ))}
+                </div>
+              </div>
+              {request.review.comment && (
+                <p className="text-sm text-gray-600">{request.review.comment}</p>
+              )}
+            </div>
+          )}
 
           {/* Actions */}
           {getActionButtons().length > 0 && (
@@ -299,6 +360,17 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
           </Button>
         </ModalFooter>
       </Modal>
+
+      {/* Review Modal */}
+      {isClient && request.status === 'COMPLETED' && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          requestId={request.id}
+          ajussiName={request.ajussi_profiles?.title || request.ajussi?.name || '아저씨'}
+          onSuccess={() => setHasReviewed(true)}
+        />
+      )}
     </>
   )
 }

@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Container } from '@/components/layout/Container'
-import { PageHeader } from '@/components/layout/PageHeader'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Form, FormField, FormActions } from '@/components/ui/Form'
 import { Input } from '@/components/ui/Input'
@@ -14,13 +13,14 @@ import { Checkbox } from '@/components/ui/Checkbox'
 import { Button } from '@/components/ui/Button'
 import { Loading } from '@/components/ui/Loading'
 import { useToast } from '@/components/ui/Toast'
+import { Badge } from '@/components/ui/Badge'
 import { useAuth } from '@/components/providers/AuthProvider'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 
 const ajussiProfileSchema = z.object({
   title: z.string().min(5, '제목은 5자 이상이어야 합니다').max(50, '제목은 50자 이하여야 합니다'),
   description: z.string().min(20, '설명은 20자 이상이어야 합니다').max(500, '설명은 500자 이하여야 합니다'),
-  hourly_rate: z.number().min(5000, '최소 5,000원 이상이어야 합니다').max(100000, '최대 100,000원 이하여야 합니다'),
+  hourly_rate: z.number().min(20000, '요금은 20,000원이어야 합니다').max(20000, '요금은 20,000원이어야 합니다'),
   available_areas: z.array(z.string()).min(1, '최소 1개 지역을 선택해주세요'),
   open_chat_url: z.string().url('올바른 URL을 입력해주세요').optional().or(z.literal('')),
   is_active: z.boolean(),
@@ -30,17 +30,7 @@ const ajussiProfileSchema = z.object({
 type AjussiProfileFormData = z.infer<typeof ajussiProfileSchema>
 
 const LOCATIONS = [
-  '강남구', '서초구', '송파구', '마포구', '용산구', '중구', '영등포구',
-  '종로구', '성동구', '광진구', '동대문구', '중랑구', '성북구', '강북구',
-  '도봉구', '노원구', '은평구', '서대문구', '양천구', '강서구', '구로구',
-  '금천구', '관악구', '동작구', '강동구'
-]
-
-const TAGS = [
-  '산책', '대화', '조언', '멘토링', '운동', '건강관리',
-  '취업상담', '직장생활', '인생상담', '카페', '공원',
-  '문화생활', '독서', '음악', '영화', '요리', '여행',
-  '언어교환', '컴퓨터', '스마트폰', '투자', '부동산'
+  'Seoul', 'Online'
 ]
 
 export default function AjussiProfilePage() {
@@ -102,7 +92,7 @@ function AjussiProfileContent() {
   const handleSave = async (data: AjussiProfileFormData) => {
     try {
       setSaving(true)
-      
+
       const response = await fetch('/api/profile', {
         method: 'PUT',
         headers: {
@@ -132,7 +122,7 @@ function AjussiProfileContent() {
     const newAreas = currentAreas.includes(area)
       ? currentAreas.filter(a => a !== area)
       : [...currentAreas, area]
-    
+
     form.setValue('available_areas', newAreas)
   }
 
@@ -141,7 +131,7 @@ function AjussiProfileContent() {
     const newTags = currentTags.includes(tag)
       ? currentTags.filter(t => t !== tag)
       : [...currentTags, tag]
-    
+
     form.setValue('tags', newTags)
   }
 
@@ -166,17 +156,12 @@ function AjussiProfileContent() {
 
   return (
     <>
-      <PageHeader
-        title="아저씨 프로필 관리"
-        description="서비스 정보와 활동 상태를 관리하세요"
-        breadcrumbs={[
-          { label: '마이페이지', href: '/mypage' },
-          { label: '아저씨 프로필' }
-        ]}
-      />
-
       <Container className="py-8">
         <div className="max-w-4xl mx-auto">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900">아저씨 프로필 관리</h1>
+            <p className="text-gray-600 mt-1">서비스 정보와 활동 상태를 관리하세요</p>
+          </div>
           <Card>
             <CardHeader>
               <h2 className="text-xl font-semibold">서비스 정보</h2>
@@ -184,18 +169,29 @@ function AjussiProfileContent() {
             <CardBody>
               <Form onSubmit={form.handleSubmit(handleSave)}>
                 <div className="space-y-6">
-                  <FormField>
-                    <Input
-                      label="서비스 제목"
-                      placeholder="예: 건강한 산책과 운동 동행"
-                      error={form.formState.errors.title?.message}
-                      {...form.register('title')}
-                    />
-                  </FormField>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700">아저씨 닉네임</label>
+                    <div className="flex items-center">
+                      <Input
+                        placeholder="예: 낚시왕"
+                        {...form.register('title')}
+                        className="rounded-r-none border-r-0"
+                      />
+                      <div className="bg-gray-100 border border-l-0 border-gray-300 px-3 py-2 rounded-r-md text-gray-600 h-[42px] flex items-center whitespace-nowrap">
+                        아저씨
+                      </div>
+                    </div>
+                    {form.formState.errors.title?.message && (
+                      <p className="text-sm text-red-600 mt-1">{form.formState.errors.title.message}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">
+                      서비스에는 "{form.watch('title') || 'OOO'} 아저씨"로 표시됩니다.
+                    </p>
+                  </div>
 
                   <FormField>
                     <Textarea
-                      label="서비스 설명"
+                      label="아저씨 설명 (한줄 소개)"
                       placeholder="제공하는 서비스에 대해 자세히 설명해주세요"
                       rows={4}
                       error={form.formState.errors.description?.message}
@@ -208,10 +204,12 @@ function AjussiProfileContent() {
                       <Input
                         label="시간당 요금 (원)"
                         type="number"
-                        min="5000"
-                        max="100000"
-                        step="1000"
-                        error={form.formState.errors.hourly_rate?.message}
+                        min="20000"
+                        max="20000"
+                        value={20000}
+                        readOnly
+                        className="bg-gray-100"
+                        helperText="첫 만남 1시간 비용은 20,000원으로 고정됩니다. (수수료 50% 공제 후 10,000원 정산)"
                         {...form.register('hourly_rate', { valueAsNumber: true })}
                       />
                     </FormField>
@@ -219,9 +217,32 @@ function AjussiProfileContent() {
                       <Input
                         label="오픈채팅 URL"
                         placeholder="https://open.kakao.com/..."
-                        error={form.formState.errors.open_chat_url?.message}
                         {...form.register('open_chat_url')}
                       />
+                      <details className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-md">
+                        <summary className="p-3 cursor-pointer font-medium hover:text-primary list-none flex items-center">
+                          <span className="bg-primary/10 text-primary rounded-full w-5 h-5 flex items-center justify-center mr-2 text-xs">?</span>
+                          오픈채팅방이 왜 필요한가요? / 만드는 방법
+                        </summary>
+                        <div className="px-4 pb-4 space-y-3 border-t border-gray-100 pt-3">
+                          <div>
+                            <p className="font-semibold text-gray-800 mb-1">💡 왜 필요한가요?</p>
+                            <p>
+                              아저씨렌탈은 개인 연락처 노출 없이 안전하게 소통하기 위해 카카오톡 오픈채팅을 사용합니다.
+                              고객과의 상담 및 일정 조율이 이 링크를 통해 이루어집니다.
+                            </p>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-800 mb-1">🛠 만드는 방법</p>
+                            <ol className="list-decimal pl-5 space-y-1">
+                              <li>카카오톡 앱 실행 → '채팅' 탭 → 우측 상단 말풍선(+) 아이콘 터치</li>
+                              <li><strong>[오픈채팅]</strong> 선택 → <strong>[오픈프로필]</strong> 탭 선택 → <strong>[+ 만들기]</strong></li>
+                              <li>프로필 이름(예: OOO 아저씨) 설정 후 '완료'</li>
+                              <li>생성된 프로필의 <strong>[링크 공유]</strong> 버튼을 눌러 주소를 복사하여 위 칸에 붙여넣기</li>
+                            </ol>
+                          </div>
+                        </div>
+                      </details>
                     </FormField>
                   </div>
 
@@ -237,24 +258,38 @@ function AjussiProfileContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       활동 가능 지역
                     </label>
-                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {LOCATIONS.map((area) => {
-                        const isSelected = form.watch('available_areas')?.includes(area)
-                        return (
-                          <button
-                            key={area}
-                            type="button"
-                            onClick={() => handleAreaToggle(area)}
-                            className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                              isSelected
-                                ? 'bg-primary text-white border-primary'
-                                : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                            }`}
-                          >
-                            {area}
-                          </button>
-                        )
-                      })}
+                    <div className="space-y-2">
+                      {/* Online */}
+                      <div className="flex items-start p-3 border rounded-md hover:bg-gray-50 cursor-pointer mb-2" onClick={() => handleAreaToggle('Online')}>
+                        <div className="flex items-center h-5">
+                          <input
+                            type="checkbox"
+                            checked={form.watch('available_areas')?.includes('Online')}
+                            onChange={() => { }} // Handled by div click
+                            className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          />
+                        </div>
+                        <div className="ml-3 text-sm">
+                          <span className="font-medium text-gray-700">온라인 상담</span>
+                          <p className="text-gray-500">전화, 화상채팅, 메신저 등</p>
+                        </div>
+                      </div>
+
+                      {/* Seoul */}
+                      <div className="flex items-start p-3 border rounded-md hover:bg-gray-50 cursor-pointer" onClick={() => handleAreaToggle('Seoul')}>
+                        <div className="flex items-center h-5">
+                          <input
+                            type="checkbox"
+                            checked={form.watch('available_areas')?.includes('Seoul')}
+                            onChange={() => { }} // Handled by div click
+                            className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
+                          />
+                        </div>
+                        <div className="ml-3 text-sm">
+                          <span className="font-medium text-gray-700">오프라인 만남 (서울)</span>
+                          <p className="text-gray-500">현재 오프라인 활동은 서울 지역만 지원합니다.</p>
+                        </div>
+                      </div>
                     </div>
                     {form.formState.errors.available_areas && (
                       <p className="text-sm text-red-600 mt-1">
@@ -268,24 +303,33 @@ function AjussiProfileContent() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       서비스 태그
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {TAGS.map((tag) => {
-                        const isSelected = form.watch('tags')?.includes(tag)
-                        return (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => handleTagToggle(tag)}
-                            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
-                              isSelected
-                                ? 'bg-primary text-white border-primary'
-                                : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                            }`}
-                          >
-                            {tag}
-                          </button>
-                        )
-                      })}
+                    <div className="flex gap-2 mb-2">
+                      <Input
+                        placeholder="태그 입력 후 Enter (예: #고민상담, #낚시, #코딩)"
+                        onKeyDown={(e) => {
+                          if (e.nativeEvent.isComposing) return
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            const val = e.currentTarget.value.trim()
+                            if (val) {
+                              handleTagToggle(val) //Reuse logic to add
+                              e.currentTarget.value = ''
+                            }
+                          }
+                        }}
+                      />
+                      <Button type="button" onClick={() => {
+                        // Logic handled by input
+                      }}>추가</Button>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {form.watch('tags')?.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="px-3 py-1 text-sm flex items-center gap-1">
+                          #{tag.replace(/^#/, '')}
+                          <button type="button" onClick={() => handleTagToggle(tag)} className="hover:text-red-500 ml-1">×</button>
+                        </Badge>
+                      ))}
                     </div>
                     {form.formState.errors.tags && (
                       <p className="text-sm text-red-600 mt-1">

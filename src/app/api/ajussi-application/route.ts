@@ -8,9 +8,9 @@ export async function POST(request: NextRequest) {
     // Try to get user from session directly
     const supabase = await createServerSupabase()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-    
+
     console.log('POST /api/ajussi-application - User:', user?.id)
-    
+
     if (!user) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -19,10 +19,25 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, description, hourly_rate, available_areas, open_chat_url, tags } = body
+    const {
+      title,
+      description,
+      hourly_rate,
+      available_areas,
+      open_chat_url,
+      tags,
+      real_name,
+      birth_date,
+      phone_number,
+      career_history,
+      specialties
+    } = body
 
     // Validate required fields
-    if (!title || !description || !hourly_rate || !available_areas || !open_chat_url || !tags) {
+    if (
+      !title || !description || !hourly_rate || !available_areas || !open_chat_url ||
+      !real_name || !birth_date || !phone_number || !career_history
+    ) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
@@ -55,6 +70,11 @@ export async function POST(request: NextRequest) {
         open_chat_url,
         tags,
         status: 'PENDING', // Waiting for admin approval
+        real_name,
+        birth_date,
+        phone_number,
+        career_history,
+        specialties: specialties || [],
       })
       .select()
       .single()
