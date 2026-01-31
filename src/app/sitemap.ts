@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://aje-rental.vercel.app'
+    const baseUrl = 'https://ajussirental.com'
 
     // Anonymous Supabase client
     const supabase = createClient<Database>(
@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             .order('updated_at', { ascending: false })
 
         if (ajussis) {
-            const ajussiRoutes = ajussis.map((ajussi) => ({
+            const ajussiRoutes = (ajussis as { id: string; updated_at: string }[]).map((ajussi) => ({
                 url: `${baseUrl}/ajussi/${ajussi.id}`,
                 lastModified: new Date(ajussi.updated_at),
                 changeFrequency: 'weekly' as const,

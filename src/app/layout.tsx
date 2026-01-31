@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   keywords: ['아저씨렌탈', '아저씨', '렌탈', '산책', '대화', '조언', '멘토링', '동행', '서울', '활동', '만남'],
   authors: [{ name: '아저씨렌탈' }],
   creator: '아저씨렌탈',
-  metadataBase: new URL('https://aje-rental.vercel.app'),
+  metadataBase: new URL('https://ajussirental.com'),
   manifest: '/manifest.json',
   alternates: {
     canonical: '/',
