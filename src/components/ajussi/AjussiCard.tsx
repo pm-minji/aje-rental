@@ -30,7 +30,7 @@ export function AjussiCard({
 
   return (
     <Card hover className="relative overflow-hidden">
-      <Link href={`/ajussi/${ajussi.id}`}>
+      <Link href={`/ajussi/${ajussi.slug || ajussi.id}`}>
         <div className="space-y-4">
           {/* Header with Avatar and Favorite */}
           <div className="flex items-start justify-between">

@@ -35,6 +35,7 @@ export interface Database {
           phone_number: string | null;
           career_history: string | null;
           specialties: string[] | null;
+          slug: string | null;
         };
         Insert: Omit<Database['public']['Tables']['ajussi_profiles']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['ajussi_profiles']['Insert']>;

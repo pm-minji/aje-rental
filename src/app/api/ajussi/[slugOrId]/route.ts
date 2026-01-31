@@ -3,16 +3,24 @@ import { createServerSupabase } from '@/lib/supabase'
 
 export const dynamic = 'force-dynamic'
 
+// UUID 형식 체크
+function isUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return uuidRegex.test(str)
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { slugOrId: string } }
 ) {
   try {
-    const { id } = params
+    const { slugOrId } = params
     const supabase = await createServerSupabase()
 
-    // Get ajussi profile with user info
-    const { data: ajussi, error: ajussiError } = await supabase
+    let ajussi = null
+
+    // 1. slug로 먼저 조회
+    const { data: bySlug } = await supabase
       .from('ajussi_profiles')
       .select(`
         *,
@@ -23,11 +31,33 @@ export async function GET(
           profile_image
         )
       `)
-      .eq('id', id)
+      .eq('slug', slugOrId)
       .eq('is_active', true)
       .single()
 
-    if (ajussiError || !ajussi) {
+    if (bySlug) {
+      ajussi = bySlug
+    } else if (isUUID(slugOrId)) {
+      // 2. UUID로 fallback 조회
+      const { data: byId } = await supabase
+        .from('ajussi_profiles')
+        .select(`
+          *,
+          profiles (
+            id,
+            name,
+            nickname,
+            profile_image
+          )
+        `)
+        .eq('id', slugOrId)
+        .eq('is_active', true)
+        .single()
+
+      ajussi = byId
+    }
+
+    if (!ajussi) {
       return NextResponse.json(
         { success: false, error: 'Ajussi not found' },
         { status: 404 }

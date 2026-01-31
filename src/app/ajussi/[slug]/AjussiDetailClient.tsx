@@ -32,7 +32,11 @@ interface AjussiDetailData {
   reviewCount: number
 }
 
-export default function AjussiDetailClient({ params }: { params: { id: string } }) {
+interface AjussiDetailClientProps {
+  slug: string
+}
+
+export default function AjussiDetailClient({ slug }: AjussiDetailClientProps) {
   const { isAuthenticated } = useAuth()
   const { error, success } = useToast()
   const [data, setData] = useState<AjussiDetailData | null>(null)
@@ -42,12 +46,13 @@ export default function AjussiDetailClient({ params }: { params: { id: string } 
 
   useEffect(() => {
     fetchAjussiDetail()
-  }, [params.id])
+  }, [slug])
 
   const fetchAjussiDetail = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/ajussi/${params.id}`)
+      // API now supports both slug and UUID lookup
+      const response = await fetch(`/api/ajussi/${slug}`)
       const result = await response.json()
 
       if (result.success) {

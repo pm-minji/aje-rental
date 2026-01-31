@@ -119,7 +119,7 @@ function FavoritesContent() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {favorites.map((ajussi) => (
                             <Card key={ajussi.id} hover className="relative">
-                                <Link href={`/ajussi/${ajussi.id}`}>
+                                <Link href={`/ajussi/${ajussi.slug || ajussi.id}`}>
                                     <div className="flex items-start space-x-4">
                                         <Avatar
                                             src={ajussi.profiles?.profile_image}

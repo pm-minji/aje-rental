@@ -53,17 +53,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // ... 아저씨 동적 라우트 로직 ...
 
-    // 아저씨 상세 페이지들 (동적 생성)
+    // 아저씨 상세 페이지들 (동적 생성 - slug 기반)
     try {
         const { data: ajussis } = await supabase
             .from('ajussi_profiles')
-            .select('id, updated_at')
+            .select('slug, updated_at')
             .eq('is_active', true)
+            .not('slug', 'is', null)
             .order('updated_at', { ascending: false })
 
         if (ajussis) {
-            const ajussiRoutes = (ajussis as { id: string; updated_at: string }[]).map((ajussi) => ({
-                url: `${baseUrl}/ajussi/${ajussi.id}`,
+            const ajussiRoutes = (ajussis as { slug: string; updated_at: string }[]).map((ajussi) => ({
+                url: `${baseUrl}/ajussi/${ajussi.slug}`,
                 lastModified: new Date(ajussi.updated_at),
                 changeFrequency: 'weekly' as const,
                 priority: 0.7,
