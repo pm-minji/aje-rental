@@ -1,110 +1,44 @@
-'use client'
-
-import { useState, useEffect } from 'react'
+import { createServerSupabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/layout/Container'
-import { AjussiCard } from '@/components/ajussi/AjussiCard'
-import { Loading } from '@/components/ui/Loading'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { useToast } from '@/components/ui/Toast'
-import { redirectToLogin } from '@/lib/auth-utils'
+import { FeaturedAjussiList } from '@/components/home/FeaturedAjussiList'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { AjussiWithProfile } from '@/types/database'
-import { pushToDataLayer } from '@/lib/gtm'
 
-export default function Home() {
-  const [featuredAjussi, setFeaturedAjussi] = useState<AjussiWithProfile[]>([])
-  const [loading, setLoading] = useState(true)
-  const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set())
-  const { isAuthenticated } = useAuth()
-  const { success, error } = useToast()
+// ISR: 30초마다 재생성
+export const revalidate = 30
 
-  const fetchFavorites = async () => {
-    if (!isAuthenticated) {
-      setFavoriteIds(new Set())
-      return
-    }
+async function getFeaturedAjussi(): Promise<AjussiWithProfile[]> {
+  const supabase = await createServerSupabase()
 
-    try {
-      const response = await fetch('/api/favorites')
-      const result = await response.json()
+  const { data, error } = await supabase
+    .from('ajussi_profiles')
+    .select(`
+      *,
+      profiles (
+        id,
+        name,
+        nickname,
+        profile_image
+      )
+    `)
+    .eq('is_active', true)
+    .order('created_at', { ascending: false })
+    .limit(6)
 
-      if (result.success) {
-        const ids = new Set<string>(result.data.map((fav: any) => fav.ajussi_id))
-        setFavoriteIds(ids)
-      }
-    } catch (err) {
-      console.error('Error fetching favorites:', err)
-    }
+  if (error) {
+    console.error('Error fetching featured ajussi:', error)
+    return []
   }
 
-  useEffect(() => {
-    fetchFeaturedAjussi()
-    fetchFavorites()
-  }, [isAuthenticated])
+  return (data as AjussiWithProfile[]) || []
+}
 
-  const fetchFeaturedAjussi = async () => {
-    try {
-      const response = await fetch('/api/ajussi?limit=6&sort=rating')
-      const result = await response.json()
-      if (result.success && result.data) {
-        setFeaturedAjussi(result.data)
-      }
-    } catch (error) {
-      console.error('Error fetching featured ajussi:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+export default async function Home() {
+  // 서버에서 데이터를 미리 가져옴 (HTML에 포함됨)
+  const featuredAjussi = await getFeaturedAjussi()
 
-  const handleFavorite = async (ajussiId: string) => {
-    if (!isAuthenticated) {
-      redirectToLogin()
-      return
-    }
-
-    try {
-      const response = await fetch('/api/favorites', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ajussiId }),
-      })
-
-      const result = await response.json()
-
-      if (result.success) {
-        if (result.action === 'added') {
-          success('즐겨찾기 추가', '즐겨찾기에 추가되었습니다.')
-          setFavoriteIds(prev => new Set([...Array.from(prev), ajussiId]))
-          pushToDataLayer({
-            event: 'favorite_added',
-            ajussiId,
-            location: 'home',
-          })
-        } else if (result.action === 'removed') {
-          success('즐겨찾기 해제', '즐겨찾기에서 제거되었습니다.')
-          setFavoriteIds(prev => {
-            const newSet = new Set(prev)
-            newSet.delete(ajussiId)
-            return newSet
-          })
-          pushToDataLayer({
-            event: 'favorite_removed',
-            ajussiId,
-            location: 'home',
-          })
-        }
-      } else {
-        error('오류 발생', result.error || '즐겨찾기 처리 중 오류가 발생했습니다.')
-      }
-    } catch (err) {
-      console.error('Error toggling favorite:', err)
-      error('오류 발생', '즐겨찾기 처리 중 오류가 발생했습니다.')
-    }
-  }
   return (
     <>
       {/* Hero Section - Simplified */}
@@ -128,7 +62,7 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Featured Ajussi Section - Immediately Visible */}
+      {/* Featured Ajussi Section - Server-rendered */}
       <section className="py-12 bg-white">
         <Container>
           <div className="max-w-2xl mx-auto">
@@ -141,41 +75,18 @@ export default function Home() {
               </p>
             </div>
 
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loading size="lg" />
-              </div>
-            ) : (
-              <>
-                <div className="space-y-4 mb-8">
-                  {featuredAjussi && featuredAjussi.length > 0 ? (
-                    featuredAjussi.slice(0, 4).map((ajussi) => (
-                      <AjussiCard
-                        key={ajussi.id}
-                        ajussi={ajussi}
-                        onFavorite={handleFavorite}
-                        isFavorited={favoriteIds.has(ajussi.user_id)}
-                        showFavorite={true}
-                      />
-                    ))
-                  ) : (
-                    <div className="text-center py-12 text-gray-500">
-                      <p>아직 등록된 아저씨가 없습니다.</p>
-                    </div>
-                  )}
-                </div>
+            {/* Client Component for interactive favorites */}
+            <FeaturedAjussiList initialData={featuredAjussi} />
 
-                {featuredAjussi && featuredAjussi.length > 0 && (
-                  <div className="text-center">
-                    <Button asChild variant="outline" className="w-full sm:w-auto">
-                      <Link href="/ajussi" className="flex items-center justify-center">
-                        더 많은 아저씨 보기
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </>
+            {featuredAjussi && featuredAjussi.length > 0 && (
+              <div className="text-center mt-8">
+                <Button asChild variant="outline" className="w-full sm:w-auto">
+                  <Link href="/ajussi" className="flex items-center justify-center">
+                    더 많은 아저씨 보기
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
             )}
           </div>
         </Container>
