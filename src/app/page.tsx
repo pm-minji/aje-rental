@@ -1,17 +1,22 @@
-import { createServerSupabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/layout/Container'
 import { FeaturedAjussiList } from '@/components/home/FeaturedAjussiList'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { AjussiWithProfile } from '@/types/database'
+import { Database } from '@/types/database'
 
 // ISR: 5분마다 재생성 (대부분의 방문자가 캐시된 버전을 봄)
 export const revalidate = 300
 
-async function getFeaturedAjussi(): Promise<AjussiWithProfile[]> {
-  const supabase = await createServerSupabase()
+// Anonymous Supabase client for public data (enables ISR caching)
+const supabase = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
+async function getFeaturedAjussi(): Promise<AjussiWithProfile[]> {
   const { data, error } = await supabase
     .from('ajussi_profiles')
     .select(`
