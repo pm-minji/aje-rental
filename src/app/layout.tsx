@@ -121,6 +121,21 @@ export default function RootLayout({
             </AuthProvider>
           </ToastProvider>
         </ErrorBoundary>
+
+        {/* Naver Analytics */}
+        <Script
+          src="//wcs.pstatic.net/wcslog.js"
+          strategy="afterInteractive"
+        />
+        <Script id="naver-analytics" strategy="afterInteractive">
+          {`
+            if(!wcs_add) var wcs_add = {};
+            wcs_add["wa"] = "6a052c3edb11e8";
+            if(window.wcs) {
+              wcs_do();
+            }
+          `}
+        </Script>
       </body>
     </html>
   )
