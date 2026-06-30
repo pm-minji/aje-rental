@@ -70,10 +70,11 @@ export default function Footer({ showFullFooter = true }: FooterProps) {
         ) : null}
 
         <div className={`${showFullFooter ? 'mt-8 pt-8 border-t border-gray-200' : ''} flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500`}>
-          <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <span>© 2026 아저씨렌탈</span>
             <Link href="/terms" className="hover:text-gray-900">이용약관</Link>
             <Link href="/privacy" className="hover:text-gray-900">개인정보처리방침</Link>
+            <Link href="/refund-policy" className="hover:text-gray-900">취소/환불정책</Link>
           </div>
         </div>
       </div>

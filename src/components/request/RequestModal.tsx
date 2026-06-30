@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -194,6 +195,13 @@ export function RequestModal({
               <ul className="text-sm text-blue-800 space-y-1">
                 <li>• 요청 후 아저씨의 수락을 기다려주세요</li>
                 <li>• 기본 1시간 요금(20,000원)은 선결제됩니다</li>
+                <li>
+                  • 취소 및 환불 기준은{' '}
+                  <Link href="/refund-policy" className="font-medium underline underline-offset-2">
+                    취소/환불정책
+                  </Link>
+                  을 따릅니다
+                </li>
                 <li>• 이동, 식사, 체험 비용 등은 의뢰인이 부담합니다</li>
                 <li>• 공개된 장소에서 만나시기를 권장합니다</li>
                 <li>• 서비스 이용 후 리뷰를 남겨주세요</li>

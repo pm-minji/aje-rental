@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Container } from '@/components/layout/Container'
 import { Card, CardHeader, CardBody } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
@@ -103,7 +104,7 @@ export default function GuidePage() {
                     <div>
                       <h4 className="font-medium">상호 존중과 매너</h4>
                       <p className="text-sm text-gray-600">
-                        서로를 "아저씨", "회원님" 등으로 호칭하며 예의를 지켜주세요.<br />
+                        서로를 &quot;아저씨&quot;, &quot;회원님&quot; 등으로 호칭하며 예의를 지켜주세요.<br />
                         무리한 요구, 폭언, 성희롱 등은 계정 영구 정지 및 법적 조치의 대상이 됩니다.
                       </p>
                     </div>
@@ -142,10 +143,13 @@ export default function GuidePage() {
                 <CardBody>
                   <h3 className="font-semibold mb-2">Q. 예약을 취소하고 싶어요. 환불되나요?</h3>
                   <p className="text-gray-600">
-                    아저씨의 일정 보호를 위해 취소 시점에 따라 위약금이 발생할 수 있습니다.<br />
-                    - 이용 24시간 전: 100% 환불<br />
-                    - 이용 당일 취소: 환불 불가<br />
-                    자세한 내용은 마이페이지 의뢰 관리에서 확인 가능합니다.
+                    예약 시작 24시간 전까지는 선결제 기본요금이 100% 환불되며,
+                    예약 시작 24시간 전 이후 또는 노쇼는 환불이 어려울 수 있습니다.<br />
+                    자세한 기준은{' '}
+                    <Link href="/refund-policy" className="text-primary hover:underline">
+                      취소/환불정책
+                    </Link>
+                    에서 확인해주세요.
                   </p>
                 </CardBody>
               </Card>
