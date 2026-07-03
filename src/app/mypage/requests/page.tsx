@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Container } from '@/components/layout/Container'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
 import { Select } from '@/components/ui/Select'
@@ -18,6 +18,7 @@ const STATUS_OPTIONS = [
   { value: 'COMPLETED', label: '완료' },
   { value: 'REJECTED', label: '거절' },
   { value: 'CANCELLED', label: '취소' },
+  { value: 'EXPIRED', label: '만료' },
 ]
 
 export default function RequestsPage() {
@@ -36,10 +37,28 @@ function RequestsContent() {
   const [sentRequests, setSentRequests] = useState<RequestWithDetails[]>([])
   const [receivedRequests, setReceivedRequests] = useState<RequestWithDetails[]>([])
   const [loading, setLoading] = useState(true)
+  // 결제 완료 반영을 기다리는 지연 재조회 횟수 제한 (무한 폴링 방지)
+  const paymentRefetchCountRef = useRef(0)
 
   useEffect(() => {
     fetchRequests()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter])
+
+  // 결제 후 returnurl로 복귀한 직후엔 웹훅(PAID) 반영이 몇 초 늦을 수 있다.
+  // 결제 대기 건이 남아 있으면 최대 3회까지 지연 재조회해 '결제완료'로 갱신한다.
+  // (결제를 끝내지 않고 이탈한 경우 무한 폴링하지 않도록 횟수를 제한)
+  useEffect(() => {
+    if (loading) return
+    const hasPending = sentRequests.some((r) => r.payment_status === 'PAYMENT_REQUESTED')
+    if (!hasPending || paymentRefetchCountRef.current >= 3) return
+    const timer = setTimeout(() => {
+      paymentRefetchCountRef.current += 1
+      fetchRequests()
+    }, 3000)
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, sentRequests])
 
   const fetchRequests = async () => {
     try {

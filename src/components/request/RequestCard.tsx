@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Calendar, Clock, MapPin, User, MessageCircle, ExternalLink, Star } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Calendar, Clock, MapPin, User, MessageCircle, ExternalLink, Star, Copy, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import { Card } from '@/components/ui/Card'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
@@ -9,9 +9,12 @@ import { Button } from '@/components/ui/Button'
 import { Avatar } from '@/components/ui/Avatar'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal'
 import { useToast } from '@/components/ui/Toast'
-import { formatDateTime } from '@/lib/utils'
+import { formatDateTime, formatCurrency } from '@/lib/utils'
 import { RequestWithDetails } from '@/types/database'
 import { ReviewModal } from '@/components/review/ReviewModal'
+import { paymentStatusLabels, paymentStatusToBadgeVariant } from '@/styles/tokens'
+import { openPayappCheckout } from '@/lib/payapp-client'
+import { DEPOSIT_AMOUNT, depositGoodName } from '@/lib/pricing'
 
 interface RequestCardProps {
   request: RequestWithDetails
@@ -31,12 +34,66 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
   const isClient = userType === 'client'
   const isAjussi = userType === 'ajussi'
 
+  // 결제창으로 이동(같은 탭) 후 뒤로가기(bfcache)로 복귀하면 로딩 상태가 고착된다. pageshow에서 해제.
+  useEffect(() => {
+    const reset = () => setLoading(false)
+    window.addEventListener('pageshow', reset)
+    return () => window.removeEventListener('pageshow', reset)
+  }, [])
+
+  // 결제 완료 또는 결제 도입 이전(legacy) 데이터
+  const isPaidOrLegacy = ['PAID', 'NONE'].includes(request.payment_status ?? 'NONE')
+  const isAwaitingPayment = request.payment_status === 'PAYMENT_REQUESTED'
+
+  // 취소 시 전액 환불 가능 여부 (수락 전 언제든 / 확정 후 예약 24시간 전까지)
+  const hoursUntilService = (new Date(request.date).getTime() - Date.now()) / (60 * 60 * 1000)
+  const isFullyRefundable = request.status === 'PENDING' || hoursUntilService >= 24
+
   // Check if the scheduled service time has passed (date + duration)
   const isServiceTimeOver = (() => {
     const serviceDate = new Date(request.date)
     const endTime = new Date(serviceDate.getTime() + request.duration * 60 * 1000)
     return new Date() > endTime
   })()
+
+  const handleResumePayment = async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    try {
+      setLoading(true)
+      await openPayappCheckout({
+        requestId: request.id,
+        goodname: depositGoodName(request.ajussi_profiles?.title),
+        price: request.deposit_amount ?? DEPOSIT_AMOUNT,
+      })
+    } catch (err) {
+      console.error('Resume payment error:', err)
+      error('결제 오류', '결제창을 여는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      setLoading(false)
+    }
+  }
+
+  const handleCopySummary = async (e?: React.MouseEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
+    const summary = [
+      '[아저씨렌탈 예약 요약]',
+      `일시: ${formatDateTime(request.date)}`,
+      `소요 시간: ${request.duration}분`,
+      `장소: ${request.location}`,
+      `요청 내용: ${request.description}`,
+      request.payment_status === 'PAID'
+        ? `예약금 ${formatCurrency(request.deposit_amount ?? DEPOSIT_AMOUNT)} 결제완료`
+        : '',
+    ].filter(Boolean).join('\n')
+
+    try {
+      await navigator.clipboard.writeText(summary)
+      success('복사 완료', '예약 요약이 복사되었어요. 오픈채팅에 붙여넣어 주세요.')
+    } catch {
+      error('복사 실패', '클립보드 복사에 실패했습니다.')
+    }
+  }
 
   const handleStatusChange = async (newStatus: string) => {
     try {
@@ -79,6 +136,20 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
 
     switch (request.status) {
       case 'PENDING':
+        // 결제 미완료: 이어서 결제 (클라이언트)
+        if (isClient && isAwaitingPayment) {
+          buttons.push(
+            <Button
+              key="pay"
+              size="sm"
+              loading={loading}
+              onClick={handleResumePayment}
+            >
+              <CreditCard className="h-4 w-4 mr-1" />
+              결제하기
+            </Button>
+          )
+        }
         if (isClient) {
           buttons.push(
             <Button
@@ -91,7 +162,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
             </Button>
           )
         }
-        if (isAjussi) {
+        if (isAjussi && isPaidOrLegacy) {
           buttons.push(
             <Button
               key="reject"
@@ -113,7 +184,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
         break
 
       case 'CONFIRMED':
-        if (isServiceTimeOver) {
+        if (isServiceTimeOver && isPaidOrLegacy) {
           buttons.push(
             <Button
               key="complete"
@@ -123,7 +194,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               완료하기
             </Button>
           )
-        } else {
+        } else if (!isServiceTimeOver) {
           buttons.push(
             <Button
               key="complete-disabled"
@@ -137,7 +208,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
           )
         }
         // 채팅하기 버튼은 클라이언트(유저)에게만 표시
-        if (isClient && request.ajussi_profiles?.open_chat_url) {
+        if (isClient && isPaidOrLegacy && request.ajussi_profiles?.open_chat_url) {
           buttons.push(
             <Button
               key="chat"
@@ -148,6 +219,33 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               <MessageCircle className="h-4 w-4 mr-1" />
               채팅하기
               <ExternalLink className="h-3 w-3 ml-1" />
+            </Button>
+          )
+        }
+        // 예약 요약 복사 - 오픈채팅에 붙여넣어 컨텍스트 전달
+        if (isClient && isPaidOrLegacy) {
+          buttons.push(
+            <Button
+              key="copy-summary"
+              variant="outline"
+              size="sm"
+              onClick={handleCopySummary}
+            >
+              <Copy className="h-4 w-4 mr-1" />
+              예약 요약 복사
+            </Button>
+          )
+        }
+        // 확정 후에도 취소 가능 (환불정책: 예약 24시간 전까지 전액 환불)
+        if (isClient) {
+          buttons.push(
+            <Button
+              key="cancel-confirmed"
+              variant="outline"
+              size="sm"
+              onClick={(e) => openConfirmModal('CANCELLED', e)}
+            >
+              취소하기
             </Button>
           )
         }
@@ -203,7 +301,12 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
       case 'CANCELLED':
         return {
           title: '요청 취소',
-          message: '이 서비스 요청을 취소하시겠습니까?',
+          message:
+            request.payment_status === 'PAID'
+              ? isFullyRefundable
+                ? '취소 시 결제하신 예약금이 전액 환불됩니다. 취소하시겠습니까?'
+                : '예약 24시간 이내 취소는 취소/환불정책에 따라 환불되지 않습니다. 그래도 취소하시겠습니까?'
+              : '이 서비스 요청을 취소하시겠습니까?',
           confirmText: '취소하기',
           variant: 'destructive' as const,
         }
@@ -262,7 +365,14 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
                 )}
               </div>
             </div>
-            <StatusBadge status={request.status} />
+            <div className="flex flex-col items-end gap-1">
+              <StatusBadge status={request.status} />
+              {request.payment_status && paymentStatusLabels[request.payment_status] && (
+                <Badge variant={paymentStatusToBadgeVariant[request.payment_status] || 'default'} size="sm">
+                  {paymentStatusLabels[request.payment_status]}
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* Request Details */}
@@ -276,7 +386,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
               <Clock className="h-4 w-4 mr-2" />
               <span>{request.duration}분</span>
               <span className="ml-2 font-medium text-primary">
-                (20,000원 / 첫 1시간)
+                ({formatCurrency(request.deposit_amount ?? DEPOSIT_AMOUNT)} / 첫 1시간)
               </span>
             </div>
 

@@ -122,12 +122,12 @@ export default function RootLayout({
           </ToastProvider>
         </ErrorBoundary>
 
-        {/* Naver Analytics */}
+        {/* Naver Analytics - 방문 집계용이므로 유휴 시점에 로드해 초기 렌더를 막지 않는다 */}
         <Script
           src="//wcs.pstatic.net/wcslog.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="naver-analytics" strategy="afterInteractive">
+        <Script id="naver-analytics" strategy="lazyOnload">
           {`
             if(!wcs_add) var wcs_add = {};
             wcs_add["wa"] = "6a052c3edb11e8";

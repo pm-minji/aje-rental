@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, getUser } from '@/lib/supabase'
+import { DEPOSIT_AMOUNT } from '@/lib/pricing'
+import { sweepExpiredPayments } from '@/lib/payment-sweep'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create the request
+    // Create the request - 결제창은 클라이언트(PayApp JS)가 열고, 결제 확정은 웹훅이 처리
     const { data: newRequest, error: requestError } = await supabase
       .from('requests')
       .insert({
@@ -70,6 +72,8 @@ export async function POST(request: NextRequest) {
         location,
         description,
         status: 'PENDING',
+        payment_status: 'PAYMENT_REQUESTED',
+        deposit_amount: DEPOSIT_AMOUNT,
       })
       .select(`
         *,
@@ -96,7 +100,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // TODO: Send notification to ajussi (implement later with Supabase Realtime)
+    // 아저씨 알림은 결제 완료 웹훅(PAYMENT_COMPLETED) 시점에 발송된다
 
     return NextResponse.json({
       success: true,
@@ -133,6 +137,9 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
+    // 미결제/미수락 만료 처리 (lazy expiry) - 조회 결과에 반영되도록 먼저 실행
+    await sweepExpiredPayments(supabase)
+
     let query = supabase
       .from('requests')
       .select(`
@@ -151,14 +158,22 @@ export async function GET(request: NextRequest) {
         )
       `)
 
+    // 아저씨의 "받은 요청"에는 결제 완료된 요청만 노출한다
+    // (NONE = 결제 도입 이전 데이터는 계속 노출)
+    const unpaidStates = '(PAYMENT_REQUESTED,EXPIRED)'
+
     // Filter by type (sent or received)
     if (type === 'sent') {
       query = query.eq('client_id', user.id)
     } else if (type === 'received') {
-      query = query.eq('ajussi_id', user.id)
+      query = query
+        .eq('ajussi_id', user.id)
+        .not('payment_status', 'in', unpaidStates)
     } else {
       // Both sent and received
-      query = query.or(`client_id.eq.${user.id},ajussi_id.eq.${user.id}`)
+      query = query.or(
+        `client_id.eq.${user.id},and(ajussi_id.eq.${user.id},payment_status.not.in.${unpaidStates})`
+      )
     }
 
     // Filter by status

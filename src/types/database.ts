@@ -50,11 +50,51 @@ export interface Database {
           location: string;
           description: string;
           status: 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
+          payment_status: 'NONE' | 'PAYMENT_REQUESTED' | 'PAID' | 'EXPIRED' | 'REFUND_REQUESTED' | 'REFUNDED' | 'REFUND_DENIED';
+          deposit_amount: number | null;
+          payapp_mul_no: string | null;
+          pay_type: number | null;
+          paid_at: string | null;
+          refund_requested_at: string | null;
+          refund_processed_at: string | null;
+          admin_payment_note: string | null;
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['requests']['Row'], 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Database['public']['Tables']['requests']['Insert']>;
+        Insert: Omit<
+          Database['public']['Tables']['requests']['Row'],
+          'id' | 'created_at' | 'updated_at' | 'payment_status' | 'deposit_amount' | 'payapp_mul_no' | 'pay_type' | 'paid_at' | 'refund_requested_at' | 'refund_processed_at' | 'admin_payment_note'
+        > & Partial<Pick<
+          Database['public']['Tables']['requests']['Row'],
+          'payment_status' | 'deposit_amount' | 'payapp_mul_no' | 'pay_type' | 'paid_at' | 'refund_requested_at' | 'refund_processed_at' | 'admin_payment_note'
+        >>;
+        Update: Partial<Omit<Database['public']['Tables']['requests']['Row'], 'id' | 'created_at' | 'updated_at'>>;
+      };
+      payment_events: {
+        Row: {
+          id: string;
+          request_id: string | null;
+          mul_no: string | null;
+          pay_state: number | null;
+          raw: Record<string, any>;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['payment_events']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['payment_events']['Insert']>;
+      };
+      notification_logs: {
+        Row: {
+          id: string;
+          event_type: string;
+          channel: string;
+          recipient: string;
+          request_id: string | null;
+          status: 'SENT' | 'FAILED';
+          error: string | null;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['notification_logs']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['notification_logs']['Insert']>;
       };
       reviews: {
         Row: {
@@ -114,6 +154,9 @@ export type Favorite = Database['public']['Tables']['favorites']['Row'];
 export type AjussiApplication = Database['public']['Tables']['ajussi_applications']['Row'];
 
 export type RequestStatus = Request['status'];
+export type PaymentStatus = Request['payment_status'];
+export type PaymentEvent = Database['public']['Tables']['payment_events']['Row'];
+export type NotificationLog = Database['public']['Tables']['notification_logs']['Row'];
 
 export interface AjussiWithProfile extends AjussiProfile {
   profiles: Profile;

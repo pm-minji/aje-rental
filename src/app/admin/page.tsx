@@ -11,6 +11,8 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import { AjussiApplication } from '@/types/database'
 import { Badge } from '@/components/ui/Badge'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs'
+import { PaymentManagementTab } from '@/components/admin/PaymentManagementTab'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
@@ -167,31 +169,34 @@ function AdminContent() {
     )
   }
 
-  if (loading) {
-    return (
-      <Container className="py-16">
-        <Loading size="lg" text="신청서 목록을 불러오는 중..." />
-      </Container>
-    )
-  }
-
   return (
     <>
       <PageHeader
         title="관리자 대시보드"
-        description="아저씨 신청서를 검토하고 승인/거절할 수 있습니다"
+        description="아저씨 신청서 검토와 결제/환불을 관리할 수 있습니다"
       />
 
       <Container className="py-8">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
+          <Tabs defaultValue="applications">
+            <TabsList>
+              <TabsTrigger value="applications">아저씨 신청서</TabsTrigger>
+              <TabsTrigger value="payments">결제 관리</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="applications">
+          <div className="mb-6 mt-4">
             <h2 className="text-xl font-semibold mb-2">아저씨 신청서 목록</h2>
             <p className="text-gray-600">
               총 {applications.length}개의 신청서가 있습니다.
             </p>
           </div>
 
-          {applications.length === 0 ? (
+          {loading ? (
+            <div className="py-8">
+              <Loading size="lg" text="신청서 목록을 불러오는 중..." />
+            </div>
+          ) : applications.length === 0 ? (
             <Card>
               <CardBody>
                 <div className="text-center py-8">
@@ -341,6 +346,14 @@ function AdminContent() {
               ))}
             </div>
           )}
+            </TabsContent>
+
+            <TabsContent value="payments">
+              <div className="mt-4">
+                <PaymentManagementTab />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </Container>
     </>

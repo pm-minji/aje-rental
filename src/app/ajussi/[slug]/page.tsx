@@ -1,9 +1,14 @@
 import { Metadata } from 'next'
+import { cache } from 'react'
 import { redirect, notFound } from 'next/navigation'
-import AjussiDetailClient from './AjussiDetailClient'
+import AjussiDetailClient, { AjussiDetailData } from './AjussiDetailClient'
 import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
 import Script from 'next/script'
+
+// 프로필/리뷰 변경이 반영되도록 캐시 수명을 60초로 제한한다.
+// (클라이언트 재조회를 제거했으므로 서버 데이터가 무기한 캐시되면 스테일 고착)
+export const revalidate = 60
 
 // Direct Supabase client for metadata generation (avoids API route overhead)
 const supabase = createClient<Database>(
@@ -12,7 +17,7 @@ const supabase = createClient<Database>(
 )
 
 // Helper type for the query result
-import { AjussiWithProfile } from '@/types/database'
+import { AjussiWithProfile, ReviewWithDetails } from '@/types/database'
 
 // UUID 형식 체크 (기존 URL 리다이렉트용)
 function isUUID(str: string): boolean {
@@ -21,7 +26,8 @@ function isUUID(str: string): boolean {
 }
 
 // slug 또는 id로 아저씨 정보 조회
-async function getAjussiBySlugOrId(slugOrId: string) {
+// cache()로 감싸 generateMetadata와 페이지 본문이 같은 요청 내에서 1회만 조회한다
+const getAjussiBySlugOrId = cache(async (slugOrId: string) => {
   // 1. slug로 먼저 조회
   const { data: bySlug } = await supabase
     .from('ajussi_profiles')
@@ -73,7 +79,59 @@ async function getAjussiBySlugOrId(slugOrId: string) {
   }
 
   return { ajussi: null, needsRedirect: false }
-}
+})
+
+// 리뷰 포함 상세 데이터 - 서버에서 1회 조회 후 클라이언트에 initialData로 전달
+// (기존에는 metadata/페이지/클라이언트가 같은 데이터를 3번 조회했다)
+const getAjussiDetailData = cache(async (slugOrId: string): Promise<AjussiDetailData | null> => {
+  const { ajussi } = await getAjussiBySlugOrId(slugOrId)
+  if (!ajussi || !ajussi.is_active) return null
+
+  const { data: reviews, error: reviewsError } = await supabase
+    .from('reviews')
+    .select(`
+      *,
+      reviewer:profiles!reviewer_id (
+        name,
+        nickname,
+        profile_image
+      ),
+      request:requests!request_id!inner (
+        date,
+        duration,
+        location
+      )
+    `)
+    .eq('request.ajussi_id', ajussi.user_id)
+    .order('created_at', { ascending: false })
+
+  if (reviewsError) {
+    console.error('Error fetching reviews:', reviewsError)
+  }
+
+  const validReviews = (reviews || []) as unknown as ReviewWithDetails[]
+  const averageRating = validReviews.length > 0
+    ? validReviews.reduce((sum, review) => sum + review.rating, 0) / validReviews.length
+    : 0
+
+  // 클라이언트로 내려가는 데이터에는 공개 프로필 필드만 담는다 (email 등 제외)
+  const publicAjussi = {
+    ...ajussi,
+    profiles: {
+      id: ajussi.profiles?.id,
+      name: ajussi.profiles?.name,
+      nickname: ajussi.profiles?.nickname,
+      profile_image: ajussi.profiles?.profile_image,
+    },
+  } as unknown as AjussiWithProfile
+
+  return {
+    ajussi: publicAjussi,
+    reviews: validReviews,
+    averageRating: Math.round(averageRating * 10) / 10,
+    reviewCount: validReviews.length,
+  }
+})
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   try {
@@ -125,6 +183,14 @@ export default async function AjussiDetailPage({ params }: { params: { slug: str
     notFound()
   }
 
+  const initialData = await getAjussiDetailData(params.slug)
+
+  // 비활성(is_active=false) 아저씨는 상세 데이터가 null → 404 처리.
+  // (클라이언트에서 재조회 후 에러 토스트가 뜨던 문제 방지)
+  if (!initialData) {
+    notFound()
+  }
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -143,8 +209,8 @@ export default async function AjussiDetailPage({ params }: { params: { slug: str
     },
     aggregateRating: {
       '@type': 'AggregateRating',
-      ratingValue: '5.0', // TODO: 리뷰 데이터에서 동적으로 계산
-      reviewCount: '1',
+      ratingValue: initialData && initialData.reviewCount > 0 ? String(initialData.averageRating) : '5.0',
+      reviewCount: String(initialData && initialData.reviewCount > 0 ? initialData.reviewCount : 1),
     },
   }
 
@@ -155,7 +221,7 @@ export default async function AjussiDetailPage({ params }: { params: { slug: str
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <AjussiDetailClient slug={params.slug} />
+      <AjussiDetailClient slug={params.slug} initialData={initialData} />
     </>
   )
 }
