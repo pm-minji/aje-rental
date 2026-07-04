@@ -24,8 +24,10 @@ import { RequestModal } from '@/components/request/RequestModal'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { AjussiWithProfile, ReviewWithDetails } from '@/types/database'
 import { pushToDataLayer } from '@/lib/gtm'
+import { openPayappCheckout } from '@/lib/payapp-client'
+import { DEPOSIT_AMOUNT, depositGoodName } from '@/lib/pricing'
 
-interface AjussiDetailData {
+export interface AjussiDetailData {
   ajussi: AjussiWithProfile
   reviews: ReviewWithDetails[]
   averageRating: number
@@ -34,18 +36,23 @@ interface AjussiDetailData {
 
 interface AjussiDetailClientProps {
   slug: string
+  initialData?: AjussiDetailData | null
 }
 
-export default function AjussiDetailClient({ slug }: AjussiDetailClientProps) {
+export default function AjussiDetailClient({ slug, initialData }: AjussiDetailClientProps) {
   const { isAuthenticated } = useAuth()
   const { error, success } = useToast()
-  const [data, setData] = useState<AjussiDetailData | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<AjussiDetailData | null>(initialData ?? null)
+  const [loading, setLoading] = useState(!initialData)
   const [isFavorited, setIsFavorited] = useState(false)
   const [showRequestModal, setShowRequestModal] = useState(false)
 
   useEffect(() => {
-    fetchAjussiDetail()
+    // 서버에서 initialData를 받았으면 클라이언트 재조회를 생략한다
+    if (!initialData) {
+      fetchAjussiDetail()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug])
 
   const fetchAjussiDetail = async () => {
@@ -143,32 +150,43 @@ export default function AjussiDetailClient({ slug }: AjussiDetailClientProps) {
   }
 
   const handleSubmitRequest = async (requestData: any) => {
-    try {
-      const response = await fetch('/api/requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ajussiId: data?.ajussi.user_id,
-          ...requestData,
-        }),
-      })
-
-      const result = await response.json()
-      if (!result.success) {
-        throw new Error(result.error)
-      }
-
-      pushToDataLayer({
-        event: 'service_requested',
+    const response = await fetch('/api/requests', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         ajussiId: data?.ajussi.user_id,
-        ajussiTitle: data?.ajussi.title,
-        location: requestData.location,
-        duration: requestData.duration,
+        ...requestData,
+      }),
+    })
+
+    const result = await response.json()
+    if (!result.success) {
+      throw new Error(result.error)
+    }
+
+    pushToDataLayer({
+      event: 'service_requested',
+      ajussiId: data?.ajussi.user_id,
+      ajussiTitle: data?.ajussi.title,
+      location: requestData.location,
+      duration: requestData.duration,
+    })
+
+    // 예약 = 결제: 생성된 요청으로 페이앱 결제창을 같은 탭에서 바로 연다.
+    // 결제창 열기에 실패해도 요청은 이미 생성됐으므로(PAYMENT_REQUESTED),
+    // 모달에서 '요청 실패'로 오인해 재제출(중복 생성)하지 않도록 마이페이지로 이동해
+    // '결제하기'로 이어서 결제하게 한다.
+    try {
+      await openPayappCheckout({
+        requestId: result.data.id,
+        goodname: depositGoodName(data?.ajussi.title),
+        price: DEPOSIT_AMOUNT,
       })
-    } catch (err) {
-      throw err
+    } catch (checkoutErr) {
+      console.error('Failed to open PayApp checkout:', checkoutErr)
+      window.location.href = '/mypage/requests'
     }
   }
 

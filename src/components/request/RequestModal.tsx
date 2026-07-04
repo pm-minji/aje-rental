@@ -14,6 +14,7 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { formatCurrency } from '@/lib/utils'
+import { DEPOSIT_AMOUNT, EXTRA_HOURLY_RATE } from '@/lib/pricing'
 
 const requestSchema = z.object({
   date: z.string().min(1, '날짜를 선택해주세요'),
@@ -61,7 +62,7 @@ export function RequestModal({
   onSubmit,
 }: RequestModalProps) {
   const [loading, setLoading] = useState(false)
-  const { success, error } = useToast()
+  const { error } = useToast()
 
   const {
     register,
@@ -82,13 +83,11 @@ export function RequestModal({
   const handleFormSubmit = async (data: RequestFormData) => {
     try {
       setLoading(true)
+      // onSubmit이 요청 생성 후 페이앱 결제창으로 이동시키므로
+      // 성공 시 모달을 닫지 않고 로딩 상태를 유지한다
       await onSubmit(data)
-      success('요청 완료', '서비스 요청이 성공적으로 전송되었습니다.')
-      reset()
-      onClose()
     } catch (err) {
       error('요청 실패', '서비스 요청 중 오류가 발생했습니다.')
-    } finally {
       setLoading(false)
     }
   }
@@ -157,11 +156,11 @@ export function RequestModal({
               <div className="mt-2 p-3 bg-gray-50 rounded-md text-sm">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-gray-600">기본 요금 (첫 1시간)</span>
-                  <span className="font-semibold text-primary">20,000원</span>
+                  <span className="font-semibold text-primary">{formatCurrency(DEPOSIT_AMOUNT)}</span>
                 </div>
                 <div className="flex justify-between items-center text-gray-500 text-xs">
                   <span>추가 시간</span>
-                  <span>시간당 10,000원 (현장 정산)</span>
+                  <span>시간당 {formatCurrency(EXTRA_HOURLY_RATE)} (현장 정산)</span>
                 </div>
               </div>
             </FormField>
@@ -193,8 +192,8 @@ export function RequestModal({
                 📋 요청 전 확인사항
               </h4>
               <ul className="text-sm text-blue-800 space-y-1">
-                <li>• 요청 후 아저씨의 수락을 기다려주세요</li>
-                <li>• 기본 1시간 요금(20,000원)은 선결제됩니다</li>
+                <li>• 결제 완료 후 아저씨의 수락을 기다려주세요</li>
+                <li>• 기본 1시간 요금({formatCurrency(DEPOSIT_AMOUNT)})은 선결제되며, 아저씨 수락 전에는 취소 시 전액 환불됩니다</li>
                 <li>
                   • 취소 및 환불 기준은{' '}
                   <Link href="/refund-policy" className="font-medium underline underline-offset-2">
@@ -225,7 +224,7 @@ export function RequestModal({
               loading={loading}
               disabled={loading}
             >
-              {loading ? '요청 중...' : '요청하기'}
+              {loading ? '결제창으로 이동 중...' : `${formatCurrency(DEPOSIT_AMOUNT)} 결제하기`}
             </Button>
           </FormActions>
         </ModalFooter>

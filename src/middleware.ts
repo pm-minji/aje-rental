@@ -13,6 +13,18 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(redirectUrl, { status: 301 })
     }
 
+    // 보호된 경로에서만 Supabase 인증을 확인한다.
+    // 공개 페이지(홈/목록/상세)와 API 라우트는 자체적으로 인증을 처리하므로
+    // 모든 요청마다 인증 서버를 호출할 필요가 없다 (요청당 50~200ms 절약).
+    const protectedPaths = ['/mypage', '/admin']
+    const isProtectedPath = protectedPaths.some(path =>
+        request.nextUrl.pathname.startsWith(path)
+    )
+
+    if (!isProtectedPath) {
+        return NextResponse.next()
+    }
+
     let supabaseResponse = NextResponse.next({
         request,
     })
@@ -48,13 +60,7 @@ export async function middleware(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // 보호된 경로 체크 (로그인 필요한 페이지들)
-    const protectedPaths = ['/mypage']
-    const isProtectedPath = protectedPaths.some(path =>
-        request.nextUrl.pathname.startsWith(path)
-    )
-
-    if (isProtectedPath && !user) {
+    if (!user) {
         // 로그인 안 된 상태에서 보호된 경로 접근 시 로그인 페이지로 리다이렉트
         const url = request.nextUrl.clone()
         url.pathname = '/auth/login'

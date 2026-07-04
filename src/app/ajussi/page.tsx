@@ -90,11 +90,17 @@ export default function AjussiListPage() {
     }
   }
 
+  // 목록과 즐겨찾기를 분리 - 로그인 상태가 늦게 확정되어도 목록 전체를 다시 불러오지 않는다
   useEffect(() => {
     fetchAjussiList(1, filters)
-    fetchFavorites()
     setCurrentPage(1)
-  }, [filters, isAuthenticated])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters])
+
+  useEffect(() => {
+    fetchFavorites()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated])
 
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters)

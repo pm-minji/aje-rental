@@ -65,6 +65,7 @@ export async function GET(
     }
 
     // Get reviews for this ajussi
+    // !inner 조인이 없으면 필터가 임베드에만 적용되어 전체 리뷰가 반환된다
     const { data: reviews, error: reviewsError } = await supabase
       .from('reviews')
       .select(`
@@ -74,13 +75,13 @@ export async function GET(
           nickname,
           profile_image
         ),
-        request:requests!request_id (
+        request:requests!request_id!inner (
           date,
           duration,
           location
         )
       `)
-      .eq('requests.ajussi_id', ajussi.user_id)
+      .eq('request.ajussi_id', ajussi.user_id)
       .order('created_at', { ascending: false })
 
     if (reviewsError) {

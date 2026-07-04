@@ -35,6 +35,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [supabase] = useState(() => createClientSupabase())
   const router = useRouter()
   const pathname = usePathname()
+  // 이미 프로필을 불러온 유저 id - 토큰 갱신/탭 포커스 때마다
+  // /api/auth/create-profile을 반복 호출하지 않기 위한 가드
+  const loadedProfileUserIdRef = useRef<string | null>(null)
 
   // Simple redirect disable mechanism
   const disableRedirect = () => {
@@ -75,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               setUser(session.user)
               setProfile(profileData)
               setSession(session)
+              loadedProfileUserIdRef.current = session.user.id
             }
           } catch (error) {
             console.error('Error fetching profile during initial session check:', error)
@@ -111,8 +115,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // console.log('Processing user session...')
 
           // Only fetch profile and potentially redirect after initial load is complete
-          // and if we're not on the setup page
-          const shouldFetchProfile = initialLoadComplete && !pathname.includes('/auth/setup-profile')
+          // and if we're not on the setup page.
+          // 같은 유저의 프로필이 이미 로드돼 있으면(TOKEN_REFRESHED 등) 재조회하지 않는다.
+          const alreadyLoaded = loadedProfileUserIdRef.current === session.user.id
+          const shouldFetchProfile =
+            initialLoadComplete && !pathname.includes('/auth/setup-profile') && !alreadyLoaded
 
           if (shouldFetchProfile) {
             const profileData = await fetchProfile(session.user.id, true) // Allow redirect
@@ -122,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(session.user)
             setProfile(profileData)
             setSession(session)
+            loadedProfileUserIdRef.current = profileData ? session.user.id : null
           } else {
             // Just update user and session without fetching profile
             setUser(session.user)
@@ -132,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(null)
           setProfile(null)
           setSession(null)
+          loadedProfileUserIdRef.current = null
         }
 
         if (mounted) {

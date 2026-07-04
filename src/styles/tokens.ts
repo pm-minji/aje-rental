@@ -186,3 +186,31 @@ export const statusLabels: Record<string, string> = {
     EXPIRED: '만료',
     APPROVED: '승인',
 }
+
+// ============================================================
+// 결제 상태 (requests.payment_status)
+// ============================================================
+
+/**
+ * 결제 상태 → Badge variant 매핑
+ */
+export const paymentStatusToBadgeVariant: Record<string, BadgeVariant> = {
+    PAYMENT_REQUESTED: 'warning',
+    PAID: 'success',
+    EXPIRED: 'secondary',
+    REFUND_REQUESTED: 'warning',
+    REFUNDED: 'secondary',
+    REFUND_DENIED: 'error',
+}
+
+/**
+ * 결제 상태 라벨 매핑 (NONE은 배지 미표시)
+ */
+export const paymentStatusLabels: Record<string, string> = {
+    PAYMENT_REQUESTED: '결제 대기',
+    PAID: '결제완료',
+    EXPIRED: '결제 만료',
+    REFUND_REQUESTED: '환불 처리중',
+    REFUNDED: '환불완료',
+    REFUND_DENIED: '환불 불가',
+}
