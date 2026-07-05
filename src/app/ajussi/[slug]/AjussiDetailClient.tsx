@@ -24,7 +24,7 @@ import { RequestModal } from '@/components/request/RequestModal'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { AjussiWithProfile, ReviewWithDetails } from '@/types/database'
 import { pushToDataLayer } from '@/lib/gtm'
-import { openPayappCheckout } from '@/lib/payapp-client'
+import { openCheckout } from '@/lib/checkout-client'
 import { DEPOSIT_AMOUNT, depositGoodName } from '@/lib/pricing'
 
 export interface AjussiDetailData {
@@ -179,13 +179,13 @@ export default function AjussiDetailClient({ slug, initialData }: AjussiDetailCl
     // 모달에서 '요청 실패'로 오인해 재제출(중복 생성)하지 않도록 마이페이지로 이동해
     // '결제하기'로 이어서 결제하게 한다.
     try {
-      await openPayappCheckout({
+      await openCheckout({
         requestId: result.data.id,
         goodname: depositGoodName(data?.ajussi.title),
         price: DEPOSIT_AMOUNT,
       })
     } catch (checkoutErr) {
-      console.error('Failed to open PayApp checkout:', checkoutErr)
+      console.error('Failed to open checkout:', checkoutErr)
       window.location.href = '/mypage/requests'
     }
   }

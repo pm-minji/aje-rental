@@ -1,6 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database'
-import { cancelPayment } from '@/lib/payapp'
+import { refundExternalPayment } from '@/lib/payment-refund'
 import { notify } from '@/lib/notifications'
 import { PAYMENT_EXPIRE_HOURS } from '@/lib/pricing'
 
@@ -48,10 +48,10 @@ export async function sweepExpiredPayments(supabase: SupabaseClient<Database>): 
       if (!updated || updated.length === 0) continue
 
       if (req.payapp_mul_no) {
-        await cancelPayment({
-          mulNo: req.payapp_mul_no,
+        await refundExternalPayment({
+          ref: req.payapp_mul_no,
+          unpaid: true,
           memo: '기한 내 미결제로 요청 만료',
-          mode: 'ready',
         })
       }
       await notify({
@@ -91,11 +91,12 @@ export async function sweepExpiredPayments(supabase: SupabaseClient<Database>): 
 
       // 선점 성공 후에만 실제 환불을 실행한다
       const cancel = req.payapp_mul_no
-        ? await cancelPayment({
-            mulNo: req.payapp_mul_no,
+        ? await refundExternalPayment({
+            ref: req.payapp_mul_no,
+            unpaid: false,
             memo: '아저씨 미수락으로 예약 만료 - 전액 환불',
           })
-        : { ok: false, error: 'payapp_mul_no missing' }
+        : { ok: false, error: 'external ref missing' }
 
       if (cancel.ok) {
         await supabase

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, createServerClient } from '@/lib/supabase'
 import { cancelPayment } from '@/lib/payapp'
+import { refundSale } from '@/lib/gumroad'
+import { getPaymentProvider } from '@/lib/payment-provider'
 import { notify } from '@/lib/notifications'
 
 export const dynamic = 'force-dynamic'
@@ -104,15 +106,28 @@ export async function POST(
     const paidAmount = req.deposit_amount ?? 0
     const isPartial = !!amount && amount > 0 && amount < paidAmount
 
-    const cancel = await cancelPayment({
-      mulNo: req.payapp_mul_no,
-      memo: note || '관리자 환불 처리',
-      partAmount: isPartial ? amount : undefined,
-    })
+    // 제공자별 외부 환불 실행
+    let cancel: { ok: boolean; error?: string }
+    if (getPaymentProvider() === 'gumroad') {
+      if (isPartial) {
+        // Gumroad 부분환불은 통화·금액 매핑이 모호하므로 대시보드에서 처리하도록 안내
+        return NextResponse.json(
+          { success: false, error: 'Gumroad 부분환불은 Gumroad 대시보드에서 처리해주세요. 여기서는 전액 환불만 지원합니다.' },
+          { status: 400 }
+        )
+      }
+      cancel = await refundSale(req.payapp_mul_no)
+    } else {
+      cancel = await cancelPayment({
+        mulNo: req.payapp_mul_no,
+        memo: note || '관리자 환불 처리',
+        partAmount: isPartial ? amount : undefined,
+      })
+    }
 
     if (!cancel.ok) {
       return NextResponse.json(
-        { success: false, error: `페이앱 환불 실패: ${cancel.error}` },
+        { success: false, error: `환불 실패: ${cancel.error}` },
         { status: 502 }
       )
     }

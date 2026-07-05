@@ -13,7 +13,7 @@ import { formatDateTime, formatCurrency } from '@/lib/utils'
 import { RequestWithDetails } from '@/types/database'
 import { ReviewModal } from '@/components/review/ReviewModal'
 import { paymentStatusLabels, paymentStatusToBadgeVariant } from '@/styles/tokens'
-import { openPayappCheckout } from '@/lib/payapp-client'
+import { openCheckout } from '@/lib/checkout-client'
 import { DEPOSIT_AMOUNT, depositGoodName } from '@/lib/pricing'
 
 interface RequestCardProps {
@@ -61,7 +61,7 @@ export function RequestCard({ request, userType, onStatusChange }: RequestCardPr
     e?.stopPropagation()
     try {
       setLoading(true)
-      await openPayappCheckout({
+      await openCheckout({
         requestId: request.id,
         goodname: depositGoodName(request.ajussi_profiles?.title),
         price: request.deposit_amount ?? DEPOSIT_AMOUNT,
