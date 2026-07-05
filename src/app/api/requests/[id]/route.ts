@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase, getUser } from '@/lib/supabase'
-import { cancelPayment } from '@/lib/payapp'
+import { refundExternalPayment } from '@/lib/payment-refund'
 import { notify } from '@/lib/notifications'
 
 export const dynamic = 'force-dynamic'
@@ -124,10 +124,7 @@ export async function PUT(
     let refundFailure: string | undefined
 
     const fullRefund = async (memo: string) => {
-      if (!existingRequest.payapp_mul_no) {
-        return { ok: false, error: 'payapp_mul_no missing' }
-      }
-      return cancelPayment({ mulNo: existingRequest.payapp_mul_no, memo })
+      return refundExternalPayment({ ref: existingRequest.payapp_mul_no, unpaid: false, memo })
     }
 
     const applyRefundResult = (cancel: { ok: boolean; error?: string }) => {
@@ -152,13 +149,13 @@ export async function PUT(
 
     if (status === 'CANCELLED') {
       if (existingRequest.payment_status === 'PAYMENT_REQUESTED') {
-        // 미결제 취소: 열려 있는 결제요청 무효화.
+        // 미결제 취소: (페이앱) 열려 있는 결제요청 무효화 / (Gumroad) 취소할 sale 없음 → no-op.
         // payment_status는 PAYMENT_REQUESTED로 유지해 아저씨 목록(결제완료 건만 노출)에서 계속 숨긴다.
         if (existingRequest.payapp_mul_no) {
-          await cancelPayment({
-            mulNo: existingRequest.payapp_mul_no,
+          await refundExternalPayment({
+            ref: existingRequest.payapp_mul_no,
+            unpaid: true,
             memo: '요청 취소로 결제요청 무효화',
-            mode: 'ready',
           })
         }
       } else if (existingRequest.payment_status === 'PAID') {
