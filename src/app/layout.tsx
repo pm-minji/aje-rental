@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import BusinessInformation from '@/components/layout/BusinessInformation'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
@@ -114,7 +115,7 @@ export default function RootLayout({
                   <main className="flex-1 bg-white pb-16 lg:pb-0">
                     {children}
                   </main>
-                  <Footer />
+                  <Footer businessInformation={<BusinessInformation />} />
                   <BottomNav />
                 </div>
               </AuthLoadingWrapper>

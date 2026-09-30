@@ -3,21 +3,21 @@
 import Link from 'next/link'
 import { Mail } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import type { ReactNode } from 'react'
 
 interface FooterProps {
   showFullFooter?: boolean;
+  businessInformation?: ReactNode;
 }
 
-export default function Footer({ showFullFooter = true }: FooterProps) {
+export default function Footer({ showFullFooter = true, businessInformation }: FooterProps) {
   const pathname = usePathname()
-
-  // Only show footer on the home page
-  if (pathname !== '/') return null
+  const showBrand = showFullFooter && pathname === '/'
 
   return (
     <footer className="bg-gray-50 border-t mt-auto pb-20 lg:pb-0">
       <div className="container mx-auto px-4 py-8">
-        {showFullFooter ? (
+        {showBrand ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 브랜드 정보 */}
             <div>
@@ -69,7 +69,9 @@ export default function Footer({ showFullFooter = true }: FooterProps) {
           </div>
         ) : null}
 
-        <div className={`${showFullFooter ? 'mt-8 pt-8 border-t border-gray-200' : ''} flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500`}>
+        {businessInformation}
+
+        <div className={`${showBrand || businessInformation ? 'mt-8 pt-8 border-t border-gray-200' : ''} flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500`}>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <span>© 2026 아저씨렌탈</span>
             <Link href="/terms" className="hover:text-gray-900">이용약관</Link>
