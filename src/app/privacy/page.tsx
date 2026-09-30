@@ -92,15 +92,13 @@ export default function PrivacyPage() {
                   <li>물리적 조치: 전산실, 자료보관실 등의 접근통제</li>
                 </ul>
 
-                <h2>9. 개인정보보호책임자</h2>
+                <h2>9. 개인정보 관련 문의 및 권리 행사</h2>
                 <p>
-                  회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의
-                  불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보보호책임자를 지정하고 있습니다.
+                  개인정보 열람·정정·삭제·처리정지 요청과 개인정보 관련 불만은
+                  아래 고객 지원 이메일로 보내주세요.
                 </p>
                 <ul>
-                  <li>개인정보보호책임자: 개발팀장</li>
-                  <li>연락처: privacy@ajussi-rental.com</li>
-                  <li>전화번호: 1588-0000</li>
+                  <li>이메일: <a href="mailto:joon@pm-minji.com">joon@pm-minji.com</a></li>
                 </ul>
 
                 <h2>10. 개인정보 처리방침 변경</h2>
@@ -112,7 +110,7 @@ export default function PrivacyPage() {
                 <div className="mt-8 p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-gray-600">
                     <strong>시행일자:</strong> 2026년 1월 1일<br />
-                    <strong>최종 수정일:</strong> 2026년 1월 1일
+                    <strong>최종 수정일:</strong> 2026년 9월 30일
                   </p>
                 </div>
               </div>
